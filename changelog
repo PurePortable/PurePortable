@@ -1,0 +1,13 @@
+﻿(!) исправлено
+(*) изменено
+(+) добавлено
+(-) удалено
+(?) непонятно ))
+
+
+[4.10.0.7] 2024-03-19 13:00:00
+(*) PureApps: Секция [Cleanup.Files] в PurePort.ini переименована в [Cleanup].
+(*) PureApps: Параметр CleanupFiles в секции [Portable] PurePort.ini переименован в Cleanup.
+(+) PureApps: Добавлен параметр CleanupRootDir в секции [Portable] PurePort.ini.
+(+) PureApps: Добавлен параметр AllDirs в секцию [SpecialFolders] для установки общего значения для всех видов перенаправления, кроме Documents.
+(+) PureApps: Скрипт Increment-Build.ps1 для автоматического инкримента билда.
