@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.6
+;RES_VERSION 4.10.0.7
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -31,7 +31,7 @@ XIncludeFile "PurePortableCustom.pbi"
 
 ;;----------------------------------------------------------------------------------------------------------------------
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
-#PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
+#PORTABLE_REGISTRY = 2 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
@@ -242,6 +242,7 @@ Procedure.s PreferencePath(Path.s="")
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
+;XIncludeFile "PP_Registry2Detours-Test.pbi"
 Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
 	Protected i
@@ -397,6 +398,14 @@ ProcedureDLL.l AttachProcess(Instance)
 
 	; Перенаправляемые специальные папки
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
+		p = PreferencePath(ReadPreferenceString("AllDirs",""))
+		If p
+			ProfileRedir = p
+			AppDataRedir = p
+			LocalAppDataRedir = p
+			LocalLowAppDataRedir = p
+			CommonAppDataRedir = p
+		EndIf
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
@@ -532,7 +541,7 @@ ProcedureDLL.l DetachProcess(Instance)
 	EndIf
 	
 	If PreferenceGroup("Portable")
-		If ReadPreferenceInteger("CleanupFiles",0)
+		If ReadPreferenceInteger("Cleanup",0)
 			Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup")
 		EndIf
 	EndIf
@@ -551,20 +560,32 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	Protected RetCode
 	Protected Heap = HeapCreate_(0,0,0)
 	Protected *buf = HeapAlloc_(Heap,#HEAP_ZERO_MEMORY,4)
-	
+	Protected CleanupRootDir.s, lCleanupRootDir
 	If PreferenceGroup("Debug")
 		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
 	EndIf
+	If PreferenceGroup("Portable")
+		;If ReadPreferenceInteger("Cleanup",0) = 0
+		;	ProcedureReturn
+		;EndIf
+		CleanupRootDir = PreferencePath(ReadPreferenceString("CleanupRootDir",""))
+	EndIf
+	If CleanupRootDir = ""
+		CleanupRootDir = DllDirN
+	EndIf
+	DbgCln("CleanupRootDir: "+CleanupRootDir)
+	CleanupRootDir = LCase(CleanupRootDir+"\") ; обязательно "\" в конце
+	lCleanupRootDir = Len(CleanupRootDir)
 	
 	; Чистка
 	Protected SHFileOp.SHFILEOPSTRUCT
-	If PreferenceGroup("Cleanup.Files")
+	If PreferenceGroup("Cleanup")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			p = PreferencePath(PreferenceKeyName())
 			DbgCln("Cleanup: "+p)
-			; Для безопасности проверим путь - начало пути должно совпадать с DllDir (с "\" на конце!)
-			If LCase(Left(p,Len(DllDir))) <> LCase(DllDir)
+			; Для безопасности проверим путь - начало пути должно совпадать с CleanupRootDir
+			If LCase(Left(p,lCleanupRootDir)) <> CleanupRootDir
 				DbgCln("Cleanup: Wrong path!"+p)
 				Continue
 			EndIf
@@ -615,20 +636,20 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 535
-; FirstLine = 451
-; Folding = vyX0-
+; CursorPosition = 33
+; FirstLine = 12
+; Folding = vy40-
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.6
+; VersionField0 = 4.10.0.7
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.6
+; VersionField5 = 4.10.0.7
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
