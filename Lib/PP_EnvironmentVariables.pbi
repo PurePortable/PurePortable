@@ -31,7 +31,7 @@ CompilerIf #DBG_ENVIRONMENT_VARIABLES
 	Global DbgEnvList.s = "appdata|localappdata|userprofile|allusersprofile|programdata|public|home|homedrive|homepath|temp|tmp|tmpdir|programdir|commonprogramfiles|commonprogramfiles(x86)|commonprogramw6432|programdata|programfiles|programfiles(x86)|programw6432|systemroot|windir|driverdata"
 	Procedure DbgEnv(txt.s,var.s="")
 		If DbgEnvMode
-			If var="" Or (DbgEnvMode=1 And FindString(DbgEnvList,LCase(var))>0)
+			If var="" Or (DbgEnvMode=1 And FindString(DbgEnvList,LCase(var))>0) Or DbgEnvMode=2
 				dbg(txt)
 			EndIf
 		EndIf
@@ -62,10 +62,10 @@ Procedure.s env2path(Env.s)
 		DbgEnv("env2path: "+ProfileRedir)
 		Result = ProfileRedir
 	ElseIf Env="homedrive" And ProfileRedir
-		DbgEnv("env2path: "+ProfileRedir)
+		DbgEnv("env2path: "+HomeDriveRedir)
 		Result = HomeDriveRedir
 	ElseIf Env="homepath" And ProfileRedir
-		DbgEnv("env2path: "+ProfileRedir)
+		DbgEnv("env2path: "+HomePathRedir)
 		Result = HomePathRedir
 	ElseIf Env="appdata" And AppDataRedir
 		DbgEnv("env2path: "+AppDataRedir)
@@ -189,7 +189,9 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 ; 		ProcedureReturn *new
 ; 	EndProcedure
 
-	Declare _GetEnvironmentStrings(CodePage)
+	;Declare _GetEnvironmentStrings(CodePage)
+	Declare _GetEnvironmentStringsA()
+	Declare _GetEnvironmentStringsW()
 
 	; https://learn.microsoft.com/ru-ru/windows/win32/api/processenv/nf-processenv-getenvironmentstrings
 	Prototype GetEnvironmentStrings()
@@ -200,7 +202,7 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_GetEnvironmentStrings()
 		CompilerElse
-			Result = _GetEnvironmentStrings(#PB_Ascii)
+			Result = _GetEnvironmentStringsA()
 		CompilerEndIf
 		DbgEnv("GetEnvironmentStrings: "+Str(Result))
 		ProcedureReturn Result
@@ -213,7 +215,7 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_GetEnvironmentStringsA()
 		CompilerElse
-			Result = _GetEnvironmentStrings(#PB_Ascii)
+			Result = _GetEnvironmentStringsA()
 		CompilerEndIf
 		DbgEnv("GetEnvironmentStringsA: "+Str(Result))
 		ProcedureReturn Result
@@ -226,7 +228,7 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_GetEnvironmentStringsW()
 		CompilerElse
-			Result = _GetEnvironmentStrings(#PB_Unicode)
+			Result = _GetEnvironmentStringsW()
 		CompilerEndIf
 		DbgEnv("GetEnvironmentStringsW: "+Str(Result))
 		ProcedureReturn Result
@@ -234,11 +236,11 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 	;Global Trampoline_GetEnvironmentStringsW = @Detour_GetEnvironmentStringsW()
 
 	Global EnvHeap = HeapCreate_(0,0,0)
-	Procedure _GetEnvironmentStrings(CodePage)
+	Procedure _GetEnvironmentStringsA()
 		EnvCriticalEnter
-		Protected CharSize, block
 
 		; Ищем свободный блок
+		Protected block
 		For block=1 To nEnvBlocks
 			If EnvBlocks(block)=0
 				Break
@@ -251,55 +253,106 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		EndIf
 
 		; Блок переменных
-		Protected *block
-		If CodePage=#PB_Ascii
-			CharSize = 1
-			*block = Original_GetEnvironmentStringsA()
-		Else
-			CharSize = 2
-			*block = Original_GetEnvironmentStringsW()
-		EndIf
+		Protected *OrigBlock = Original_GetEnvironmentStringsA()
 
 		; Перебираем переменные и помещаем их в буфер
-		Protected *new = HeapAlloc_(EnvHeap,#HEAP_ZERO_MEMORY,CharSize) ; Пустой буфер с одним нулевым символом (HEAP_ZERO_MEMORY+HEAP_NO_SERIALIZE)
+		Protected *NewBlock = HeapAlloc_(EnvHeap,#HEAP_ZERO_MEMORY,1) ; Пустой буфер с одним нулевым символом (HEAP_ZERO_MEMORY+HEAP_NO_SERIALIZE)
+		Protected NewSize = 1 ; Начальная длина в один нулевой символ
 		;DbgEnv("HeapAlloc: "+Str(*new))
-		Protected NewOffset, BlockOffset   ; текущие смещения для копирования
-		Protected n
-		Protected cBlock, cEnv
+		Protected EnvOffset ; Смещение относительно начала нового блока в байтах, куда пишем очередную переменную
+		Protected EnvSize ; Размер под текущую переменную в байтах с учётом конечного нулевого символа
 		Protected Env.s, Path.s
+		Protected n
 
-		cBlock = MemoryStringLength(*block)*CharSize
-		While cBlock
-			Env = PeekS(*block+BlockOffset,-1,CodePage)
-			;dbg("Env: "+Env)
+		Protected *orig.Byte = *OrigBlock
+		While *orig\b ; самая последняя запись будет иметь длину равную нулю
+			Env = PeekS(*orig,-1,#PB_Ascii)
+			*orig + Len(Env)+1 ; следующая переменная
+			DbgEnv("Env: "+Env)
 			n = FindString(Env,"=")
 			If n
 				Path = env2path(Left(Env,n-1))
 				If Path
 					Env = Left(Env,n)+Path
-					;dbg("New: "+Env)
+					DbgEnv("  -> "+Env+"="+Path)
 				EndIf
 			EndIf
-			cEnv = Len(Env)*CharSize
-			*new = HeapReAlloc_(EnvHeap,#HEAP_ZERO_MEMORY,*new,NewOffset+cEnv+CharSize+CharSize) ; + два нулевых символа (конец строки и конец блока)
+			EnvSize = Len(Env)+1
+			NewSize + EnvSize
+			*NewBlock = HeapReAlloc_(EnvHeap,#HEAP_ZERO_MEMORY,*NewBlock,NewSize) ; + два нулевых символа (конец строки и конец блока)
 			;DbgEnv("HeapReAlloc: "+Str(*new))
-			PokeS(*new+NewOffset,Env)
-
-			BlockOffset+cBlock+CharSize ; следующая переменная
-			NewOffset+cEnv+CharSize	 ; нулевой символ в конце блока
-			cBlock = MemoryStringLength(*block+BlockOffset)*CharSize
+			PokeS(*NewBlock+EnvOffset,Env,-1,#PB_Ascii)
+			EnvOffset + EnvSize
 		Wend
 
-		; Освобождаем память
-		If CodePage=#PB_Ascii
-			Original_FreeEnvironmentStringsA(*block)
-		Else
-			Original_FreeEnvironmentStringsW(*block)
+		Original_FreeEnvironmentStringsA(*OrigBlock)
+		EnvBlocks(block) = *NewBlock
+		EnvCriticalLeave
+		ProcedureReturn *NewBlock
+	EndProcedure
+	Procedure _GetEnvironmentStringsW()
+		EnvCriticalEnter
+
+		; Ищем свободный блок
+		Protected block
+		For block=1 To nEnvBlocks
+			If EnvBlocks(block)=0
+				Break
+			EndIf
+		Next
+		; По окончании block будет содержать номер свободного блока либо на 1 больше nEnvBlocks
+		If block>nEnvBlocks
+			nEnvBlocks = block
+			ReDim EnvBlocks(block)
 		EndIf
 
-		EnvBlocks(block) = *new
+		; Блок переменных
+		Protected *OrigBlock = Original_GetEnvironmentStringsW()
+
+		; Перебираем переменные и помещаем их в буфер
+		Protected *NewBlock = HeapAlloc_(EnvHeap,#HEAP_ZERO_MEMORY,2) ; Пустой буфер с одним нулевым символом (HEAP_ZERO_MEMORY+HEAP_NO_SERIALIZE)
+		Protected NewSize = 2 ; Начальная длина в один нулевой символ
+		;DbgEnv("HeapAlloc: "+Str(*new))
+		Protected EnvOffset ; Смещение относительно начала нового блока в байтах, куда пишем очередную переменную
+		Protected EnvSize ; Размер под текущую переменную в байтах с учётом конечного нулевого символа
+		Protected Env.s, Path.s
+		Protected n
+
+		Protected *orig.Word = *OrigBlock
+		While *orig\w ; самая последняя запись будет иметь длину равную нулю
+			Env = PeekS(*orig)
+			*orig + Len(Env)*2+2 ; следующая переменная
+			DbgEnv("Env: "+Env)
+			n = FindString(Env,"=")
+			If n
+				Path = env2path(Left(Env,n-1))
+				If Path
+					Env = Left(Env,n)+Path
+					DbgEnv("  -> "+Env+"="+Path)
+				EndIf
+			EndIf
+			EnvSize = Len(Env)*2+2
+			NewSize + EnvSize
+			*NewBlock = HeapReAlloc_(EnvHeap,#HEAP_ZERO_MEMORY,*NewBlock,NewSize) ; + два нулевых символа (конец строки и конец блока)
+			;DbgEnv("HeapReAlloc: "+Str(*new))
+			PokeS(*NewBlock+EnvOffset,Env)
+			EnvOffset + EnvSize
+		Wend
+
+		Original_FreeEnvironmentStringsW(*OrigBlock)
+		EnvBlocks(block) = *NewBlock
 		EnvCriticalLeave
-		ProcedureReturn *new
+		
+		; тестирование блока
+; 		*orig = *NewBlock
+; 		dbg("GetEnvironmentStringsW")
+; 		While *orig\w
+; 			Env = PeekS(*orig)
+; 			dbg("  "+Env)
+; 			*orig + Len(Env)*2+2
+; 		Wend
+			
+		ProcedureReturn *NewBlock
 	EndProcedure
 
 	Procedure _FreeEnvironmentStrings(*penv)
@@ -493,10 +546,10 @@ CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 			DbgEnv("env2ptr: "+ProfileRedir)
 			Result = iif(Ansi,@ProfileRedirA,@ProfileRedir)
 		ElseIf Env="homedrive" And ProfileRedir
-			DbgEnv("env2ptr: "+ProfileRedir)
+			DbgEnv("env2ptr: "+HomeDriveRedir)
 			Result = iif(Ansi,@HomeDriveRedirA,@HomeDriveRedir)
 		ElseIf Env="homepath" And ProfileRedir
-			DbgEnv("env2ptr: "+ProfileRedir)
+			DbgEnv("env2ptr: "+HomePathRedir)
 			Result = iif(Ansi,@HomePathRedirA,@HomePathRedir)
 		ElseIf Env="appdata" And AppDataRedir
 			DbgEnv("env2ptr: "+AppDataRedir)
@@ -581,7 +634,7 @@ Procedure _InitEnvironmentVariablesHooks()
 	If EnvironmentVariablesPermit
 		If ProfileRedir
 			HomeDriveRedir = Left(ProfileRedir,2)
-			HomePathRedir = ProfileRedir
+			HomePathRedir = Mid(ProfileRedir,3)
 		EndIf
 		CompilerIf #DETOUR_ENVIRONMENTVARIABLE
 			MH_HookApi(kernel32,GetEnvironmentVariableA)
@@ -631,9 +684,9 @@ AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 30
-; FirstLine = 12
+; CursorPosition = 238
+; FirstLine = 229
 ; Folding = -----
-; Markers = 237
+; Markers = 294
 ; DisableDebugger
 ; EnableExeConstant
