@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.7
+;RES_VERSION 4.10.0.8
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -14,6 +14,7 @@
 ;RES_PRODUCTVERSION 4.10.0.0
 ;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
+;PP_X32_COPYAS "P:\GamesX\BVS Solitaire Collection\BVS Solitaire Collection 9.0\PurePort.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
@@ -31,7 +32,7 @@ XIncludeFile "PurePortableCustom.pbi"
 
 ;;----------------------------------------------------------------------------------------------------------------------
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
-#PORTABLE_REGISTRY = 2 ; Перехват функций для работы с реестром
+#PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
@@ -326,7 +327,20 @@ ProcedureDLL.l AttachProcess(Instance)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
 	SetEnvironmentVariable("PP_DllPath",DllPath)
 	SetEnvironmentVariable("PP_DllDir",DllDirN)
-
+	If PreferenceGroup("Startup.SetEnvironmentVariables")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			;v = PreferenceKeyValue()
+			p = PreferencePath()
+			If p
+				SetEnvironmentVariable(k,p)
+			Else
+				RemoveEnvironmentVariable(k)
+			EndIf
+		Wend
+	EndIf
+	
 	; Общие параметры
 	If PreferenceGroup("Portable")
 		RegistryPermit = ReadPreferenceInteger("Registry",0)
@@ -405,6 +419,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			LocalAppDataRedir = p
 			LocalLowAppDataRedir = p
 			CommonAppDataRedir = p
+			CreatePath(p)
 		EndIf
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
@@ -414,20 +429,25 @@ ProcedureDLL.l AttachProcess(Instance)
 			Select LCase(k)
 				Case "profile"
 					ProfileRedir = p
+					CreatePath(p)
 				Case "appdata"
 					AppDataRedir = p
+					CreatePath(p)
 				Case "localappdata"
 					LocalAppDataRedir = p
+					CreatePath(p)
 				Case "localappdatalow"
 					LocalLowAppDataRedir = p
+					CreatePath(p)
 				Case "commonappdata"
 					CommonAppDataRedir = p
+					CreatePath(p)
 				Case "documents"
 					DocumentsRedir = p
-					CreateDirectory(p)
+					CreatePath(p)
 				Case "commondocuments"
 					CommonDocumentsRedir = p
-					CreateDirectory(p)
+					CreatePath(p)
 			EndSelect
 		Wend
 	EndIf
@@ -636,20 +656,20 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 33
-; FirstLine = 12
-; Folding = vy40-
+; CursorPosition = 449
+; FirstLine = 352
+; Folding = vyX0-
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.7
+; VersionField0 = 4.10.0.8
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.7
+; VersionField5 = 4.10.0.8
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
