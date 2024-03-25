@@ -16,8 +16,8 @@
 ;RES_PRODUCTNAME Pure Portable
 ;RES_PRODUCTVERSION 4.10.0.0
 ;RES_COMMENT PAM Project
-;PP_X32_COPYAS "P:\PurePortable\All\proxy32.dll"
-;PP_X64_COPYAS "P:\PurePortable\All\proxy64.dll"
+;PP_X32_COPYAS "P:\PurePortable\Apps\proxy32.dll"
+;PP_X64_COPYAS "P:\PurePortable\Apps\proxy64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
@@ -232,7 +232,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		CommonAppDataRedir = PrgDirN
 		;DocumentsRedir = PrgDirN+"\Documents"
 		;CommonDocumentsRedir = DocumentsRedir
-		;CreateDirectory(DocumentsRedir)
+		;CreatePath(DocumentsRedir)
 	CompilerEndIf
 	;}
 

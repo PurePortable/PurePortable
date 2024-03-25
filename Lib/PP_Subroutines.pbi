@@ -591,15 +591,17 @@ CompilerIf Not Defined(PROC_NORMALIZEPATH,#PB_Constant) : #PROC_NORMALIZEPATH = 
 ;CanonicalizePath
 ;CompilerIf #PROC_NORMALIZEPATH
 Procedure.s NormalizePath(Path.s)
-	Protected NewPath.s = Path + "\."
-	Protected *Buf
-	Protected LenBuf = GetFullPathName_(@NewPath,0,#Null,#Null)
-	If LenBuf
-		*Buf = AllocateMemory(LenBuf*2)
-		GetFullPathName_(@NewPath,LenBuf,*Buf,#Null)
-		NewPath = PeekS(*Buf)
-		FreeMemory(*Buf)
-		ProcedureReturn NewPath
+	If Path ; Иначе вернём корень текущего диска
+		Protected NewPath.s = Path + "\."
+		Protected *Buf
+		Protected LenBuf = GetFullPathName_(@NewPath,0,#Null,#Null)
+		If LenBuf
+			*Buf = AllocateMemory(LenBuf*2)
+			GetFullPathName_(@NewPath,LenBuf,*Buf,#Null)
+			NewPath = PeekS(*Buf)
+			FreeMemory(*Buf)
+			ProcedureReturn NewPath
+		EndIf
 	EndIf
 	ProcedureReturn Path
 EndProcedure
@@ -619,7 +621,11 @@ Procedure DirectoryExist(fn.s)
 	ProcedureReturn Bool(attr<>#INVALID_FILE_ATTRIBUTES And (attr&#FILE_ATTRIBUTE_DIRECTORY))
 	;ProcedureReturn PathIsDirectory_(@fn)
 EndProcedure
-
+; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexw
+DeclareImport(shell32,_SHCreateDirectoryExW@12,SHCreateDirectoryExW,SHCreateDirectoryEx_(hWnd,*pszPath,*psa))
+Procedure CreatePath(Path.s)
+	SHCreateDirectoryEx_(0,@Path,#Null)
+EndProcedure
 ;=======================================================================================================================
 ; Проверка версии/имени файла
 
@@ -777,8 +783,8 @@ EndProcedure
 ;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 610
-; FirstLine = 580
+; CursorPosition = 626
+; FirstLine = 587
 ; Folding = ---z9-+--
 ; EnableAsm
 ; EnableThread

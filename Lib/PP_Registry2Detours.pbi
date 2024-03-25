@@ -277,10 +277,6 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTEDW
 	;Global Trampoline_RegOpenKeyTransactedW = @Detour_RegOpenKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
-; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shregopenuskeya
-Prototype.l SHRegOpenUSKey(*pszPath,samDesired,hRelativeUSKey.l,*phNewUSKey.Long,fIgnoreHKCU)
-
-;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKey(hKey.l,*lpSubKey)
 CompilerIf #DETOUR_REGDELETEKEYA
 	Global Original_RegDeleteKeyA.RegDeleteKey
@@ -1020,8 +1016,8 @@ CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 1009
-; FirstLine = 985
+; CursorPosition = 278
+; FirstLine = 276
 ; Folding = --------
 ; EnableThread
 ; DisableDebugger
