@@ -4,6 +4,11 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.8] 2024-03-25 23:00:00
+(+) PP_Subroutines.pbi: Добавлена общая процедура CreatePath для создания папки, включая создание промежуточных папок.
+(+) PureApps: Секция [Startup.SetEnvironmentVariables] для установки переменных среды при старте программы.
+(+) PureApps: Принудительное создание папок, заданных в секции [SpecialFolders].
+(+) _PurePortableTemplate.pb: Замена CreateDirectory на CreatePath.
 
 [4.10.0.7] 2024-03-19 13:00:00
 (*) PureApps: Секция [Cleanup.Files] в PurePort.ini переименована в [Cleanup].
