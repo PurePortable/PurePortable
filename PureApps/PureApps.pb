@@ -14,7 +14,6 @@
 ;RES_PRODUCTVERSION 4.10.0.0
 ;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
-;PP_X32_COPYAS "P:\GamesX\BVS Solitaire Collection\BVS Solitaire Collection 9.0\PurePort.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
