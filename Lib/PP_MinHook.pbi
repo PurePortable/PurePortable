@@ -3,14 +3,21 @@ CompilerIf Not Defined(DBG_MIN_HOOK,#PB_Constant) : #DBG_MIN_HOOK = 0 : Compiler
 
 ;CompilerIf Not Defined(MINHOOK,#PB_Constant) : #MINHOOK = 1 : CompilerEndIf
 CompilerIf Not Defined(MIN_HOOK,#PB_Constant) : #MIN_HOOK = 1 : CompilerEndIf
-CompilerIf Not Defined(MIN_HOOK_CHECKRESULT,#PB_Constant) : #MIN_HOOK_CHECKRESULT = 1 : CompilerEndIf
 
 CompilerIf #DBG_MIN_HOOK
-	;UndefineMacro dbgany
 	Macro DbgMinHook(txt) : dbg(txt) : EndMacro
 CompilerElse
 	Macro DbgMinHook(txt) : EndMacro
 CompilerEndIf
+CompilerIf #DBG_MIN_HOOK Or Defined(MIN_HOOK_ERROR_MODE,#PB_Constant)
+	Macro DbgMinHookError(txt) : dbg(txt) : EndMacro
+CompilerElse
+	Macro DbgMinHookError(txt) : EndMacro
+CompilerEndIf
+
+;CompilerIf Not Defined(MIN_HOOK_CHECKRESULT,#PB_Constant) : #MIN_HOOK_CHECKRESULT = 1 : CompilerEndIf
+CompilerIf Not Defined(MIN_HOOK_ERROR_MODE,#PB_Constant) : #MIN_HOOK_ERROR_MODE = 2 : CompilerEndIf
+;#MIN_HOOK_ERROR_MODE = 2
 
 ;;======================================================================================================================
 CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
@@ -83,44 +90,42 @@ EndMacro
 ; 	MH_EnableHook(Target_#FuncName)
 ; EndMacro
 
-CompilerIf #DBG_MIN_HOOK Or #MIN_HOOK_CHECKRESULT
-	Procedure.s _MH_Error(ErrorNum)
-		Protected ErrorText.s
-		Select ErrorNum
-			Case #MH_ERROR_ALREADY_INITIALIZED
-				ErrorText = " ERROR ALREADY INITIALIZED"
-			Case #MH_ERROR_NOT_INITIALIZED
-				ErrorText = " ERROR NOT INITIALIZED"
-			Case #MH_ERROR_ALREADY_CREATED
-				ErrorText = " ERROR ALREADY CREATED"
-			Case #MH_ERROR_NOT_CREATED
-				ErrorText = " ERROR NOT CREATED"
-			Case #MH_ERROR_ENABLED
-				ErrorText = " ERROR ENABLED"
-			Case #MH_ERROR_DISABLED
-				ErrorText = " ERROR DISABLED"
-			Case #MH_ERROR_NOT_EXECUTABLE
-				ErrorText = " ERROR NOT EXECUTABLE"
-			Case #MH_ERROR_UNSUPPORTED_FUNCTION
-				ErrorText = " ERROR UNSUPPORTED FUNCTION"
-			Case #MH_ERROR_MEMORY_ALLOC
-				ErrorText = " ERROR MEMORY ALLOC"
-			Case #MH_ERROR_MEMORY_PROTECT
-				ErrorText = " ERROR MEMORY PROTECT"
-			Case #MH_ERROR_MODULE_NOT_FOUND
-				ErrorText = " ERROR MODULE NOT FOUND"
-			Case #MH_ERROR_FUNCTION_NOT_FOUND
-				ErrorText = " ERROR FUNCTION NOT FOUND"
-			Default
-				ErrorText = " (UNKNOWN)"
-		EndSelect
-		ProcedureReturn Str(ErrorNum)+ErrorText
-	EndProcedure
-CompilerEndIf
+Procedure.s _MH_Error(ErrorNum)
+	Protected ErrorText.s
+	Select ErrorNum
+		Case #MH_ERROR_ALREADY_INITIALIZED
+			ErrorText = " ERROR ALREADY INITIALIZED"
+		Case #MH_ERROR_NOT_INITIALIZED
+			ErrorText = " ERROR NOT INITIALIZED"
+		Case #MH_ERROR_ALREADY_CREATED
+			ErrorText = " ERROR ALREADY CREATED"
+		Case #MH_ERROR_NOT_CREATED
+			ErrorText = " ERROR NOT CREATED"
+		Case #MH_ERROR_ENABLED
+			ErrorText = " ERROR ENABLED"
+		Case #MH_ERROR_DISABLED
+			ErrorText = " ERROR DISABLED"
+		Case #MH_ERROR_NOT_EXECUTABLE
+			ErrorText = " ERROR NOT EXECUTABLE"
+		Case #MH_ERROR_UNSUPPORTED_FUNCTION
+			ErrorText = " ERROR UNSUPPORTED FUNCTION"
+		Case #MH_ERROR_MEMORY_ALLOC
+			ErrorText = " ERROR MEMORY ALLOC"
+		Case #MH_ERROR_MEMORY_PROTECT
+			ErrorText = " ERROR MEMORY PROTECT"
+		Case #MH_ERROR_MODULE_NOT_FOUND
+			ErrorText = " ERROR MODULE NOT FOUND"
+		Case #MH_ERROR_FUNCTION_NOT_FOUND
+			ErrorText = " ERROR FUNCTION NOT FOUND"
+		Default
+			ErrorText = " (UNKNOWN)"
+	EndSelect
+	ProcedureReturn Str(ErrorNum)+ErrorText
+EndProcedure
 
 ; Procedure _MH_EnableHook(pTarget)
 ; 	Protected Result = MH_EnableHook(pTarget)
-; 	CompilerIf #DBG_MIN_HOOK Or #MIN_HOOK_CHECKRESULT
+; 	CompilerIf #DBG_MIN_HOOK Or Defined(MIN_HOOK_ERROR_MODE,#PB_Constant)
 ; 		If Result = #MH_OK
 ; 			DbgMinHook("MINHOOK ENABLE: OK")
 ; 		Else
@@ -131,6 +136,8 @@ CompilerEndIf
 ; 	ProcedureReturn Result
 ; EndProcedure
 
+Global MinHookErrorMode = #MIN_HOOK_ERROR_MODE
+
 Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.Integer,flags=0)
 	Protected ErrorText.s
 	Protected MH_Status = MH_CreateHookApiEx(pszModule,pszProcName,*pDetour,*ppOriginal,*ppTarget)
@@ -138,32 +145,32 @@ Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.I
 		DbgMinHook("MINHOOK CREATE: "+pszModule+"."+pszProcName+" OK")
 		If flags & #MH_HOOKAPI_INIT
 			MH_Status = MH_EnableHook(*ppTarget\i)
-			CompilerIf #DBG_MIN_HOOK Or #MIN_HOOK_CHECKRESULT
-				If MH_Status = #MH_OK
-					DbgMinHook("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" OK")
-				Else
-					ErrorText.s = _MH_Error(MH_Status)
-					;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
-					DbgMinHook("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
-					If (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-						MessageBox_(0,"Error enable hook "+pszModule+"."+pszProcName+#CR$+ErrorText,"PurePortable",#MB_ICONERROR)
+			If MH_Status = #MH_OK
+				DbgMinHook("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" OK")
+			Else
+				ErrorText.s = _MH_Error(MH_Status)
+				;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
+				DbgMinHookError("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
+				If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
+					MessageBox_(0,"Error enable hook "+pszModule+"."+pszProcName+#CR$+ErrorText,"PurePortable",#MB_ICONERROR)
+					If MinHookErrorMode = 2
 						;RaiseError(#ERROR_DLL_INIT_FAILED)
 						TerminateProcess_(GetCurrentProcess_(),0)
 					EndIf
 				EndIf
-			CompilerEndIf
+			EndIf
 		EndIf
 	Else
-		CompilerIf #DBG_MIN_HOOK Or #MIN_HOOK_CHECKRESULT
-			ErrorText.s = _MH_Error(MH_Status)
-			;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
-			DbgMinHook("MINHOOK CREATE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
-			If (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-				MessageBox_(0,"Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText,"PurePortable",#MB_ICONERROR)
+		ErrorText.s = _MH_Error(MH_Status)
+		;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
+		DbgMinHook("MINHOOK CREATE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
+		If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
+			MessageBox_(0,"Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText,"PurePortable",#MB_ICONERROR)
+			If MinHookErrorMode = 2
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			EndIf
-		CompilerEndIf
+		EndIf
 	EndIf
 	ProcedureReturn MH_Status
 EndProcedure
@@ -173,8 +180,8 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 159
-; FirstLine = 126
+; CursorPosition = 19
 ; Folding = --
+; Markers = 18,148
 ; DisableDebugger
 ; EnableExeConstant

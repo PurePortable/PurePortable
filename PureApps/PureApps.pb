@@ -356,6 +356,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			PermanentFile = PreferencePath(p)
 		EndIf
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
+		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 	EndIf
 
 	; Вывод отладочной информации
