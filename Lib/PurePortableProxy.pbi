@@ -25,7 +25,8 @@ CompilerEndIf
 ;Global WinDir.s
 Global SysDir.s
 ;Global TempDir.s
-;Global DllPath.s, DllDir.s, DllDirN.s, DllName.s
+Global PrgPath.s
+Global DllPath.s
 Global DllDir.s
 Global DllDirN.s
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
@@ -63,8 +64,11 @@ Procedure _GlobalInitialization()
 	;TempDir = RTrim(buf,"\")
 	
 	Protected *buf = AllocateMemory(#MAX_PATH_EXTEND*2)
+	GetModuleFileName_(0,*buf,#MAX_PATH_EXTEND)
+	PrgPath = PeekS(*buf)
 	GetModuleFileName_(DllInstance,*buf,#MAX_PATH_EXTEND)
 	; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovefilespeca
+	DllPath = PeekS(*buf)
 	PathRemoveFileSpec_(*buf) ; Удаляет имя файла в конце и обратную косую черту из пути, если они присутствуют.
 	DllDirN = PeekS(*buf)
 	DllDir = DllDirN+"\"
@@ -75,16 +79,12 @@ Procedure _GlobalInitialization()
 	
 EndProcedure
 _GlobalInitialization()
+dbg("ATTACHPROCESS: "+PrgPath)
+dbg("ATTACHPROCESS: "+DllPath)
 
 ;;======================================================================================================================
 XIncludeFile "PP_Proxy.pbi"
 XIncludeFile "Proxy\"+#PROXY_DLL+".pbi"
-
-;;======================================================================================================================
-; Вывод общей информации при аттаче dll
-
-;dbg("ATTACHPROCESS: "+PrgPath)
-;dbg("ATTACHPROCESS: "+DllPath)
 
 ;=======================================================================================================================
 ; https://www.rsdn.org/article/qna/baseserv/fileexist.xml
@@ -107,8 +107,8 @@ CompilerEndIf
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 96
-; FirstLine = 73
+; CursorPosition = 82
+; FirstLine = 71
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
