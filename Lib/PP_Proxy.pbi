@@ -3,14 +3,32 @@
 ;;======================================================================================================================
 
 CompilerIf Not Defined(DBG_PROXY_DLL,#PB_Constant) : #DBG_PROXY_DLL = 0 : CompilerEndIf
-CompilerIf Not Defined(PROXY_DLL_ERROR_IGNORE,#PB_Constant) : #PROXY_DLL_ERROR_IGNORE = 0 : CompilerEndIf
+
 CompilerIf #DBG_PROXY_DLL
-	;UndefineMacro dbgany : DbgAnyDef
-	Macro dbgproxy(txt) : dbg(txt) : EndMacro
-	;Macro dbgproxy2(txt) : dbg(txt) : EndMacro
+	Macro DbgProxy(txt) : dbg(txt) : EndMacro
 CompilerElse
-	Macro dbgproxy(txt) : EndMacro
-	;Macro dbgproxy2(txt) : EndMacro
+	Macro DbgProxy(txt) : EndMacro
+CompilerEndIf
+CompilerIf #DBG_PROXY_DLL
+	Macro DbgProxyInit(txt) : dbg(txt) : EndMacro
+CompilerElse
+	Macro DbgProxyInit(txt) : EndMacro
+CompilerEndIf
+CompilerIf Defined(PROXY_ERROR_MODE,#PB_Constant)
+	Macro DbgProxyError(txt) : dbg(txt) : EndMacro
+CompilerElse
+	Macro DbgProxyError(txt) : EndMacro
+CompilerEndIf
+CompilerIf Not Defined(PROXY_ERROR_MODE,#PB_Constant)
+	CompilerIf Defined(PROXY_DLL_ERROR_IGNORE,#PB_Constant)
+		CompilerIf #PROXY_DLL_ERROR_IGNORE
+			#PROXY_ERROR_MODE = 0
+		CompilerElse
+			#PROXY_ERROR_MODE = 2
+		CompilerEndIf
+	CompilerElse
+		#PROXY_ERROR_MODE = 2
+	CompilerEndIf
 CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -170,7 +188,7 @@ EndMacro
 Macro DeclareProxyFunc(DllName,FuncName,Compat=0)
 	CompilerIf Compat=0 Or Compat<=#PROXY_DLL_COMPATIBILITY
 		ProcedureDLL FuncName()
-			dbgproxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
+			DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
 			CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 				!JMP [v_Trampoline_#FuncName]
 			CompilerElse
@@ -192,7 +210,7 @@ EndMacro
 Macro DeclareProxyConflictFunc(DllName,FuncName,ConflictFuncName,Compat=0)
 	CompilerIf Compat=0 Or Compat<=#PROXY_DLL_COMPATIBILITY
 		ProcedureDLL ConflictFuncName()
-			dbgproxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
+			DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
 			CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 				!JMP [v_Trampoline_#FuncName]
 			CompilerElse
@@ -205,7 +223,7 @@ Macro DeclareProxyConflictFunc(DllName,FuncName,ConflictFuncName,Compat=0)
 			!DB SingleQuote#FuncName#SingleQuote, 0
 		EndDataSection
 		Global Trampoline_#FuncName = _InitProxyFunc(hDll_#DllName,?FuncAsciiName_#FuncName)
-		;dbgproxy(ProxyFuncInitMsg FuncName#DoubleQuote)
+		;DbgProxy(ProxyFuncInitMsg FuncName#DoubleQuote)
 	CompilerEndIf
 EndMacro
 
@@ -215,7 +233,7 @@ EndMacro
 Macro DeclareProxyFuncExt(DllName,DllExt,FuncName,Compat=0)
 	CompilerIf Compat=0 Or Compat<=#PROXY_DLL_COMPATIBILITY
 		ProcedureDLL FuncName()
-			dbgproxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
+			DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
 			CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 				!JMP [v_Trampoline_#FuncName]
 			CompilerElse
@@ -228,7 +246,7 @@ Macro DeclareProxyFuncExt(DllName,DllExt,FuncName,Compat=0)
 			!DB SingleQuote#FuncName#SingleQuote, 0
 		EndDataSection
 		Global Trampoline_#FuncName = _InitProxyFunc(hDll_#DllName,?FuncAsciiName_#FuncName)
-		;dbgproxy(ProxyFuncInitMsg FuncName#DoubleQuote)
+		;DbgProxy(ProxyFuncInitMsg FuncName#DoubleQuote)
 	CompilerEndIf
 EndMacro
 
@@ -236,7 +254,7 @@ EndMacro
 Macro DeclareProxyFuncDelay(DllName,FuncName)
 	Global Trampoline_#FuncName
 	ProcedureDLL FuncName()
-		dbgproxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
+		DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
 		CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 			!MOV EAX, DWORD [v_Trampoline_#FuncName]
 			!AND EAX, EAX
@@ -276,29 +294,37 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 EndMacro
 
 ;;----------------------------------------------------------------------------------------------------------------------
+; Режим обработаки ошибок инициализации прокси-функций
+; 0 - Выключен, ошибки выводятся только dbg.
+; 1 - При первой ошибке выдаётся предупреждение, программа продолжает работу.
+; 2 - При первой ошибке выдаётся предупреждение, программа завершает работу.
+Global ProxyErrorMode = #PROXY_ERROR_MODE
 ; Обёртка над GetProcAddress
 Procedure.i _InitProxyFunc(hDll,*AsciiFuncName)
 	Protected ProcAddr = GetProcAddress_(hDll,*AsciiFuncName)
 	If Not ProcAddr
-		dbgproxy("InitProxyFunc: "+PeekS(*AsciiFuncName,-1,#PB_Ascii)+" ERROR "+Str(GetLastError_()))
-		CompilerIf Not #PROXY_DLL_ERROR_IGNORE
+		DbgProxyError("InitProxyFunc: "+PeekS(*AsciiFuncName,-1,#PB_Ascii)+" ERROR "+Str(GetLastError_()))
+		If ProxyErrorMode
 			MessageBox_(0,"Error init proxy function "+PeekS(*AsciiFuncName,-1,#PB_Ascii),"PurePortable",#MB_ICONERROR)
-			;RaiseError(#ERROR_DLL_INIT_FAILED)
-			TerminateProcess_(GetCurrentProcess_(),0)
-			ProcedureReturn
-		CompilerEndIf
+			If ProxyErrorMode=2
+				;RaiseError(#ERROR_DLL_INIT_FAILED)
+				TerminateProcess_(GetCurrentProcess_(),0)
+			EndIf
+			ProxyErrorMode = 0
+		EndIf
+		ProcedureReturn #Null
 	EndIf
-	dbgproxy("InitProxyFunc: "+PeekS(*AsciiFuncName,-1,#PB_Ascii)+" OK")
+	DbgProxyInit("InitProxyFunc: "+PeekS(*AsciiFuncName,-1,#PB_Ascii)+" OK")
 	ProcedureReturn ProcAddr
 EndProcedure
 Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассемблера
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 186
-; FirstLine = 161
+; CursorPosition = 314
+; FirstLine = 285
 ; Folding = ----
-; Markers = 147
+; Markers = 7,165,305
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

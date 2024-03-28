@@ -23,6 +23,7 @@ IncludePath "..\lib" ; Для доступа к файлам рядом с ис�
 
 #PROXY_DLL = "pureport"
 ;#PROXY_DLL_COMPATIBILITY = 7 ; Совместимость: 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
+#PROXY_ERROR_MODE = 0
 
 XIncludeFile "PurePortableProxy.pbi"
 ;;======================================================================================================================
@@ -51,8 +52,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 25
-; FirstLine = 2
+; CursorPosition = 26
 ; Folding = -
 ; Optimizer
 ; EnableThread

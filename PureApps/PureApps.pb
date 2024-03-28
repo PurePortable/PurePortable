@@ -18,7 +18,7 @@
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\lib" ; Для доступа к файлам рядом с исходником можно использовать #PB_Compiler_FilePath
+IncludePath "..\Lib"
 XIncludeFile "PurePortableCustom.pbi"
 
 #PROXY_DLL = "pureport"
@@ -52,7 +52,9 @@ XIncludeFile "PurePortableCustom.pbi"
 #PROFILE_STRINGS_FILENAME = "PurePortable"
 #PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
-
+;{ Обработка ошибок
+;#PROXY_ERROR_MODE = 0
+;}
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Диагностика
 #DBG_REGISTRY = #DBG_REG_MODE_MAX
@@ -353,6 +355,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		If p
 			PermanentFile = PreferencePath(p)
 		EndIf
+		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 	EndIf
 
 	; Вывод отладочной информации
@@ -655,9 +658,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 449
-; FirstLine = 352
-; Folding = vyX0-
+; CursorPosition = 55
+; FirstLine = 39
+; Folding = fkv7-
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
