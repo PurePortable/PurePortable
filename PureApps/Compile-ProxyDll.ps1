@@ -23,7 +23,10 @@ param (
 	[switch] $x64
 	,
 	[Parameter(Mandatory=$false)]
-	[switch] $xDir # Раскидывать по папкам x32, x64
+	[string] $Dir32
+	,
+	[Parameter(Mandatory=$false)]
+	[string] $Dir64
 	,
 	[Parameter(Mandatory=$false)]
 	[switch] $CorrectExport
@@ -85,7 +88,12 @@ Get-Content -Lit $SrcFile -Enc UTF8 | foreach {
 	Add-Content -Lit $Tmp -Value $s -Enc UTF8
 }
 if ($x32 -or ((-not $x32) -and (-not $x64))) { # Компиляция x32
-	if ($xDir) { $SubDir = "x32" }
+	if ($Dir32) {
+		$SubDir = $Dir32
+		if (-not (Test-Path $SubDir -Type Container)) {
+			New-Item $SubDir -Type Directory
+		}
+	}
 	& "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe" /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
 	if ($CorrectExport) {
 		.\PPCorrectExportC "$SubDir\$OutFile"
@@ -94,7 +102,12 @@ if ($x32 -or ((-not $x32) -and (-not $x64))) { # Компиляция x32
 	Remove-Item -Lit "$SubDir\$OutName.lib" -Force -ErrorAction Ignore
 }
 if ($x64 -or ((-not $x32) -and (-not $x64))) { # Компиляция x64
-	if ($xDir) { $SubDir = "x64" }
+	if ($Dir64) {
+		$SubDir = $Dir64
+		if (-not (Test-Path $SubDir -Type Container)) {
+			New-Item $SubDir -Type Directory
+		}
+	}
 	& "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe" /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
 	if ($CorrectExport) {
 		.\PPCorrectExportC "$SubDir\$OutFile"

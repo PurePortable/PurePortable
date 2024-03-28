@@ -2,6 +2,6 @@
 Set-Location -Lit $CurrentDir
 [System.IO.Directory]::SetCurrentDirectory($CurrentDir)
 
-.\Compile-ProxyDll "PureApps" "PurePort" -xDir -O "PurePort1" -C "PORTABLE_REGISTRY=1" -RC "PureApps1"
-.\Compile-ProxyDll "PureApps" "PurePort" -xDir -O "PurePort1xp" -C "PORTABLE_REGISTRY=1","PROXY_DLL_COMPATIBILITY=5" -x32 -RC "PureApps1"
-.\Compile-ProxyDll "PureApps" "PurePort" -xDir -O "PurePort2" -C "PORTABLE_REGISTRY=2" -RC "PureApps2"
+.\Compile-ProxyDll "PureApps" "PurePort" -Dir32 "x32" -Dir64 "x64" -O "PurePort1" -C "PORTABLE_REGISTRY=1" -RC "PureApps1"
+.\Compile-ProxyDll "PureApps" "PurePort" -Dir32 "x32" -Dir64 "x64" -O "PurePort1xp" -C "PORTABLE_REGISTRY=1","PROXY_DLL_COMPATIBILITY=5" -x32 -RC "PureApps1"
+.\Compile-ProxyDll "PureApps" "PurePort" -Dir32 "x32" -Dir64 "x64" -O "PurePort2" -C "PORTABLE_REGISTRY=2" -RC "PureApps2"

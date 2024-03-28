@@ -9,11 +9,11 @@ Set-Location -Lit $CurrentDir
 	"mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "secur32"
 	"urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wintrust", "wtsapi32"
 	"shfolder"
-) | foreach { .\Compile-ProxyDll "Proxy" $_ -xDir }
+) | foreach { .\Compile-ProxyDll "Proxy" $_ -Dir32 "x32" -Dir64 "x64" }
 
 @(
 	"msimg32"
 	#"shell32", "user32"
-) | foreach {.\Compile-ProxyDll "Proxy" $_ -xDir -CorrectExport}
+) | foreach {.\Compile-ProxyDll "Proxy" $_ -Dir32 "x32" -Dir64 "x64" -CorrectExport}
 
-.\Compile-ProxyDll "Proxy" "winspool" -xDir -Out "winspool.drv"
+.\Compile-ProxyDll "Proxy" "winspool" -Dir32 "x32" -Dir64 "x64" -Out "winspool.drv"
