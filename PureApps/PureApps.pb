@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.8
+;RES_VERSION 4.10.0.9
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -54,6 +54,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_ENTRYPOINT = 0
 ;{ Обработка ошибок
 ;#PROXY_ERROR_MODE = 0
+#MIN_HOOK_ERROR_MODE = 2
 ;}
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Диагностика
@@ -659,8 +660,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 55
-; FirstLine = 39
+; CursorPosition = 56
+; FirstLine = 30
 ; Folding = fkv7-
 ; Optimizer
 ; EnableThread
@@ -668,11 +669,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.8
+; VersionField0 = 4.10.0.9
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.8
+; VersionField5 = 4.10.0.9
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
