@@ -277,11 +277,15 @@ ProcedureDLL.l AttachProcess(Instance)
 
 	; Проверка, та ли программа запущена
 	; TODO: LangAndCodepage
+	Protected ValidateProgram = 1
 	Protected InvalidProgram
 	Protected InvalidReaction = 1
 	If LCase(PrgName) = "rundll32"
 		InvalidProgram = 2
-	ElseIf PreferenceGroup("ValidateProgram")
+	ElseIf PreferenceGroup("Portable")
+		ValidateProgram = ReadPreferenceInteger("ValidateProgram",1)
+	EndIf
+	If ValidateProgram And PreferenceGroup("ValidateProgram")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
@@ -304,7 +308,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndSelect
 		Wend
 	EndIf
-	If InvalidProgram = 1
+	If ValidateProgram And InvalidProgram = 1
 		If InvalidReaction=3 ; Выдать предупреждение
 			MessageBox_(0,"Invalid program "+PrgName+"!","PurePortable",#MB_ICONERROR)
 		ElseIf InvalidReaction=1 Or InvalidReaction=2 ; Выдать запрос на продолжение
@@ -660,12 +664,12 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 56
-; FirstLine = 30
+; CursorPosition = 310
+; FirstLine = 222
 ; Folding = fkv7-
 ; Optimizer
 ; EnableThread
-; Executable = 400.dll
+; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
