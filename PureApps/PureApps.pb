@@ -117,15 +117,15 @@ XIncludeFile "PurePortable.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure RFID_DATA
-	rfid.l
+	rfid.GUID
 	path.s
 EndStructure
-Global Dim rfids.RFID_DATA(1), nrfids
+Global Dim RFIDs.RFID_DATA(1), nRFIDs
 Procedure.s CheckRFID(rfid) ; Принимается указатель на rfid
 	Protected i
-	For i=1 To nrfids
-		If CompareMemory(rfid,@rfids(i)\rfid,16)
-			ProcedureReturn rfids(i)\path
+	For i=1 To nRFIDs
+		If CompareMemory(rfid,@RFIDs(i)\rfid,16)
+			ProcedureReturn RFIDs(i)\path
 		EndIf
 	Next
 	ProcedureReturn ""
@@ -135,12 +135,12 @@ Structure CSIDL_DATA
 	csidl.l
 	path.s
 EndStructure
-Global Dim csidls.CSIDL_DATA(1), ncsidl
+Global Dim CSIDLs.CSIDL_DATA(1), ncsidl
 Procedure.s CheckCSIDL(csidl) ; Принимается csidl & ~#CSIDL_FLAG_MASK
 	Protected i
 	For i=1 To ncsidl
-		If csidl=csidls(i)\csidl
-			ProcedureReturn csidls(i)\path
+		If csidl=CSIDLs(i)\csidl
+			ProcedureReturn CSIDLs(i)\path
 		EndIf
 	Next
 	ProcedureReturn ""
@@ -244,6 +244,32 @@ Procedure.s PreferencePath(Path.s="")
 	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
+;;======================================================================================================================
+Prototype GUIDFromString(*psz,*pguid)
+Procedure s2guid(guid.s,*guid.GUID)
+	Static GUIDFromString.GUIDFromString
+	Static hShell32
+	If hShell32 = 0
+		hShell32 = LoadLibrary_("shell32.dll")
+	EndIf
+	If GUIDFromString = 0
+		GUIDFromString = GetProcAddress_(hShell32,704)
+	EndIf
+	ProcedureReturn GUIDFromString(@guid,*guid)
+EndProcedure
+; Procedure s2guid2(guid.s,*guid.GUID)
+; 	*guid\Data1 = Val("$"+Mid(guid,2,8))
+; 	*guid\Data2 = Val("$"+Mid(guid,11,4))
+; 	*guid\Data3 = Val("$"+Mid(guid,16,4))
+; 	*guid\Data4[0] = Val("$"+Mid(guid,21,2))
+; 	*guid\Data4[1] = Val("$"+Mid(guid,23,2))
+; 	*guid\Data4[2] = Val("$"+Mid(guid,26,2))
+; 	*guid\Data4[3] = Val("$"+Mid(guid,28,2))
+; 	*guid\Data4[4] = Val("$"+Mid(guid,30,2))
+; 	*guid\Data4[5] = Val("$"+Mid(guid,32,2))
+; 	*guid\Data4[6] = Val("$"+Mid(guid,34,2))
+; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
+; EndProcedure
 ;;======================================================================================================================
 ;XIncludeFile "PP_Registry2Detours-Test.pbi"
 Global PureAppsPrefs.s
@@ -456,6 +482,34 @@ ProcedureDLL.l AttachProcess(Instance)
 				Case "commondocuments"
 					CommonDocumentsRedir = p
 					CreatePath(p)
+				Default
+					Protected id.s = k
+					Protected rfid.GUID
+					; https://learn.microsoft.com/en-us/windows/win32/shell/guidfromstring
+					; Пытаемся распознать ключ как RFID (GUID в скобках {} или без)
+					; или CSIDL (число dec или hex в формате C)
+					If Left(k,1)="{"
+						id = Mid(id,2)
+					EndIf
+					If s2guid(id,@rfid)
+						nRFIDs+1
+						ReDim RFIDs(nRFIDs)
+						CopyMemory(@rfid,@RFIDs(nRFIDs)\rfid,16)
+						RFIDs(nRFIDs)\path = p
+						CreatePath(p)
+					Else
+						If Left(k,2)="0x" ; HEX CSIDL
+							k = "$"+Mid(k,3)
+						EndIf
+						Protected csidl = Val(k)
+						If csidl
+							ncsidl+1
+							ReDim CSIDLs(ncsidl)
+							CSIDLs(ncsidl)\csidl = csidl
+							CSIDLs(ncsidl)\path = p
+							CreatePath(p)
+						EndIf
+					EndIf
 			EndSelect
 		Wend
 	EndIf
@@ -664,9 +718,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 310
-; FirstLine = 222
-; Folding = fkv7-
+; CursorPosition = 493
+; FirstLine = 422
+; Folding = fkv7--
+; Markers = 491
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
