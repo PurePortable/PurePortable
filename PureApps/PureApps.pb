@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.9
+;RES_VERSION 4.10.0.10
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -248,12 +248,12 @@ EndProcedure
 Prototype GUIDFromString(*psz,*pguid)
 Procedure s2guid(guid.s,*guid.GUID)
 	Static GUIDFromString.GUIDFromString
-	Static hShell32
-	If hShell32 = 0
-		hShell32 = LoadLibrary_("shell32.dll")
+	Static hDll
+	If hDll = 0
+		hDll = LoadLibrary_("shell32.dll")
 	EndIf
 	If GUIDFromString = 0
-		GUIDFromString = GetProcAddress_(hShell32,704)
+		GUIDFromString = GetProcAddress_(hDll,704)
 	EndIf
 	ProcedureReturn GUIDFromString(@guid,*guid)
 EndProcedure
@@ -718,8 +718,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 493
-; FirstLine = 422
+; CursorPosition = 255
+; FirstLine = 171
 ; Folding = fkv7--
 ; Markers = 491
 ; Optimizer
@@ -728,11 +728,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.9
+; VersionField0 = 4.10.0.10
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.9
+; VersionField5 = 4.10.0.10
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
