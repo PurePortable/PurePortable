@@ -148,44 +148,125 @@ CompilerIf #DETOUR_CREATEFILE
 	EndProcedure
 	;Global Trampoline_CreateFileW = @Detour_CreateFileW()
 CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya
+CompilerIf Not Defined(DETOUR_CREATEDIRECTORY,#PB_Constant) : #DETOUR_CREATEDIRECTORY=1 : CompilerEndIf
+CompilerIf #DETOUR_CREATEDIRECTORY
+	Prototype CreateDirectory(lpPathName,lpSecurityAttributes)
+	Global Original_CreateDirectoryA.CreateDirectory
+	Procedure Detour_CreateDirectoryA(lpPathName,lpSecurityAttributes)
+		dbg("CreateDirectoryA: "+PeekS(lpPathName,-1,#PB_Ascii))
+		ProcedureReturn Original_CreateDirectoryA(lpPathName,lpSecurityAttributes)
+	EndProcedure
+	Global Original_CreateDirectoryW.CreateDirectory
+	Procedure Detour_CreateDirectoryW(lpPathName,lpSecurityAttributes)
+		dbg("CreateDirectoryW: "+PeekS(lpPathName))
+		ProcedureReturn Original_CreateDirectoryW(lpPathName,lpSecurityAttributes)
+	EndProcedure
+CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createdirectoryexa
+CompilerIf Not Defined(DETOUR_CREATEDIRECTORYEX,#PB_Constant) : #DETOUR_CREATEDIRECTORYEX=1 : CompilerEndIf
+CompilerIf #DETOUR_CREATEDIRECTORYEX
+	Prototype CreateDirectoryEx(lpTemplateDirectory,lpNewDirectory,lpSecurityAttributes)
+	Global Original_CreateDirectoryExA.CreateDirectoryEx
+	Procedure Detour_CreateDirectoryExA(lpTemplateDirectory,lpNewDirectory,lpSecurityAttributes)
+		dbg("CreateDirectoryExA: "+PeekSZ(lpTemplateDirectory,-1,#PB_Ascii)+" :: "+PeekSZ(lpNewDirectory,-1,#PB_Ascii))
+		ProcedureReturn Original_CreateDirectoryExA(lpTemplateDirectory,lpNewDirectory,lpSecurityAttributes)
+	EndProcedure
+	Global Original_CreateDirectoryExW.CreateDirectoryEx
+	Procedure Detour_CreateDirectoryExW(lpTemplateDirectory,lpNewDirectory,lpSecurityAttributes)
+		dbg("CreateDirectoryExW: "+PeekSZ(lpTemplateDirectory)+" :: "+PeekSZ(lpNewDirectory))
+		ProcedureReturn Original_CreateDirectoryExW(lpTemplateDirectory,lpNewDirectory,lpSecurityAttributes)
+	EndProcedure
+CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexa
+CompilerIf Not Defined(DETOUR_SHCREATEDIRECTORYEX,#PB_Constant) : #DETOUR_SHCREATEDIRECTORYEX=1 : CompilerEndIf
+CompilerIf #DETOUR_CREATEDIRECTORYEX
+	Prototype SHCreateDirectoryEx(hwnd,pszPath,*psa)
+	Global Original_SHCreateDirectoryExA.CreateDirectoryEx
+	Procedure Detour_SHCreateDirectoryExA(hwnd,pszPath,*psa)
+		dbg("SHCreateDirectoryExA: "+PeekSZ(pszPath,-1,#PB_Ascii))
+		ProcedureReturn Original_SHCreateDirectoryExA(hwnd,pszPath,*psa)
+	EndProcedure
+	Global Original_SHCreateDirectoryExW.CreateDirectoryEx
+	Procedure Detour_SHCreateDirectoryExW(hwnd,pszPath,*psa)
+		dbg("SHCreateDirectoryExW: "+PeekSZ(pszPath))
+		ProcedureReturn Original_SHCreateDirectoryExW(hwnd,pszPath,*psa)
+	EndProcedure
+CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
+CompilerIf Not Defined(DETOUR_SHFILEOPERATION,#PB_Constant) : #DETOUR_SHFILEOPERATION=1 : CompilerEndIf
+CompilerIf #DETOUR_SHFILEOPERATION
+	Prototype SHFileOperation(*FileOp.SHFILEOPSTRUCT)
+	Global Original_SHFileOperationA.SHFileOperation
+	Procedure Detour_SHFileOperationA(*FileOp.SHFILEOPSTRUCT)
+		dbg("SHFileOperationA: "+PeekSZ(*FileOp\pFrom,-1,#PB_Ascii)+" :: "+PeekSZ(*FileOp\pTo,-1,#PB_Ascii))
+		ProcedureReturn Original_SHFileOperationA(*FileOp)
+	EndProcedure
+	Global Original_SHFileOperationW.SHFileOperation
+	Procedure Detour_SHFileOperationW(*FileOp.SHFILEOPSTRUCT)
+		dbg("SHFileOperationW: "+PeekSZ(*FileOp\pFrom)+" :: "+PeekSZ(*FileOp\pTo))
+		ProcedureReturn Original_SHFileOperationW(*FileOp)
+	EndProcedure
+CompilerEndIf
+
 ;;======================================================================================================================
 
 XIncludeFile "PP_MinHook.pbi"
 
 Procedure _InitDbgxFileOperations()
-	CompilerIf #DETOUR_GETFULLPATHNAME ;And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_GETFULLPATHNAME
 		MH_HookApi(kernel32,GetFullPathNameA)
 		MH_HookApi(kernel32,GetFullPathNameW)
 	CompilerEndIf
-	CompilerIf #DETOUR_FINDFIRSTFILE ;And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_FINDFIRSTFILE
 		MH_HookApi(kernel32,FindFirstFileA)
 		MH_HookApi(kernel32,FindFirstFileW)
 	CompilerEndIf
-	CompilerIf #DETOUR_FINDFIRSTFILEEX ;And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_FINDFIRSTFILEEX
 		MH_HookApi(kernel32,FindFirstFileExA)
 		MH_HookApi(kernel32,FindFirstFileExW)
 	CompilerEndIf
-	CompilerIf #DETOUR_GETFILEATTRIBUTES ;And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_GETFILEATTRIBUTES
 		MH_HookApi(kernel32,GetFileAttributesA)
 		MH_HookApi(kernel32,GetFileAttributesW)
 	CompilerEndIf
-	CompilerIf #DETOUR_GETFILEATTRIBUTESEX ;And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_GETFILEATTRIBUTESEX
 		MH_HookApi(kernel32,GetFileAttributesExA)
 		MH_HookApi(kernel32,GetFileAttributesExW)
 	CompilerEndIf
-	CompilerIf #DETOUR_CREATEFILE ;And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_CREATEFILE
 		MH_HookApi(kernel32,CreateFile2,#MH_HOOKAPI_NOCHECKRESULT)
 		MH_HookApi(kernel32,CreateFileA)
 		MH_HookApi(kernel32,CreateFileW)
+	CompilerEndIf
+	CompilerIf #DETOUR_CREATEDIRECTORY
+		MH_HookApi(kernel32,CreateDirectoryA)
+		MH_HookApi(kernel32,CreateDirectoryW)
+	CompilerEndIf
+	CompilerIf #DETOUR_CREATEDIRECTORYEX
+		MH_HookApi(kernel32,CreateDirectoryExA)
+		MH_HookApi(kernel32,CreateDirectoryExW)
+	CompilerEndIf
+	CompilerIf #DETOUR_SHCREATEDIRECTORYEX
+		MH_HookApi(shell32,SHCreateDirectoryExA)
+		MH_HookApi(shell32,SHCreateDirectoryExW)
+	CompilerEndIf
+	CompilerIf #DETOUR_SHFILEOPERATION
+		MH_HookApi(shell32,SHFileOperationA)
+		MH_HookApi(shell32,SHFileOperationW)
 	CompilerEndIf
 EndProcedure
 AddInitProcedure(_InitDbgxFileOperations)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 175
-; FirstLine = 150
-; Folding = ---
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 205
+; FirstLine = 201
+; Folding = ----
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
