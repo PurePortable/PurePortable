@@ -2,7 +2,6 @@
 ;;======================================================================================================================
 CompilerIf Not Defined(DBG_IAT_HOOK,#PB_Constant) : #DBG_IAT_HOOK = 0 : CompilerEndIf
 CompilerIf #DBG_IAT_HOOK
-	;UndefineMacro dbgany : DbgAnyDef
 	Macro DbgIatHook(txt) : dbg(txt) : EndMacro
 CompilerElse
 	Macro DbgIatHook(txt) : EndMacro
@@ -171,9 +170,6 @@ Macro IAT_HookExt(ModuleName,DllName,DllExt,FuncName,flags=#IATHOOK_ALLIMPORT)
 	CompilerEndIf
 	_IAT_Hook(@ModuleData_#ModuleName,DoubleQuote#DllName.DllExt#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,flags)
 EndMacro
-;Macro IAT_HookC(ModuleName,DllName,FuncName)
-;	CompilerIf #DETOUR_#FuncName : IAT_Hook(ModuleName,DllName,FuncName) : CompilerEndIf
-;EndMacro
 
 Procedure.i _IAT_Hook(*ModuleData.MODULE_DATA,DllName.s,FuncName.s,*Detour,*Original.Integer=#Null,flags=#IATHOOK_ALLIMPORT) ; TODO: *hDll.Integer=#Null
 	Protected *ImportAddress.Integer, *ImportName.Integer
@@ -284,8 +280,8 @@ EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 281
-; FirstLine = 251
+; CursorPosition = 172
+; FirstLine = 153
 ; Folding = ---
 ; EnableThread
 ; DisableDebugger
