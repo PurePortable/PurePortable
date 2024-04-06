@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.10
+;RES_VERSION 4.10.0.11
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -271,6 +271,27 @@ EndProcedure
 ; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
 ; EndProcedure
 ;;======================================================================================================================
+Global VolumeSerialNumber
+Prototype GetVolumeInformation(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber.LONG,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
+Global Original_GetVolumeInformationA.GetVolumeInformation
+Procedure Detour_GetVolumeInformationA(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber.LONG,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
+	Protected Result = Original_GetVolumeInformationA(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
+	If VolumeSerialNumber And *VolumeSerialNumber
+		;dbg("GetVolumeInformationA: "+PeekSZ(*RootPathName,-1,#PB_Ascii)+" "+StrU(PeekL(*VolumeSerialNumber),#PB_Long))
+		*VolumeSerialNumber\l = VolumeSerialNumber
+	EndIf
+	ProcedureReturn Result
+EndProcedure
+Global Original_GetVolumeInformationW.GetVolumeInformation
+Procedure Detour_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber.LONG,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
+	Protected Result = Original_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
+	If VolumeSerialNumber And *VolumeSerialNumber
+		;dbg("GetVolumeInformationW: "+PeekSZ(*RootPathName)+" "+StrU(PeekL(*VolumeSerialNumber),#PB_Long))
+		*VolumeSerialNumber\l = VolumeSerialNumber
+	EndIf
+	ProcedureReturn Result
+EndProcedure
+;;======================================================================================================================
 ;XIncludeFile "PP_Registry2Detours-Test.pbi"
 Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
@@ -388,6 +409,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		EndIf
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
+		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 	EndIf
 
 	; Вывод отладочной информации
@@ -591,7 +613,12 @@ ProcedureDLL.l AttachProcess(Instance)
 		Wend
 	EndIf
 	
-	;DetachClean()
+	; Хуки для подмены серийного номера диска
+	If VolumeSerialNumber
+		MH_HookApi(kernel32,GetVolumeInformationA)
+		MH_HookApi(kernel32,GetVolumeInformationW)
+	EndIf
+
 
 	PPInitialization
 
@@ -713,26 +740,36 @@ Procedure Execute(prg.s,prm.s,dir.s="") ; TODO: dir
 		DbgCln(GetLastErrorStr())
 	EndIf
 EndProcedure
-
+;;======================================================================================================================
+ProcedureDLL ShowVolumeSerialNumber(hWnd,hInst,*lpszCmdLine,nCmdShow)
+	SetErrorMode_(#SEM_FAILCRITICALERRORS)
+	Protected RootPathName.s = Left(WinDir,3)
+	Protected VolumeNameBuffer.s = Space(#MAX_PATH)
+	Protected VolumeSerialNumber, MaximumComponentLength, FileSystemFlags
+	GetVolumeInformation_(@RootPathName,@VolumeNameBuffer,#MAX_PATH,@VolumeSerialNumber,@MaximumComponentLength,@FileSystemFlags,#Null,0)
+	If MessageBox_(#Null,"Disk serial number:"+#CRLF$+StrU(VolumeSerialNumber,#PB_Long)+#CRLF$+"Copy to clipboard?","PurePortable",#MB_YESNO) = #IDYES
+		SetClipboardText(StrU(VolumeSerialNumber,#PB_Long))
+	EndIf
+EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 255
-; FirstLine = 171
+; CursorPosition = 615
+; FirstLine = 523
 ; Folding = fkv7--
-; Markers = 491
+; Markers = 513
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.10
+; VersionField0 = 4.10.0.11
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.10
+; VersionField5 = 4.10.0.11
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

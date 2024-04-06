@@ -4,6 +4,10 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.11] 2024-04-06 20:00:00
+(+) PureApps: Перехват GetVolumeInformation и подмена серийного номера диска
+(+) Дополнительная трассировка: добавлены функции CreateDirectory, CreateDirectoryEx, SHCreateDirectoryEx, SHFileOperation
+
 [4.10.0.10] 2024-04-01 23:00:00
 (+) В секцию [Portable] добавлен параметр ValidateProgram через который можно отключить обработку секции [ValidateProgram].
 (+) В секцию [SpecialFolders] добавлена возможность перенаправлять папки по CSIDL и RFID.
