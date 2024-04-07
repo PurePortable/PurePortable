@@ -70,20 +70,20 @@ Macro DoubleQuote
 EndMacro
 Macro MH_HookApi(DllName,FuncName,flags=0)
 	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
-		Global Target_#FuncName
-		_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
+	Global Target_#FuncName
+	_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
 	;CompilerEndIf
 EndMacro
 Macro MH_HookApiV(DllName,FuncName,DetourProc,VarName,flags=0)
 	;CompilerIf Defined(Detour_#DetourProc,#PB_Procedure)
-		Global Original_#VarName, Target_#VarName
-		_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#DetourProc(),@Original_#VarName,@Target_#VarName,flags)
+	Global Original_#VarName, Target_#VarName
+	_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#DetourProc(),@Original_#VarName,@Target_#VarName,flags)
 	;CompilerEndIf
 EndMacro
 Macro MH_HookApiD(DllName,FuncName,flags=0)
 	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
-		Global Target_#FuncName
-		_MH_HookApi(DllName,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
+	Global Target_#FuncName
+	_MH_HookApi(DllName,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
 	;CompilerEndIf
 EndMacro
 ; Macro MH_Enable(FuncName)
@@ -179,8 +179,9 @@ EndProcedure
 MH_Initialize()
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 19
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 85
+; FirstLine = 64
 ; Folding = --
 ; Markers = 18,148
 ; DisableDebugger
