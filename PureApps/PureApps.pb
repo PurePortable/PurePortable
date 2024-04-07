@@ -38,7 +38,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 #PORTABLE_SPECIAL_FOLDERS = 1 ; Перехват функций для работы со специальными папками
 ;{ Управление хуками PORTABLE_SPECIAL_FOLDERS
-#DETOUR_SHFOLDER = 0 ; Перехват функций из shfolder.dll
+#DETOUR_SHFOLDER = 1 ; Перехват функций из shfolder.dll
 #DETOUR_USERENV = 1	; Перехват функций из userenv.dll
 ;}
 #PORTABLE_ENVIRONMENT_VARIABLES = 1
@@ -753,10 +753,10 @@ ProcedureDLL ShowVolumeSerialNumber(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 615
-; FirstLine = 523
+; CursorPosition = 40
+; FirstLine = 18
 ; Folding = fkv7--
 ; Markers = 513
 ; Optimizer
