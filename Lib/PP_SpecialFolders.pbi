@@ -680,10 +680,13 @@ CompilerIf #DETOUR_USERENV
 CompilerEndIf
 
 Global SpecialFoldersPermit = 1
+;Global ShfoldersPermit
 Procedure _InitSpecialFoldersHooks()
+	;If ShfoldersPermit
+	;EndIf
 	If SpecialFoldersPermit
 		CompilerIf (#DETOUR_SHFOLDER Or (#PORTABLE_SPECIAL_FOLDERS & #PORTABLE_SF_SHFOLDER))
-			LoadLibrary_("shfolder.dll")
+			LoadDll("shfolder.dll")
 			MH_HookApiV(shfolder,SHGetFolderPathA,SHGetFolderPathA,SHGetFolderPathA2)
 			MH_HookApiV(shfolder,SHGetFolderPathW,SHGetFolderPathW,SHGetFolderPathW2)
 		CompilerEndIf
@@ -691,27 +694,25 @@ Procedure _InitSpecialFoldersHooks()
 			MH_HookApi(userenv,GetUserProfileDirectoryA)
 			MH_HookApi(userenv,GetUserProfileDirectoryW)
 		CompilerEndIf
-		CompilerIf #True
-			CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH : MH_HookApi(shell32,SHGetKnownFolderPath,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETFOLDERPATHEX : MH_HookApi(shell32,SHGetFolderPathEx,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST : MH_HookApi(shell32,SHGetKnownFolderIDList,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETFOLDERPATHA : MH_HookApi(shell32,SHGetFolderPathA) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETFOLDERPATHW : MH_HookApi(shell32,SHGetFolderPathW) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA : MH_HookApi(shell32,SHGetSpecialFolderPathA) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHW : MH_HookApi(shell32,SHGetSpecialFolderPathW) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRA : MH_HookApi(shell32,SHGetFolderPathAndSubDirA) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRW : MH_HookApi(shell32,SHGetFolderPathAndSubDirW) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETFOLDERLOCATION : MH_HookApi(shell32,SHGetFolderLocation) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETSPECIALFOLDERLOCATION : MH_HookApi(shell32,SHGetSpecialFolderLocation) : CompilerEndIf
-		CompilerEndIf
+		CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH : MH_HookApi(shell32,SHGetKnownFolderPath,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHEX : MH_HookApi(shell32,SHGetFolderPathEx,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST : MH_HookApi(shell32,SHGetKnownFolderIDList,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHA : MH_HookApi(shell32,SHGetFolderPathA) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHW : MH_HookApi(shell32,SHGetFolderPathW) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA : MH_HookApi(shell32,SHGetSpecialFolderPathA) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHW : MH_HookApi(shell32,SHGetSpecialFolderPathW) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRA : MH_HookApi(shell32,SHGetFolderPathAndSubDirA) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRW : MH_HookApi(shell32,SHGetFolderPathAndSubDirW) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERLOCATION : MH_HookApi(shell32,SHGetFolderLocation) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETSPECIALFOLDERLOCATION : MH_HookApi(shell32,SHGetSpecialFolderLocation) : CompilerEndIf
 	EndIf
 EndProcedure
 AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 67
-; FirstLine = 61
+; CursorPosition = 685
+; FirstLine = 659
 ; Folding = -----
 ; EnableAsm
 ; DisableDebugger
