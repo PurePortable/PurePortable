@@ -4,6 +4,10 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.12] 2024-04-07 10:00:00
+(*) SpecialFolders: Загрузка shfolder по полному пути
+(+) PureApps: Перехват shfolder
+
 [4.10.0.11] 2024-04-06 20:00:00
 (+) PureApps: Перехват GetVolumeInformation и подмена серийного номера диска
 (+) Дополнительная трассировка: добавлены функции CreateDirectory, CreateDirectoryEx, SHCreateDirectoryEx, SHFileOperation
