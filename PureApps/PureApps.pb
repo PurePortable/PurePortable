@@ -297,7 +297,7 @@ Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
 	Protected i
 
-	; Файл конфигурации
+	;{ Файл конфигурации
 	PureAppsPrefs = DllDir+DllName
 	
 	If FileExist(PureAppsPrefs+".prefs")
@@ -318,12 +318,12 @@ ProcedureDLL.l AttachProcess(Instance)
 		TerminateProcess_(GetCurrentProcess_(),0)
 		Goto EndAttach
 	EndIf
-
+	;}
+	
 	Protected k.s, v.s, p.s, n.s, o.s ; для обработки preferences
 	Protected retcode
 
-	; Проверка, та ли программа запущена
-	; TODO: LangAndCodepage
+	;{ Проверка, та ли программа запущена
 	Protected ValidateProgram = 1
 	Protected InvalidProgram
 	Protected InvalidReaction = 1
@@ -373,8 +373,8 @@ ProcedureDLL.l AttachProcess(Instance)
 		EndIf
 		Goto EndAttach
 	EndIf
-
-	; Установка некоторых переменных среды
+	;}
+	;{ Установка переменных среды
 	SetEnvironmentVariable("PP_PrgPath",PrgPath)
 	;SetEnvironmentVariable("PP_PrgName",PrgName)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
@@ -393,8 +393,8 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-	
-	; Общие параметры
+	;}
+	;{ Общие параметры
 	If PreferenceGroup("Portable")
 		RegistryPermit = ReadPreferenceInteger("Registry",0)
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
@@ -411,8 +411,8 @@ ProcedureDLL.l AttachProcess(Instance)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 	EndIf
-
-	; Вывод отладочной информации
+	;}
+	;{ Вывод отладочной информации
 	Global DbgRegMode = 0
 	Global DbgSpecMode = 0
 	Global DbgEnvMode = 0
@@ -423,13 +423,13 @@ ProcedureDLL.l AttachProcess(Instance)
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
 		DbgAnyMode = ReadPreferenceInteger("Attach",0)
 	EndIf
-	
-	; Закончить, если был запуск через rundll32
+	;}
+	;{ Закончить, если был запуск через rundll32
 	If InvalidProgram = 2
 		Goto EndAttach
 	EndIf
-	
-	; Обрабатываемые ключи реестра
+	;}
+	;{ Обрабатываемые ключи реестра
 	If RegistryPermit And PreferenceGroup("Registry")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
@@ -465,8 +465,8 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-
-	; Перенаправляемые специальные папки
+	;}
+	;{ Перенаправляемые специальные папки
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
 		p = PreferencePath(ReadPreferenceString("AllDirs",""))
 		If p
@@ -535,16 +535,8 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndSelect
 		Wend
 	EndIf
-	If SpecialFoldersPermit And PreferenceGroup("SpecialFolders.ID")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			v = PreferencePath()
-			; TODO
-		Wend
-	EndIf
-
-	; Переменные среды
+	;}
+	;{ Перенаправление переменных среды
 	If EnvironmentVariablesPermit And PreferenceGroup("EnvironmentVariables")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
@@ -568,11 +560,11 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-
-	; Реестр
+	;}
+	;{ Чтение реестр
 	ReadCfg()
-
-	; Коррекция путей
+	;}
+	;{ Коррекция путей в реестре
 	If RegistryPermit And PreferenceGroup("Registry.CorrectPaths")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
@@ -591,8 +583,8 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-
-	; Установка путей
+	;}
+	;{ Установка путей в реестре
 	If RegistryPermit And PreferenceGroup("Registry.SetPaths")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
@@ -607,14 +599,14 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-	
-	; Хуки для подмены серийного номера диска
+	;}
+	;{ Установка хуков для подмены серийного номера диска
 	If VolumeSerialNumber
 		MH_HookApi(kernel32,GetVolumeInformationA)
 		MH_HookApi(kernel32,GetVolumeInformationW)
 	EndIf
-	
-	; Плагины
+	;}
+	;{ Плагины
 	Protected Plugin.s, hPlugin, PluginFunc.CallPlugin, *PluginFuncAscii
 	If PreferenceGroup("LoadLibrary")
 		ExaminePreferenceKeys()
@@ -631,7 +623,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-
+	;}
 	PPInitialization
 
 	EndAttach:
@@ -767,10 +759,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 627
-; FirstLine = 534
-; Folding = fkv7--
-; Markers = 513
+; CursorPosition = 323
+; FirstLine = 225
+; Folding = fkv7PAg-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
