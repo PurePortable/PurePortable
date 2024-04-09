@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.11
+;RES_VERSION 4.10.0.12
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -294,10 +294,50 @@ Procedure Detour_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNa
 EndProcedure
 ;}
 ;;======================================================================================================================
-Prototype CallPlugin(cmd,*data)
+; https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions
+Global SpoofDate.SYSTEMTIME
+; CheatDate
+; FakeDate
+;;----------------------------------------------------------------------------------------------------------------------
+Prototype GetSystemTime(*SystemTime.SYSTEMTIME)
+Global Original_GetSystemTime.GetSystemTime
+Procedure Detour_GetSystemTime(*SystemTime.SYSTEMTIME)
+	Protected Result = Original_GetSystemTime(*SystemTime)
+	*SystemTime\wDay = SpoofDate\wDay
+	*SystemTime\wDayOfWeek = SpoofDate\wDayOfWeek
+	*SystemTime\wMonth = SpoofDate\wMonth
+	*SystemTime\wYear = SpoofDate\wYear
+	ProcedureReturn Result
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+Prototype GetSystemTimeAsFileTime(*SystemTimeAsFileTime.FILETIME)
+Global Original_GetSystemTimeAsFileTime.GetSystemTimeAsFileTime
+Procedure Detour_GetSystemTimeAsFileTime(*SystemTimeAsFileTime.FILETIME)
+	Protected FileTime.FILETIME
+	Protected Result = Original_GetSystemTimeAsFileTime(@FileTime)
+	Protected SystemTime.SYSTEMTIME
+	FileTimeToSystemTime_(@FileTime,@SystemTime)
+	SystemTime\wDay = SpoofDate\wDay
+	SystemTime\wDayOfWeek = SpoofDate\wDayOfWeek
+	SystemTime\wMonth = SpoofDate\wMonth
+	SystemTime\wYear = SpoofDate\wYear
+	ProcedureReturn SystemTimeToFileTime_(@SystemTime,*SystemTimeAsFileTime)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+Prototype GetLocalTime(*SystemTime.SYSTEMTIME)
+Global Original_GetLocalTime.GetLocalTime
+Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
+	Protected Result = Original_GetLocalTime(*SystemTime)
+	*SystemTime\wDay = SpoofDate\wDay
+	*SystemTime\wDayOfWeek = SpoofDate\wDayOfWeek
+	*SystemTime\wMonth = SpoofDate\wMonth
+	*SystemTime\wYear = SpoofDate\wYear
+	ProcedureReturn Result
+EndProcedure
+;;======================================================================================================================
 Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
-	Protected i
+	Protected i, j
 
 	;{ Файл конфигурации
 	PureAppsPrefs = DllDir+DllName
@@ -397,6 +437,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf
 	;}
 	;{ Общие параметры
+	Protected SpoofDateP.s
 	If PreferenceGroup("Portable")
 		RegistryPermit = ReadPreferenceInteger("Registry",0)
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
@@ -412,6 +453,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
+		SpoofDateP = ReadPreferenceString("SpoofDate","")
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -608,21 +650,35 @@ ProcedureDLL.l AttachProcess(Instance)
 		MH_HookApi(kernel32,GetVolumeInformationW)
 	EndIf
 	;}
+	;{ Установка хуков для подмены даты
+	If SpoofDateP
+		SpoofDateP = ReplaceString(SpoofDateP,".","-")
+		SpoofDateP = ReplaceString(SpoofDateP,"/","-")
+		i = FindString(SpoofDateP,"-")
+		If i
+			SpoofDate\wYear = Val(Left(SpoofDateP,i-1))
+			j = FindString(SpoofDateP,"-",i+1)
+			If j
+				SpoofDate\wMonth = Val(Mid(SpoofDateP,i+1,j-i))
+				SpoofDate\wDay = Val(Mid(SpoofDateP,j+1))
+				;dbg("SPOOF DATE: "+Str(SpoofDate\wYear)+" :: "+Str(SpoofDate\wMonth)+" :: "+Str(SpoofDate\wDay))
+				MH_HookApi(kernel32,GetLocalTime)
+				MH_HookApi(kernel32,GetSystemTime)
+				MH_HookApi(kernel32,GetSystemTimeAsFileTime)
+				;MH_HookApi(kernel32,CompareFileTime)
+			EndIf
+		EndIf
+	EndIf
+	;}
 	;{ Плагины
-	Protected Plugin.s, hPlugin, PluginFunc.CallPlugin, *PluginFuncAscii
+	Protected LoadableLibrary.s, hLoadableLibrary
 	If PreferenceGroup("LoadLibrary")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			v = PreferenceKeyValue()
-			Plugin = PreferencePath(k)
-			hPlugin = LoadLibrary_(Plugin)
-			If hPlugin And v <> ""
-				*PluginFuncAscii = Ascii(v)
-				PluginFunc = GetProcAddress_(hPlugin,*PluginFuncAscii)
-				
-				FreeMemory(*PluginFuncAscii)
-			EndIf
+			;k = PreferenceKeyName()
+			;v = PreferenceKeyValue()
+			LoadableLibrary = PreferencePath(PreferenceKeyName())
+			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 		Wend
 	EndIf
 	;}
@@ -761,20 +817,21 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 323
-; FirstLine = 225
-; Folding = fkv7PAg-
+; CursorPosition = 677
+; FirstLine = 305
+; Folding = fkv7zjA5-
+; Markers = 298,664
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.11
+; VersionField0 = 4.10.0.12
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.11
+; VersionField5 = 4.10.0.12
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
