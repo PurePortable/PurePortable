@@ -271,6 +271,7 @@ EndProcedure
 ; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
 ; EndProcedure
 ;;======================================================================================================================
+;{ Перехват VolumeSerialNumber
 Global VolumeSerialNumber
 Prototype GetVolumeInformation(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber.LONG,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
 Global Original_GetVolumeInformationA.GetVolumeInformation
@@ -291,6 +292,7 @@ Procedure Detour_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNa
 	EndIf
 	ProcedureReturn Result
 EndProcedure
+;}
 ;;======================================================================================================================
 Prototype CallPlugin(cmd,*data)
 Global PureAppsPrefs.s
