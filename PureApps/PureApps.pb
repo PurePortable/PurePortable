@@ -38,7 +38,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 #PORTABLE_SPECIAL_FOLDERS = 1 ; Перехват функций для работы со специальными папками
 ;{ Управление хуками PORTABLE_SPECIAL_FOLDERS
-#DETOUR_SHFOLDER = 1 ; Перехват функций из shfolder.dll
+#DETOUR_SHFOLDER = 0 ; Перехват функций из shfolder.dll
 #DETOUR_USERENV = 1	; Перехват функций из userenv.dll
 ;}
 #PORTABLE_ENVIRONMENT_VARIABLES = 1
@@ -292,7 +292,7 @@ Procedure Detour_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNa
 	ProcedureReturn Result
 EndProcedure
 ;;======================================================================================================================
-;XIncludeFile "PP_Registry2Detours-Test.pbi"
+Prototype CallPlugin(cmd,*data)
 Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
 	Protected i
@@ -380,7 +380,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
 	SetEnvironmentVariable("PP_DllPath",DllPath)
 	SetEnvironmentVariable("PP_DllDir",DllDirN)
-	If PreferenceGroup("Startup.SetEnvironmentVariables")
+	If PreferenceGroup("EnvironmentVariables")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
@@ -568,11 +568,6 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-	;SetEnvironmentVariable("PUBLIC",PrgDirN)
-	;SetEnvironmentVariable("TEMP",PrgDir+".temp")
-	;SetEnvironmentVariable("TMP",PrgDir+".temp")
-	;SetEnvironmentVariable("TMPDIR",PrgDir+".temp")
-	;SetEnvironmentVariable("PROGRAMDIR",PrgDirN)
 
 	; Реестр
 	ReadCfg()
@@ -618,7 +613,24 @@ ProcedureDLL.l AttachProcess(Instance)
 		MH_HookApi(kernel32,GetVolumeInformationA)
 		MH_HookApi(kernel32,GetVolumeInformationW)
 	EndIf
-
+	
+	; Плагины
+	Protected Plugin.s, hPlugin, PluginFunc.CallPlugin, *PluginFuncAscii
+	If PreferenceGroup("LoadLibrary")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			v = PreferenceKeyValue()
+			Plugin = PreferencePath(k)
+			hPlugin = LoadLibrary_(Plugin)
+			If hPlugin And v <> ""
+				*PluginFuncAscii = Ascii(v)
+				PluginFunc = GetProcAddress_(hPlugin,*PluginFuncAscii)
+				
+				FreeMemory(*PluginFuncAscii)
+			EndIf
+		Wend
+	EndIf
 
 	PPInitialization
 
@@ -755,8 +767,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 40
-; FirstLine = 18
+; CursorPosition = 627
+; FirstLine = 534
 ; Folding = fkv7--
 ; Markers = 513
 ; Optimizer
