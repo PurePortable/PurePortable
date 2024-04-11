@@ -211,21 +211,24 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
+;{ Раскрытие переменных среды
 CompilerIf Not Defined(_ExpandEnvironmentStrings,#PB_Procedure)
 	; Подобная процедура определена в модуле EnvironmentStrings
-	Procedure.s _ExpandEnvironmentStrings(String.s)
-		Protected Result.s, Length, *Buffer
-		Length = ExpandEnvironmentStrings_(@String,*Buffer,0)
-		If Length
-			*Buffer = AllocateMemory(Length*2+2,#PB_Memory_NoClear)
-			ExpandEnvironmentStrings_(@String,*Buffer,Length)
-			Result = PeekS(*Buffer)
-			FreeMemory(*Buffer)
-		EndIf
-		ProcedureReturn Result
-	EndProcedure
+; 	Procedure.s _ExpandEnvironmentStrings(String.s)
+; 		Protected Result.s, Length, *Buffer
+; 		Length = ExpandEnvironmentStrings_(@String,*Buffer,0)
+; 		If Length
+; 			*Buffer = AllocateMemory(Length*2+2,#PB_Memory_NoClear)
+; 			ExpandEnvironmentStrings_(@String,*Buffer,Length)
+; 			Result = PeekS(*Buffer)
+; 			FreeMemory(*Buffer)
+; 		EndIf
+; 		ProcedureReturn Result
+; 	EndProcedure
 CompilerEndIf
-;;----------------------------------------------------------------------------------------------------------------------
+;}
+;;======================================================================================================================
+;{ Преобразование относительных путей
 Procedure.s PreferencePath(Path.s="")
 	Protected Result.s
 	If Path=""
@@ -244,7 +247,9 @@ Procedure.s PreferencePath(Path.s="")
 	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
+;}
 ;;======================================================================================================================
+;{ Преобразование строки в GUID
 Prototype GUIDFromString(*psz,*pguid)
 Procedure s2guid(guid.s,*guid.GUID)
 	Static GUIDFromString.GUIDFromString
@@ -270,6 +275,7 @@ EndProcedure
 ; 	*guid\Data4[6] = Val("$"+Mid(guid,34,2))
 ; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
 ; EndProcedure
+;}
 ;;======================================================================================================================
 ;{ Перехват VolumeSerialNumber
 Global VolumeSerialNumber
@@ -294,10 +300,9 @@ Procedure Detour_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNa
 EndProcedure
 ;}
 ;;======================================================================================================================
+;{ Подделка даты
 ; https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions
 Global SpoofDate.SYSTEMTIME
-; CheatDate
-; FakeDate
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype GetSystemTime(*SystemTime.SYSTEMTIME)
 Global Original_GetSystemTime.GetSystemTime
@@ -334,6 +339,7 @@ Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
 	*SystemTime\wYear = SpoofDate\wYear
 	ProcedureReturn Result
 EndProcedure
+;}
 ;;======================================================================================================================
 Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
@@ -670,7 +676,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		EndIf
 	EndIf
 	;}
-	;{ Плагины
+	;{ Загрузка сторонных библиотек
 	Protected LoadableLibrary.s, hLoadableLibrary
 	If PreferenceGroup("LoadLibrary")
 		ExaminePreferenceKeys()
@@ -682,6 +688,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		Wend
 	EndIf
 	;}
+	
 	PPInitialization
 
 	EndAttach:
@@ -817,10 +824,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 677
-; FirstLine = 305
-; Folding = fkv7zjA5-
-; Markers = 298,664
+; CursorPosition = 691
+; FirstLine = 169
+; Folding = fkvKFQAAE+
+; Markers = 305,670
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
