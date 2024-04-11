@@ -614,6 +614,22 @@ ProcedureDLL.l AttachProcess(Instance)
 	;{ Чтение реестр
 	ReadCfg()
 	;}
+	;{ Установка путей в реестре
+	If RegistryPermit And PreferenceGroup("Registry.SetPaths")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			p = PreferencePath()
+			i = FindString(k,"|")
+			If i
+				v = Mid(k,i+1)
+				k = Left(k,i-1)
+				SetCfgS(k,v,p)
+			Else ; значение по умолчанию?
+			EndIf
+		Wend
+	EndIf
+	;}
 	;{ Коррекция путей в реестре
 	If RegistryPermit And PreferenceGroup("Registry.CorrectPaths")
 		ExaminePreferenceKeys()
@@ -629,22 +645,6 @@ ProcedureDLL.l AttachProcess(Instance)
 				If n And n<>o
 					SetCfgS(k,v,n)
 				EndIf
-			Else ; значение по умолчанию?
-			EndIf
-		Wend
-	EndIf
-	;}
-	;{ Установка путей в реестре
-	If RegistryPermit And PreferenceGroup("Registry.SetPaths")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			p = PreferencePath()
-			i = FindString(k,"|")
-			If i
-				v = Mid(k,i+1)
-				k = Left(k,i-1)
-				SetCfgS(k,v,p)
 			Else ; значение по умолчанию?
 			EndIf
 		Wend
@@ -824,9 +824,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 691
-; FirstLine = 169
-; Folding = fkvKFQAAE+
+; CursorPosition = 632
+; FirstLine = 165
+; Folding = fkvKFQA5E+
 ; Markers = 305,670
 ; Optimizer
 ; EnableThread
