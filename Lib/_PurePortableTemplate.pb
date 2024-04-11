@@ -86,8 +86,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;{ Блокировка интернета
 #BLOCK_WININET = 0 ; wininet.dll
 #BLOCK_WINHTTP = 0 ; winhttp.dll
-#BLOCK_WINSOCKS = 0 ; wsock32.dll
-#BLOCK_WINSOCKS2 = 0 ; ws2_32.dll
+#BLOCK_WINSOCKS = 0 ; 1 - wsock32.dll, 2 - ws2_32.dll
 #DBG_BLOCK_INTERNET = 0
 ;}
 ;{ Блокировка консоли

@@ -52,7 +52,6 @@ CompilerIf #BLOCK_WININET
 		SetLastError_(#ERROR_INTERNET_INTERNAL_ERROR)
 		ProcedureReturn 0
 	EndProcedure
-	;Global Trampoline_InternetOpenW = @Detour_InternetOpenW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; WINHTTP.dll
@@ -72,7 +71,6 @@ CompilerIf #BLOCK_WINHTTP
 		SetLastError_(#ERROR_WINHTTP_INTERNAL_ERROR)
 		ProcedureReturn 0
 	EndProcedure
-	;Global Trampoline_WinHttpOpen = @Detour_WinHttpOpen()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; WSOCK32.dll, WS2_32.dll
@@ -84,9 +82,9 @@ CompilerIf Not Defined(BLOCK_WINSOCKS2,#PB_Constant) : #BLOCK_WINSOCKS2 = 0 : Co
 ; https://docs.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-wsastartup
 ; https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-connect
 ; https://firststeps.ru/mfc/net/socket/r.php?2
-#WSASYSNOTREADY = 10091
-;#WSAVERNOTSUPPORTED = 10091
-CompilerIf #BLOCK_WINSOCKS=2 Or #BLOCK_WINSOCKS2=2
+; #WSASYSNOTREADY = 10091
+; #WSAVERNOTSUPPORTED = 10091
+; CompilerIf #BLOCK_WINSOCKS Or #BLOCK_WINSOCKS2
 ; 	Prototype WSAStartup(wVersionRequired.w,lpWSAData)
 ; 	Global Original_WSAStartup.WSAStartup
 ; 	Procedure Detour_WSAStartup(wVersionRequired.w,lpWSAData)
@@ -102,13 +100,12 @@ CompilerIf #BLOCK_WINSOCKS=2 Or #BLOCK_WINSOCKS2=2
 ; 		DbgInt("WSAStartup: Result: "+Str(Result)+" "+Str(WSAGetLastError_()))
 ; 		ProcedureReturn Result
 ; 	EndProcedure
-	Prototype connect(s,name,namelen)
-	Global Original_connect
-	Procedure Detour_connect(s,name,namelen)
-		ProcedureReturn #WSAENETUNREACH
-	EndProcedure
-	;Global Trampoline_connect = @Detour_connect()
-CompilerEndIf
+; 	Prototype connect(s,name,namelen)
+; 	Global Original_connect
+; 	Procedure Detour_connect(s,name,namelen)
+; 		ProcedureReturn #WSAENETUNREACH
+; 	EndProcedure
+; CompilerEndIf
 
 ; Prototype setsockopt(s,level,optname,*optval,optlen)
 ; Global Original_setsockopt.setsockopt
@@ -117,7 +114,6 @@ CompilerEndIf
 ; 	DbgInt("setsockopt: "+Str(Result)+" "+ErrorMsg(WSAGetLastError_()))
 ; 	ProcedureReturn Result
 ; EndProcedure
-; ;Global Trampoline_setsockopt = @Detour_setsockopt()
 
 ; Prototype bind(s,*addr,namelen)
 ; Global Original_bind.bind
@@ -126,7 +122,6 @@ CompilerEndIf
 ; 	DbgInt("bind: "+Str(Result)+" "+ErrorMsg(WSAGetLastError_()))
 ; 	ProcedureReturn Result
 ; EndProcedure
-; ;Global Trampoline_bind = @Detour_bind()
 
 ; Prototype send(s,*buf,len,flags)
 ; Global Original_send.send
@@ -135,7 +130,6 @@ CompilerEndIf
 ; 	DbgInt("send: "+Str(Result)+" "+ErrorMsg(WSAGetLastError_()))
 ; 	ProcedureReturn Result
 ; EndProcedure
-; ;Global Trampoline_send = @Detour_send()
 
 ; Prototype sendto(s,*buf,len,flags,*to,tolen)
 ; Global Original_sendto.sendto
@@ -144,11 +138,10 @@ CompilerEndIf
 ; 	DbgInt("sendto: "+Str(Result)+" "+ErrorMsg(WSAGetLastError_()))
 ; 	ProcedureReturn Result
 ; EndProcedure
-; ;Global Trampoline_sendto = @Detour_sendto()
 
 ; https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-socket
 ;#INVALID_SOCKET = -1
-CompilerIf #BLOCK_WINSOCKS=1 Or #BLOCK_WINSOCKS2=1
+CompilerIf #BLOCK_WINSOCKS Or #BLOCK_WINSOCKS2
 	Prototype socket(af,type,protocol)
 	Global Original_socket.socket
 	Procedure Detour_socket(af,type,protocol)
@@ -160,7 +153,6 @@ CompilerIf #BLOCK_WINSOCKS=1 Or #BLOCK_WINSOCKS2=1
 		ProcedureReturn #INVALID_SOCKET
 	EndProcedure
 CompilerEndIf
-;Global Trampoline_socket = @Detour_socket()
 
 ; CompilerIf #BLOCK_WINSOCKS Or #BLOCK_WINSOCKS2
 ; 	Prototype connect(s,*name,namelen)
@@ -171,7 +163,6 @@ CompilerEndIf
 ; 		ProcedureReturn Result
 ; 	EndProcedure
 ; CompilerEndIf
-; ;Global Trampoline_connect = @Detour_connect()
 
 ;;======================================================================================================================
 ; Принудительная статическая линковка dll
@@ -218,9 +209,9 @@ XIncludeFile "PP_MinHook.pbi"
 
 Global BlockWinInetPermit = 1
 Global BlockWinHttpPermit = 1
-CompilerIf #BLOCK_WINSOCKS2
+CompilerIf #BLOCK_WINSOCKS=2 Or #BLOCK_WINSOCKS2
 	Global BlockWinSocksPermit = 2
-CompilerElseIf #BLOCK_WINSOCKS
+CompilerElseIf #BLOCK_WINSOCKS=1
 	Global BlockWinSocksPermit = 1
 CompilerEndIf
 Procedure _InitBlockInternetHooks()
@@ -237,13 +228,13 @@ Procedure _InitBlockInternetHooks()
 			MH_HookApi(winhttp,WinHttpOpen)
 		EndIf
 	CompilerEndIf
-	CompilerIf #BLOCK_WINSOCKS
+	CompilerIf #BLOCK_WINSOCKS=1
 		If BlockWinSocksPermit = 1
 			LoadDll("wsock32")
 			MH_HookApi(wsock32,socket)
 		EndIf
 	CompilerEndIf
-	CompilerIf #BLOCK_WINSOCKS2
+	CompilerIf #BLOCK_WINSOCKS=2 Or #BLOCK_WINSOCKS2
 		If BlockWinSocksPermit = 2
 			LoadDll("ws2_32")
 			MH_HookApi(ws2_32,socket)
@@ -254,8 +245,7 @@ AddInitProcedure(_InitBlockInternetHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 249
-; FirstLine = 221
+; CursorPosition = 12
 ; Folding = --
 ; EnableAsm
 ; DisableDebugger
