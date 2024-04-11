@@ -362,9 +362,9 @@ CompilerIf Not Defined(PROC_CORRECTPATH,#PB_Constant) : #PROC_CORRECTPATH = 0 : 
 CompilerIf Not Defined(PROC_CORRECTCFGPATH,#PB_Constant) : #PROC_CORRECTCFGPATH = 0 : CompilerEndIf
 CompilerIf Not Defined(DBG_CORRECTPATH,#PB_Constant) : #DBG_CORRECTPATH = 0 : CompilerEndIf
 CompilerIf #DBG_CORRECTPATH
-	Macro dbgcorpath(txt) : dbg(txt) : EndMacro
+	Macro DbgCorpath(txt) : dbg(txt) : EndMacro
 CompilerElse
-	Macro dbgcorpath(txt) : EndMacro
+	Macro DbgCorpath(txt) : EndMacro
 CompilerEndIf
 CompilerIf #PROC_CORRECTPATH Or #PROC_CORRECTCFGPATH
 	EnumerationBinary CORRECTPATH
@@ -382,7 +382,7 @@ CompilerIf #PROC_CORRECTPATH Or #PROC_CORRECTCFGPATH
 		Protected i, NewPath.s, bs.s
 		Protected LBase
 		Base = RTrim(Base,"\")+"\"
-		dbgcorpath("Base: "+Base)
+		DbgCorpath("Base: "+Base)
 		If Right(Path,1)="\"
 			Path = RTrim(Path,"\")
 			bs = "\" ; сохраним завершающий «\» для папок
@@ -394,15 +394,15 @@ CompilerIf #PROC_CORRECTPATH Or #PROC_CORRECTCFGPATH
 			Path = ReplaceString(Path,"/","\")
 			;WindowsReplaceString_(@Path,"/","\",@Path)
 		EndIf
-		dbgcorpath("Path: "+Path)
+		DbgCorpath("Path: "+Path)
 		If Path
 			If Flags & #CORRECTPATH_FROM_DEEP
 				i = FindString(Path,"\")
 				While i
 					NewPath = Base+Mid(Path,i+1)
-					dbgcorpath("   >> "+NewPath)
+					DbgCorpath("   >> "+NewPath)
 					If FileSize(NewPath)<>-1
-						dbgcorpath("   == "+NewPath)
+						DbgCorpath("   == "+NewPath)
 						If Flags & #CORRECTPATH_FORWARD_SLASH
 							NewPath = ReplaceString(NewPath,"\","/")
 						EndIf
@@ -414,9 +414,9 @@ CompilerIf #PROC_CORRECTPATH Or #PROC_CORRECTCFGPATH
 				i = FindStringReverse(Path,"\")
 				While i>0
 					NewPath = Base+Mid(Path,i+1)
-					dbgcorpath("   >> "+NewPath)
+					DbgCorpath("   >> "+NewPath)
 					If FileSize(NewPath)<>-1
-						dbgcorpath("   == "+NewPath)
+						DbgCorpath("   == "+NewPath)
 						If Flags & #CORRECTPATH_FORWARD_SLASH
 							NewPath = ReplaceString(NewPath,"\","/")
 						EndIf
@@ -783,8 +783,8 @@ EndProcedure
 ;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 626
-; FirstLine = 587
+; CursorPosition = 418
+; FirstLine = 393
 ; Folding = ---z9-+--
 ; EnableAsm
 ; EnableThread

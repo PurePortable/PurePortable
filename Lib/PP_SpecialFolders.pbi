@@ -680,10 +680,7 @@ CompilerIf #DETOUR_USERENV
 CompilerEndIf
 
 Global SpecialFoldersPermit = 1
-;Global ShfoldersPermit
 Procedure _InitSpecialFoldersHooks()
-	;If ShfoldersPermit
-	;EndIf
 	If SpecialFoldersPermit
 		CompilerIf (#DETOUR_SHFOLDER Or (#PORTABLE_SPECIAL_FOLDERS & #PORTABLE_SF_SHFOLDER))
 			LoadDll("shfolder.dll")
@@ -712,7 +709,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; CursorPosition = 685
-; FirstLine = 659
+; FirstLine = 664
 ; Folding = -----
 ; EnableAsm
 ; DisableDebugger
