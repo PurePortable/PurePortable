@@ -15,7 +15,6 @@ CompilerIf #DBG_BLOCK_INTERNET And Not Defined(DBG_ALWAYS,#PB_Constant)
 CompilerEndIf
 
 CompilerIf #DBG_BLOCK_INTERNET
-	;UndefineMacro DbgAny : DbgAnyDef
 	Global DbgIntMode = #DBG_BLOCK_INTERNET
 	Procedure DbgInt(txt.s)
 		If DbgIntMode
@@ -176,77 +175,87 @@ CompilerEndIf
 
 ;;======================================================================================================================
 ; Принудительная статическая линковка dll
-CompilerIf #BLOCK_WININET
-	Import "wininet.lib" : EndImport
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Import "/INCLUDE:_InternetOpenA@20" : EndImport
-		Import "/INCLUDE:_InternetOpenW@20" : EndImport
-	CompilerElse
-		Import "/INCLUDE:InternetOpenA" : EndImport
-		Import "/INCLUDE:InternetOpenW" : EndImport
-	CompilerEndIf
-CompilerEndIf
-CompilerIf Not Defined(BLOCK_WINHTTP,#PB_Constant) : #BLOCK_WINHTTP = 0 : CompilerEndIf
-CompilerIf #BLOCK_WINHTTP
-	Import "winhttp.lib" : EndImport
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Import "/INCLUDE:_WinHttpOpen@20" : EndImport
-	CompilerElse
-		Import "/INCLUDE:WinHttpOpen" : EndImport
-	CompilerEndIf
-CompilerEndIf
-CompilerIf #BLOCK_WINSOCKS
-	Import "wsock32.lib" : EndImport
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Import "/INCLUDE:_connect@12" : EndImport
-	CompilerElse
-		Import "/INCLUDE:connect" : EndImport
-	CompilerEndIf
-CompilerEndIf
-CompilerIf #BLOCK_WINSOCKS2
-	Import "ws2_32.lib" : EndImport
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Import "/INCLUDE:_connect@12" : EndImport
-	CompilerElse
-		Import "/INCLUDE:connect" : EndImport
-	CompilerEndIf
-CompilerEndIf
+; CompilerIf #BLOCK_WININET
+; 	Import "wininet.lib" : EndImport
+; 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+; 		Import "/INCLUDE:_InternetOpenA@20" : EndImport
+; 		Import "/INCLUDE:_InternetOpenW@20" : EndImport
+; 	CompilerElse
+; 		Import "/INCLUDE:InternetOpenA" : EndImport
+; 		Import "/INCLUDE:InternetOpenW" : EndImport
+; 	CompilerEndIf
+; CompilerEndIf
+; CompilerIf Not Defined(BLOCK_WINHTTP,#PB_Constant) : #BLOCK_WINHTTP = 0 : CompilerEndIf
+; CompilerIf #BLOCK_WINHTTP
+; 	Import "winhttp.lib" : EndImport
+; 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+; 		Import "/INCLUDE:_WinHttpOpen@20" : EndImport
+; 	CompilerElse
+; 		Import "/INCLUDE:WinHttpOpen" : EndImport
+; 	CompilerEndIf
+; CompilerEndIf
+; CompilerIf #BLOCK_WINSOCKS
+; 	Import "wsock32.lib" : EndImport
+; 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+; 		Import "/INCLUDE:_connect@12" : EndImport
+; 	CompilerElse
+; 		Import "/INCLUDE:connect" : EndImport
+; 	CompilerEndIf
+; CompilerEndIf
+; CompilerIf #BLOCK_WINSOCKS2
+; 	Import "ws2_32.lib" : EndImport
+; 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+; 		Import "/INCLUDE:_connect@12" : EndImport
+; 	CompilerElse
+; 		Import "/INCLUDE:connect" : EndImport
+; 	CompilerEndIf
+; CompilerEndIf
 ;;======================================================================================================================
 
-;CompilerIf #BLOCK_WININET  Or #BLOCK_WINHTTP Or #BLOCK_WINSOCKS Or #BLOCK_WINSOCKS2
 XIncludeFile "PP_MinHook.pbi"
-;CompilerEndIf
+
 ;;======================================================================================================================
 
-Global BlockInternetPermit = 1
+Global BlockWinInetPermit = 1
+Global BlockWinHttpPermit = 1
+CompilerIf #BLOCK_WINSOCKS2
+	Global BlockWinSocksPermit = 2
+CompilerElseIf #BLOCK_WINSOCKS
+	Global BlockWinSocksPermit = 1
+CompilerEndIf
 Procedure _InitBlockInternetHooks()
-	If BlockInternetPermit
-		CompilerIf #BLOCK_WININET
-			;Global hdll_WinInet = LoadDll("wininet",1)
+	CompilerIf #BLOCK_WININET
+		If BlockWinInetPermit
+			LoadDll("wininet")
 			MH_HookApi(wininet,InternetOpenA)
 			MH_HookApi(wininet,InternetOpenW)
-		CompilerEndIf
-		CompilerIf #BLOCK_WINHTTP
-			;Global hdll_WinHttp = LoadDll("winhttp",1)
+		EndIf
+	CompilerEndIf
+	CompilerIf #BLOCK_WINHTTP
+		If BlockWinHttpPermit
+			LoadDll("winhttp")
 			MH_HookApi(winhttp,WinHttpOpen)
-		CompilerEndIf
-		CompilerIf #BLOCK_WINSOCKS
-			;MH_HookApi(wsock32,WSAStartup)
-			;Global hdll_WinSocks = LoadDll("wsock32",1)
+		EndIf
+	CompilerEndIf
+	CompilerIf #BLOCK_WINSOCKS
+		If BlockWinSocksPermit = 1
+			LoadDll("wsock32")
 			MH_HookApi(wsock32,socket)
-		CompilerEndIf
-		CompilerIf #BLOCK_WINSOCKS2
-			;Global hdll_WinSocks2 = LoadDll("ws2_32",1)
+		EndIf
+	CompilerEndIf
+	CompilerIf #BLOCK_WINSOCKS2
+		If BlockWinSocksPermit = 2
+			LoadDll("ws2_32")
 			MH_HookApi(ws2_32,socket)
-		CompilerEndIf
-	EndIf
+		EndIf
+	CompilerEndIf
 EndProcedure
 AddInitProcedure(_InitBlockInternetHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 19
-; FirstLine = 11
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 249
+; FirstLine = 221
 ; Folding = --
 ; EnableAsm
 ; DisableDebugger
