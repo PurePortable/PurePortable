@@ -83,10 +83,10 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Блокировка интернета
-#BLOCK_WININET = 0 ; wininet.dll
-#BLOCK_WINHTTP = 0 ; winhttp.dll
-#BLOCK_WINSOCKS = 0 ; wsock32.dll
-#BLOCK_WINSOCKS2 = 0 ; ws2_32.dll
+#BLOCK_WININET = 1 ; wininet.dll
+#BLOCK_WINHTTP = 1 ; winhttp.dll
+#BLOCK_WINSOCKS = 1 ; wsock32.dll
+#BLOCK_WINSOCKS2 = 1 ; ws2_32.dll
 #DBG_BLOCK_INTERNET = 0
 ;}
 ;{ Блокировка консоли
@@ -460,6 +460,9 @@ ProcedureDLL.l AttachProcess(Instance)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
+		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
+		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
+		BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -827,10 +830,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 694
-; FirstLine = 162
-; Folding = fkvKFQAgE+
-; Markers = 305,673
+; CursorPosition = 464
+; FirstLine = 168
+; Folding = fmvKFQEAE+
+; Markers = 305,676
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
