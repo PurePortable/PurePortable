@@ -4,7 +4,10 @@
 (-) удалено
 (?) непонятно ))
 
-[4.10.0.13] 2023-04-09 11:00:00
+[4.10.0.13] 2023-04-11 14:00:00
+(*) Динамическая линковка wininet, winhttp, wsock32 и ws2_32 вместо статической.
+(+) PureApps: Блокировка интернета. Параметры BlockWinInet, BlockWinHttp, BlockWinSocks для управления блокировкой.
+(*) PureApps: Обработка секции Registry.SetPaths раньше секции Registry.CorrectPaths.
 
 [4.10.0.12] 2024-04-09 19:00:00
 (+) PureApps: Секция [LoadLibrary]
