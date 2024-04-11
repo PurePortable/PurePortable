@@ -635,13 +635,16 @@ ProcedureDLL.l AttachProcess(Instance)
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			;p = PreferenceKeyValue()
+			p = PreferencePath()
 			i = FindString(k,"|")
 			If i
 				v = Mid(k,i+1)
 				k = Left(k,i-1)
 				o = GetCfgS(k,v)
-				n = CorrectPath(o,DllDirN)
+				If p=""
+					p = DllDirN
+				EndIf
+				n = CorrectPath(o,p)
 				If n And n<>o
 					SetCfgS(k,v,n)
 				EndIf
@@ -824,10 +827,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 632
-; FirstLine = 165
-; Folding = fkvKFQA5E+
-; Markers = 305,670
+; CursorPosition = 694
+; FirstLine = 162
+; Folding = fkvKFQAgE+
+; Markers = 305,673
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
