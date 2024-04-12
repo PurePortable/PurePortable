@@ -19,7 +19,7 @@ CompilerEndIf
 ;;======================================================================================================================
 ; Найти ключ.
 ; Ключ передаётся без завершающего "\".
-; Возвращается виртуальный дескриптор найденного или Null.
+; Возвращается виртуальный дескриптор найденного ключа или Null.
 Procedure.l FindKey(Key.s)
 	Protected i
 	CharLower_(@Key)
@@ -72,7 +72,7 @@ Procedure.l AddKey(Key.s)
 	ProcedureReturn #Null
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-; Проверить, наш ли ключ. При необходимости, создать. Результат в *phkResult.
+; Проверить, наш ли ключ. При необходимости создать. Результат в *phkResult.
 ; SubKey передаётся в нижнем регистре (через LPeekSZx) и т.п.
 Procedure CreateKey(hKey.l,SubKey.s,*phkResult.Long,*Result.Long,*dwDisposition.Long=#Null)
 	Protected Key.s
@@ -132,7 +132,7 @@ Procedure CreateKey(hKey.l,SubKey.s,*phkResult.Long,*Result.Long,*dwDisposition.
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Проверить, наш ли ключ. Не создавать.
-; SubKey передаётся в нижнем регистре (через LPeekSZx).
+; SubKey передаётся в нижнем регистре (через LPeekSZx) и т.п.
 ; ASK: Надо ли что-то делать если IsKey(hKey), но в списке его нет? Такого быть не должно, но вдруг?
 Procedure OpenKey(hKey.l,SubKey.s,*phkResult.Long,*Result.Long)
 	Protected Key.s
@@ -165,7 +165,7 @@ Procedure OpenKey(hKey.l,SubKey.s,*phkResult.Long,*Result.Long)
 	ProcedureReturn #False
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-; Записать данные в массив настроек.
+; Записать данные в виртуальный реестр.
 ; Проверка существования ключа осуществляется из вызывающей функции вызовом IsKey или OpenKey или CreateKey.
 ; Имя передаётся в нижнем регистре.
 
@@ -331,7 +331,7 @@ CompilerIf #DETOUR_REG_ANSI
 	EndProcedure
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
-; Получить данные из структуры одного уже найденного параметра.
+; Получить данные из виртуального реестра.
 ; Проверка существования ключа осуществляется из вызывающей функции вызовом IsKey или OpenKey или CreateKey.
 
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-reggetvaluea
@@ -506,7 +506,7 @@ CompilerIf #DETOUR_REG_ANSI
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Перечисление данных в ключе.
-; Проверка существования ключа осуществляется из вызывающей функции вызовом IsKey или CreateKey или OpenKey.
+; Проверка существования ключа осуществляется из вызывающей функции вызовом IsKey или OpenKey или CreateKey.
 
 ; ASK: ERROR_MORE_DATA
 
@@ -591,7 +591,6 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 
 ; https://learn.microsoft.com/ru-ru/windows/desktop/api/winreg/nf-winreg-regenumvaluea
-
 ; http://w32api.narod.ru/functions/RegEnumValue.html
 
 ; dwIndex - Указывает индекс затребованного значения. Его значение должно быть нулевым для первого вызова функции RegEnumValue
@@ -920,9 +919,8 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEYA Or #DETOUR_SHDELETEEMPTYKEYW
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 12
-; Folding = 4-P-
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = CAA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -1,4 +1,6 @@
 ﻿;;======================================================================================================================
+; Враппер для работы с библиотекой MinHook
+;;======================================================================================================================
 CompilerIf Not Defined(DBG_MIN_HOOK,#PB_Constant) : #DBG_MIN_HOOK = 0 : CompilerEndIf
 
 ;CompilerIf Not Defined(MINHOOK,#PB_Constant) : #MINHOOK = 1 : CompilerEndIf
@@ -123,7 +125,7 @@ Procedure.s _MH_Error(ErrorNum)
 	ProcedureReturn Str(ErrorNum)+ErrorText
 EndProcedure
 
-; Procedure _MH_EnableHook(pTarget)
+;{ Procedure _MH_EnableHook(pTarget)
 ; 	Protected Result = MH_EnableHook(pTarget)
 ; 	CompilerIf #DBG_MIN_HOOK Or Defined(MIN_HOOK_ERROR_MODE,#PB_Constant)
 ; 		If Result = #MH_OK
@@ -135,6 +137,7 @@ EndProcedure
 ; 	CompilerEndIf
 ; 	ProcedureReturn Result
 ; EndProcedure
+;}
 
 Global MinHookErrorMode = #MIN_HOOK_ERROR_MODE
 
@@ -180,9 +183,6 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 85
-; FirstLine = 64
-; Folding = --
-; Markers = 18,148
+; Folding = -j
 ; DisableDebugger
 ; EnableExeConstant

@@ -113,7 +113,6 @@ CompilerIf #DETOUR_ENVIRONMENTVARIABLE
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetEnvironmentVariableA = @Detour_GetEnvironmentVariableA()
 	Global Original_GetEnvironmentVariableW.GetEnvironmentVariable
 	Procedure.l Detour_GetEnvironmentVariableW(*lpName,*lpBuffer.Word,nSize)
 		Protected Result
@@ -136,7 +135,6 @@ CompilerIf #DETOUR_ENVIRONMENTVARIABLE
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetEnvironmentVariableW = @Detour_GetEnvironmentVariableW()
 CompilerEndIf
 
 ;;======================================================================================================================
@@ -166,7 +164,6 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_FreeEnvironmentStringsA = @Detour_FreeEnvironmentStringsA()
 	Global Original_FreeEnvironmentStringsW.FreeEnvironmentStrings
 	Procedure.l Detour_FreeEnvironmentStringsW(*penv)
 		Protected Result = #True
@@ -178,9 +175,8 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_FreeEnvironmentStringsW = @Detour_FreeEnvironmentStringsW()
 
-; 	Procedure _ReAllocateMemory(*mem,size)
+;{ 	Procedure _ReAllocateMemory(*mem,size)
 ; 		Protected *new= ReAllocateMemory(*mem,size)
 ; 		;dbg("ReAllocateMemory: "+Str(*mem)+" -> "+Str(*new))
 ; 		If *new <> *mem
@@ -188,7 +184,8 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 ; 		EndIf
 ; 		ProcedureReturn *new
 ; 	EndProcedure
-
+;}
+	
 	;Declare _GetEnvironmentStrings(CodePage)
 	Declare _GetEnvironmentStringsA()
 	Declare _GetEnvironmentStringsW()
@@ -207,7 +204,6 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		DbgEnv("GetEnvironmentStrings: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetEnvironmentStrings = @Detour_GetEnvironmentStrings()
 	Global Original_GetEnvironmentStringsA.GetEnvironmentStrings
 	Procedure.l Detour_GetEnvironmentStringsA()
 		Protected Result
@@ -220,7 +216,6 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		DbgEnv("GetEnvironmentStringsA: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetEnvironmentStringsA = @Detour_GetEnvironmentStringsA()
 	Global Original_GetEnvironmentStringsW.GetEnvironmentStrings
 	Procedure.l Detour_GetEnvironmentStringsW()
 		Protected Result
@@ -233,7 +228,6 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		DbgEnv("GetEnvironmentStringsW: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetEnvironmentStringsW = @Detour_GetEnvironmentStringsW()
 
 	Global EnvHeap = HeapCreate_(0,0,0)
 	Procedure _GetEnvironmentStringsA()
@@ -395,7 +389,6 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		DbgEnv("ExpandEnvironmentStringsA (2): «"+PeekSZ(lpDst,-1,#PB_Ascii)+"» Result: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_ExpandEnvironmentStringsA = @Detour_ExpandEnvironmentStringsA()
 	Global Original_ExpandEnvironmentStringsW.ExpandEnvironmentStrings
 	Procedure.l Detour_ExpandEnvironmentStringsW(lpSrc,lpDst,nSize)
 		Protected Result
@@ -414,7 +407,6 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		DbgEnv("ExpandEnvironmentStringsW (2): «"+PeekSZ(lpDst)+"» Result: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_ExpandEnvironmentStringsW = @Detour_ExpandEnvironmentStringsW()
 	Procedure.s _ExpandEnvironmentStrings(s.s)
 		Protected r.s, e.s, v.s
 		Protected p1, p2
@@ -502,7 +494,6 @@ CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_getenv_s = @Detour_getenv_s()
 	; corecrt_wstdlib.h
 	Global Original__wgetenv_s.Proto_getenv_s
 	ProcedureC Detour__wgetenv_s(*RequiredCount.Integer,*Buffer,BufferCount,*VarName)
@@ -533,7 +524,6 @@ CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline__wgetenv_s = @Detour__wgetenv_s()
 	;;------------------------------------------------------------------------------------------------------------------
 	Global HomeDriveRedirA.s, HomePathRedirA.s
 	Procedure env2ptr(Env.s,Ansi=#False)
@@ -606,7 +596,6 @@ CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_getenv = @Detour_getenv()
 	; corecrt_wstdlib.h
 	Global Original__wgetenv.Proto_getenv
 	ProcedureC Detour__wgetenv(*varname)
@@ -621,7 +610,6 @@ CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline__wgetenv = @Detour__wgetenv()
 CompilerEndIf
 
 ;;======================================================================================================================
@@ -684,9 +672,6 @@ AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 238
-; FirstLine = 229
-; Folding = -----
-; Markers = 294
+; Folding = CAAA9
 ; DisableDebugger
 ; EnableExeConstant

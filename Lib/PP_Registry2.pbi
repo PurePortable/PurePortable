@@ -302,8 +302,7 @@ CompilerIf #DBG_REGISTRY_MODE
 			dbg(txt)
 		EndIf
 	EndProcedure
-	; !!!
-	; Так как мы не можем определить, где открывается ключ, данная процедура не имеет смысла
+	; !!! Так как мы не можем определить, где открывается ключ, данная процедура не имеет смысла
 	Procedure DbgRegAliens(txt.s)
 		;If DbgRegMode=#DBG_REG_MODE_ALIENS
 		;	;Global KeyExclude.s = "clsid|software\classes|"
@@ -388,7 +387,7 @@ XIncludeFile "PP_Registry2Cfg.pbi"
 
 ;;======================================================================================================================
 ; Принудительная статическая линковка dll, так как если программа имеет только отложенный импорт, MinHook вызывается с ошибкой.
-; https://learn.microsoft.com/en-us/cpp/build/reference/include-force-symbol-references?view=msvc-170
+; https://learn.microsoft.com/en-us/cpp/build/reference/include-force-symbol-references
 CompilerIf #True
 	Import "advapi32.lib" : EndImport
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
@@ -526,10 +525,8 @@ EndProcedure
 AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 291
-; FirstLine = 228
-; Folding = H-v--
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = HHv--
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

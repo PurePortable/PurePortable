@@ -452,7 +452,7 @@ XIncludeFile "PP_Registry1Detours.pbi"
 
 ;;======================================================================================================================
 ; Принудительная статическая линковка dll, так как если программа имеет только отложенный импорт, MinHook вызывается с ошибкой.
-; https://learn.microsoft.com/en-us/cpp/build/reference/include-force-symbol-references?view=msvc-170
+; https://learn.microsoft.com/en-us/cpp/build/reference/include-force-symbol-references
 CompilerIf #True
 	Import "advapi32.lib" : EndImport
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
@@ -592,8 +592,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 302
-; FirstLine = 244
 ; Folding = H----v--
 ; DisableDebugger
 ; EnableExeConstant

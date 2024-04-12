@@ -56,7 +56,6 @@ EndMacro
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Макросы для описания экспортируемых прокси-функции в dll, компилируемых не под своим именем (comdlg32, advapi32 и др.)
-;CompilerIf Not Defined(PROXY_INDIRECT,#PB_Constant) : #PROXY_INDIRECT = 0 : CompilerEndIf
 ; Трамплин на оригинальную функцию через импорт (компиляция с использованием библиотеки импорта).
 ; Перехват нужен - в Detour-функцию попадём только через перехват.
 Macro DeclareExportFunc(FuncName,LibName,Name32,Name64)
@@ -201,12 +200,12 @@ Macro DeclareProxyFunc(DllName,FuncName,Compat=0)
 			!DB SingleQuote#FuncName#SingleQuote, 0
 		EndDataSection
 		Global Trampoline_#FuncName = _InitProxyFunc(hDll_#DllName,?FuncAsciiName_#FuncName)
-		;dbgproxy(ProxyFuncInitMsg FuncName#DoubleQuote)
+		;DbgProxy(ProxyFuncInitMsg FuncName#DoubleQuote)
 	CompilerEndIf
 EndMacro
 
 ; Макрос для описания функций, имена которых конфликтуют с процедурами PureBasic.
-; Имена этих функций будут замены в экспорте внешней утилитой.
+; Имена этих функций будут заменены в экспорте внешней утилитой.
 Macro DeclareProxyConflictFunc(DllName,FuncName,ConflictFuncName,Compat=0)
 	CompilerIf Compat=0 Or Compat<=#PROXY_DLL_COMPATIBILITY
 		ProcedureDLL ConflictFuncName()
@@ -266,8 +265,7 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 			!CALL [v__InitProxyFunc]
 			!MOV DWORD [v_Trampoline_#FuncName], EAX
 			!@@:
-			;!JMP [v_Trampoline_#FuncName]
-			!JMP [EAX]
+			!JMP [EAX] ;!JMP [v_Trampoline_#FuncName]
 		CompilerElse
 			!MOV RAX, QWORD [v_Trampoline_#FuncName]
 			!AND RAX, RAX
@@ -286,8 +284,7 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 			!POP RCX
 			!@@:
 			!ADD RSP,40
-			;!JMP [v_Trampoline_#FuncName]
-			!JMP [RAX]
+			!JMP [RAX] ;!JMP [v_Trampoline_#FuncName]
 		CompilerEndIf
 		!FuncAsciiName_#FuncName DB SingleQuote#FuncName#SingleQuote, 0
 	EndProcedure
@@ -321,10 +318,7 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 314
-; FirstLine = 285
-; Folding = ----
-; Markers = 7,165,305
+; Folding = -AAw
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -23,7 +23,6 @@ CompilerIf #DETOUR_REGCREATEKEYA
 		DbgRegExt("RegCreateKeyA: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyA = @Detour_RegCreateKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGCREATEKEYW
 	Global Original_RegCreateKeyW.RegCreateKey
@@ -44,7 +43,6 @@ CompilerIf #DETOUR_REGCREATEKEYW
 		DbgRegExt("RegCreateKeyW: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyW = @Detour_RegCreateKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegCreateKeyEx(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long)
@@ -69,7 +67,6 @@ CompilerIf #DETOUR_REGCREATEKEYEXA
 		DbgRegExt("RegCreateKeyExA: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyExA = @Detour_RegCreateKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGCREATEKEYEXW
 	Global Original_RegCreateKeyExW.RegCreateKeyEx
@@ -90,7 +87,6 @@ CompilerIf #DETOUR_REGCREATEKEYEXW
 		DbgRegExt("RegCreateKeyExW: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyExW = @Detour_RegCreateKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegCreateKeyTransacted(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition,hTransaction,*pExtendedParameter)
@@ -115,7 +111,6 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDA
 		DbgRegExt("RegCreateKeyTransactedA: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyTransactedA = @Detour_RegCreateKeyTransactedA()
 CompilerEndIf
 CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDW
 	Global Original_RegCreateKeyTransactedW.RegCreateKeyTransacted
@@ -136,7 +131,6 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDW
 		DbgRegExt("RegCreateKeyTransactedW: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyTransactedW = @Detour_RegCreateKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegOpenKey(hKey.l,*lpSubKey,*phkResult.Long)
@@ -161,7 +155,6 @@ CompilerIf #DETOUR_REGOPENKEYA
 		DbgRegExt("RegOpenKeyA: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyA = @Detour_RegOpenKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGOPENKEYW
 	Global Original_RegOpenKeyW.RegOpenKey
@@ -182,7 +175,6 @@ CompilerIf #DETOUR_REGOPENKEYW
 		DbgRegExt("RegOpenKeyW: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyW = @Detour_RegOpenKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegOpenKeyEx(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long)
@@ -207,7 +199,6 @@ CompilerIf #DETOUR_REGOPENKEYEXA
 		DbgRegExt("RegOpenKeyExA: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyExA = @Detour_RegOpenKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGOPENKEYEXW
 	Global Original_RegOpenKeyExW.RegOpenKeyEx
@@ -228,7 +219,6 @@ CompilerIf #DETOUR_REGOPENKEYEXW
 		DbgRegExt("RegOpenKeyExW: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyExW = @Detour_RegOpenKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegOpenKeyTransacted(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long,hTransaction,*pExtendedParameter)
@@ -253,7 +243,6 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTEDA
 		DbgRegExt("RegOpenKeyTransactedA: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyTransactedA = @Detour_RegOpenKeyTransactedA()
 CompilerEndIf
 CompilerIf #DETOUR_REGOPENKEYTRANSACTEDW
 	Global Original_RegOpenKeyTransactedW.RegOpenKeyTransacted
@@ -274,7 +263,6 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTEDW
 		DbgRegExt("RegOpenKeyTransactedW: "+HKey2Str(*phkResult\l)+" "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyTransactedW = @Detour_RegOpenKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKey(hKey.l,*lpSubKey)
@@ -299,7 +287,6 @@ CompilerIf #DETOUR_REGDELETEKEYA
 		DbgRegExt("RegDeleteKeyA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyA = @Detour_RegDeleteKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYW
 	Global Original_RegDeleteKeyW.RegDeleteKey
@@ -320,7 +307,6 @@ CompilerIf #DETOUR_REGDELETEKEYW
 		DbgRegExt("RegDeleteKeyW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyW = @Detour_RegDeleteKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKeyEx(hKey.l,*lpSubKey,samDesired.l,Reserved.l)
@@ -345,7 +331,6 @@ CompilerIf #DETOUR_REGDELETEKEYEXA
 		DbgRegExt("RegDeleteKeyExA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyExA = @Detour_RegDeleteKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYEXW
 	Global Original_RegDeleteKeyExW.RegDeleteKeyEx
@@ -366,7 +351,6 @@ CompilerIf #DETOUR_REGDELETEKEYEXW
 		DbgRegExt("RegDeleteKeyExW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyExW = @Detour_RegDeleteKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKeyTransacted(hKey.l,*lpSubKey,samDesired.l,Reserved.l,hTransaction,*pExtendedParameter)
@@ -390,7 +374,6 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyTransactedA = @Detour_RegDeleteKeyTransactedA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDW
 	Global Original_RegDeleteKeyTransactedW.RegDeleteKeyTransacted
@@ -410,7 +393,6 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDW
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyTransactedW = @Detour_RegDeleteKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteTree(hKey.l,*lpSubKey)
@@ -434,7 +416,6 @@ CompilerIf #DETOUR_REGDELETETREEA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_ = @Detour_()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETETREEW
 	Global Original_RegDeleteTreeW.RegDeleteTree
@@ -454,7 +435,6 @@ CompilerIf #DETOUR_REGDELETETREEW
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_ = @Detour_()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l SHDeleteKey(hKey.l,*lpSubKey)
@@ -479,7 +459,6 @@ CompilerIf #DETOUR_SHDELETEKEYA
 		DbgRegExt("SHDeleteKeyA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteKeyA = @Detour_SHDeleteKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_SHDELETEKEYW
 	Global Original_SHDeleteKeyW.SHDeleteKey
@@ -500,7 +479,6 @@ CompilerIf #DETOUR_SHDELETEKEYW
 		DbgRegExt("SHDeleteKeyW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteKeyW = @Detour_SHDeleteKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l SHDeleteEmptyKey(hKey.l,*lpSubKey)
@@ -525,7 +503,6 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEYA
 		DbgRegExt("SHDeleteEmptyKeyA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteEmptyKeyA = @Detour_SHDeleteEmptyKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_SHDELETEEMPTYKEYW
 	Global Original_SHDeleteEmptyKeyW.SHDeleteEmptyKey
@@ -546,7 +523,6 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEYW
 		DbgRegExt("SHDeleteEmptyKeyW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteEmptyKeyW = @Detour_SHDeleteEmptyKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKeyValue(hkey.l,*lpSubKey,*lpValueName)
@@ -571,7 +547,6 @@ CompilerIf #DETOUR_REGDELETEKEYVALUEA
 		DbgRegExt("RegDeleteKeyValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyValueA = @Detour_RegDeleteKeyValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYVALUEW
 	Global Original_RegDeleteKeyValueW.RegDeleteKeyValue
@@ -592,7 +567,6 @@ CompilerIf #DETOUR_REGDELETEKEYVALUEW
 		DbgRegExt("RegDeleteKeyValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyValueW = @Detour_RegDeleteKeyValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeletevaluea
@@ -618,7 +592,6 @@ CompilerIf #DETOUR_SHDELETEVALUEA
 		DbgRegExt("SHDeleteValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteValueA = @Detour_SHDeleteValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHDELETEVALUEW
 	Global Original_SHDeleteValueW.SHDeleteValue
@@ -639,7 +612,6 @@ CompilerIf #DETOUR_SHDELETEVALUEW
 		DbgRegExt("SHDeleteValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteValueW = @Detour_SHDeleteValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegQueryValue(hKey.l,*lpSubKey,*lpData,*lpcbData)
@@ -664,7 +636,6 @@ CompilerIf #DETOUR_REGQUERYVALUEA
 		DbgRegExt("RegEnumValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryValueA = @Detour_RegQueryValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGQUERYVALUEW
 	Global Original_RegQueryValueW.RegQueryValue
@@ -685,7 +656,6 @@ CompilerIf #DETOUR_REGQUERYVALUEW
 		DbgRegExt("RegEnumValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryValueW = @Detour_RegQueryValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegGetValue(hKey.l,*lpSubKey,*lpValueName,rrfFlags.l,*lpType,*lpData,*lpcbData)
@@ -710,7 +680,6 @@ CompilerIf #DETOUR_REGGETVALUEA
 		DbgRegExt("RegGetValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegGetValueA = @Detour_RegGetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGGETVALUEW
 	Global Original_RegGetValueW.RegGetValue
@@ -731,7 +700,6 @@ CompilerIf #DETOUR_REGGETVALUEW
 		DbgRegExt("RegGetValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegGetValueW = @Detour_RegGetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l SHGetValue(hKey.l,*lpSubKey,*lpValueName,*pdwType,*pvData,*pcbData)
@@ -756,7 +724,6 @@ CompilerIf #DETOUR_SHGETVALUEA
 		DbgRegExt("SHGetValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetValueA = @Detour_SHGetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHGETVALUEW
 	Global Original_SHGetValueW.SHGetValue
@@ -777,7 +744,6 @@ CompilerIf #DETOUR_SHGETVALUEW
 		DbgRegExt("SHGetValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetValueW = @Detour_SHGetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l SHRegGetValue(hKey.l,*lpSubKey,*lpValueName,srrfFlags,*pdwType,*pvData,*pcbData)
@@ -802,7 +768,6 @@ CompilerIf #DETOUR_SHREGGETVALUEA
 		DbgRegExt("SHRegGetValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHRegGetValueA = @Detour_SHRegGetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHREGGETVALUEW
 	Global Original_SHRegGetValueW.SHRegGetValue
@@ -823,7 +788,6 @@ CompilerIf #DETOUR_SHREGGETVALUEW
 		DbgRegExt("SHRegGetValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHRegGetValueW = @Detour_SHRegGetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shreggetpatha
@@ -853,7 +817,6 @@ CompilerIf #DETOUR_REGSETVALUEA
 		DbgRegExt("RegSetValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetValueA = @Detour_RegSetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGSETVALUEW
 	Global Original_RegSetValueW.RegSetValue
@@ -874,7 +837,6 @@ CompilerIf #DETOUR_REGSETVALUEW
 		DbgRegExt("RegSetValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetValueW = @Detour_RegSetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetkeyvaluea
@@ -900,7 +862,6 @@ CompilerIf #DETOUR_REGSETKEYVALUEA
 		DbgRegExt("RegSetKeyValueA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetKeyValueA = @Detour_RegSetKeyValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGSETKEYVALUEW
 	Global Original_RegSetKeyValueW.RegSetKeyValue
@@ -921,7 +882,6 @@ CompilerIf #DETOUR_REGSETKEYVALUEW
 		DbgRegExt("RegSetKeyValueW: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetKeyValueW = @Detour_RegSetKeyValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shcopykeya
@@ -1016,9 +976,7 @@ CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 278
-; FirstLine = 276
-; Folding = --------
+; Folding = AAAAAAA9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

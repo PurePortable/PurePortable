@@ -44,7 +44,6 @@ CompilerIf #DETOUR_REGCLOSEKEY
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCloseKey = @Detour_RegCloseKey()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regcreatekeya
@@ -67,7 +66,6 @@ CompilerIf #DETOUR_REGCREATEKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyA = @Detour_RegCreateKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGCREATEKEYW
 	Global Original_RegCreateKeyW.RegCreateKey
@@ -86,7 +84,6 @@ CompilerIf #DETOUR_REGCREATEKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyW = @Detour_RegCreateKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
@@ -116,7 +113,6 @@ CompilerIf #DETOUR_REGCREATEKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyExA = @Detour_RegCreateKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGCREATEKEYEXW
 	Global Original_RegCreateKeyExW.RegCreateKeyEx
@@ -143,7 +139,6 @@ CompilerIf #DETOUR_REGCREATEKEYEXW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyExW = @Detour_RegCreateKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegCreateKeyTransacted(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long,hTransaction,*pExtendedParameter)
@@ -167,7 +162,6 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyTransactedA = @Detour_RegCreateKeyTransactedA()
 CompilerEndIf
 CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDW
 	Global Original_RegCreateKeyTransactedW.RegCreateKeyTransacted
@@ -189,7 +183,6 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegCreateKeyTransactedW = @Detour_RegCreateKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regopenkeya
@@ -211,7 +204,6 @@ CompilerIf #DETOUR_REGOPENKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyA = @Detour_RegOpenKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGOPENKEYW
 	Global Original_RegOpenKeyW.RegOpenKey
@@ -230,7 +222,6 @@ CompilerIf #DETOUR_REGOPENKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyW = @Detour_RegOpenKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regopenkeyexa
@@ -252,7 +243,6 @@ CompilerIf #DETOUR_REGOPENKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyExA = @Detour_RegOpenKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGOPENKEYEXW
 	Global Original_RegOpenKeyExW.RegOpenKeyEx
@@ -271,7 +261,6 @@ CompilerIf #DETOUR_REGOPENKEYEXW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyExW = @Detour_RegOpenKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegOpenKeyTransacted(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long,hTransaction,*pExtendedParameter)
@@ -292,7 +281,6 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTEDA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyTransactedA = @Detour_RegOpenKeyTransactedA()
 CompilerEndIf
 CompilerIf #DETOUR_REGOPENKEYTRANSACTEDW
 	Global Original_RegOpenKeyTransactedW.RegOpenKeyTransacted
@@ -311,7 +299,6 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTEDW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegOpenKeyTransactedW = @Detour_RegOpenKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeya
@@ -333,7 +320,6 @@ CompilerIf #DETOUR_REGDELETEKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyA = @Detour_RegDeleteKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYW
 	Global Original_RegDeleteKeyW.RegDeleteKey
@@ -352,7 +338,6 @@ CompilerIf #DETOUR_REGDELETEKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyW = @Detour_RegDeleteKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeyexa
@@ -374,7 +359,6 @@ CompilerIf #DETOUR_REGDELETEKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyExA = @Detour_RegDeleteKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYEXW
 	Global Original_RegDeleteKeyExW.RegDeleteKeyEx
@@ -393,7 +377,6 @@ CompilerIf #DETOUR_REGDELETEKEYEXW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyExW = @Detour_RegDeleteKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKeyTransacted(hKey.l,*lpSubKey,samDesired.l,Reserved.l,hTransaction,*pExtendedParameter)
@@ -414,7 +397,6 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyTransactedA = @Detour_RegDeleteKeyTransactedA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDW
 	Global Original_RegDeleteKeyTransactedW.RegDeleteKeyTransacted
@@ -433,7 +415,6 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyTransactedW = @Detour_RegDeleteKeyTransactedW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletetreea
@@ -455,7 +436,6 @@ CompilerIf #DETOUR_REGDELETETREEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteTreeA = @Detour_RegDeleteTreeA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETETREEW
 	Global Original_RegDeleteTreeW.RegDeleteTree
@@ -474,7 +454,6 @@ CompilerIf #DETOUR_REGDELETETREEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteTreeW = @Detour_RegDeleteTreeW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeletekeya
@@ -496,7 +475,6 @@ CompilerIf #DETOUR_SHDELETEKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteKeyA = @Detour_SHDeleteKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_SHDELETEKEYW
 	Global Original_SHDeleteKeyW.SHDeleteKey
@@ -515,7 +493,6 @@ CompilerIf #DETOUR_SHDELETEKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteKeyW = @Detour_SHDeleteKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeleteemptykeya
@@ -545,7 +522,6 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteEmptyKeyA = @Detour_SHDeleteEmptyKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_SHDELETEEMPTYKEYW
 	Global Original_SHDeleteEmptyKeyW.SHDeleteEmptyKey
@@ -572,7 +548,6 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteEmptyKeyW = @Detour_SHDeleteEmptyKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletevaluea
@@ -594,7 +569,6 @@ CompilerIf #DETOUR_REGDELETEVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteValueA = @Detour_RegDeleteValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEVALUEW
 	Global Original_RegDeleteValueW.RegDeleteValue
@@ -613,7 +587,6 @@ CompilerIf #DETOUR_REGDELETEVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteValueW = @Detour_RegDeleteValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluea
@@ -638,7 +611,6 @@ CompilerIf #DETOUR_REGDELETEKEYVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyValueA = @Detour_RegDeleteKeyValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGDELETEKEYVALUEW
 	Global Original_RegDeleteKeyValueW.RegDeleteKeyValue
@@ -660,7 +632,6 @@ CompilerIf #DETOUR_REGDELETEKEYVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegDeleteKeyValueW = @Detour_RegDeleteKeyValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeletevaluea
@@ -684,7 +655,6 @@ CompilerIf #DETOUR_SHDELETEVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteValueA = @Detour_SHDeleteValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHDELETEVALUEW
 	Global Original_SHDeleteValueW.SHDeleteValue
@@ -705,7 +675,6 @@ CompilerIf #DETOUR_SHDELETEVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHDeleteValueW = @Detour_SHDeleteValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regenumkeyw
@@ -734,7 +703,6 @@ CompilerIf #DETOUR_REGENUMKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegEnumKeyA = @Detour_RegEnumKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGENUMKEYW
 	Global Original_RegEnumKeyW.RegEnumKey
@@ -760,7 +728,6 @@ CompilerIf #DETOUR_REGENUMKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegEnumKeyW = @Detour_RegEnumKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regenumkeyexwa
@@ -789,7 +756,6 @@ CompilerIf #DETOUR_REGENUMKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegEnumKeyExA = @Detour_RegEnumKeyExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGENUMKEYEXW
 	Global Original_RegEnumKeyExW.RegEnumKeyEx
@@ -815,7 +781,6 @@ CompilerIf #DETOUR_REGENUMKEYEXW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegEnumKeyExW = @Detour_RegEnumKeyExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regenumvaluea
@@ -839,7 +804,6 @@ CompilerIf #DETOUR_REGENUMVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegEnumValueA = @Detour_RegEnumValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGENUMVALUEW
 	Global Original_RegEnumValueW.RegEnumValue
@@ -860,7 +824,6 @@ CompilerIf #DETOUR_REGENUMVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegEnumValueW = @Detour_RegEnumValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regqueryvaluea
@@ -885,7 +848,6 @@ CompilerIf #DETOUR_REGQUERYVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryValueA = @Detour_RegQueryValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGQUERYVALUEW
 	Global Original_RegQueryValueW.RegQueryValue
@@ -907,7 +869,6 @@ CompilerIf #DETOUR_REGQUERYVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryValueW = @Detour_RegQueryValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regqueryvalueexa
@@ -931,7 +892,6 @@ CompilerIf #DETOUR_REGQUERYVALUEEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryValueExA = @Detour_RegQueryValueExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGQUERYVALUEEXW
 	Global Original_RegQueryValueExW.RegQueryValueEx
@@ -952,7 +912,6 @@ CompilerIf #DETOUR_REGQUERYVALUEEXW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryValueExW = @Detour_RegQueryValueExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-reggetvaluea
@@ -977,7 +936,6 @@ CompilerIf #DETOUR_REGGETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegGetValueA = @Detour_RegGetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGGETVALUEW
 	Global Original_RegGetValueW.RegGetValue
@@ -999,7 +957,6 @@ CompilerIf #DETOUR_REGGETVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegGetValueW = @Detour_RegGetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shgetvaluea
@@ -1024,7 +981,6 @@ CompilerIf #DETOUR_SHGETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetValueA = @Detour_SHGetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHGETVALUEW
 	Global Original_SHGetValueW.SHGetValue
@@ -1046,7 +1002,6 @@ CompilerIf #DETOUR_SHGETVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetValueW = @Detour_SHGetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shqueryvalueexa
@@ -1054,7 +1009,7 @@ CompilerEndIf
 ; then the string is guaranteed to be properly null terminated.
 ; Additionally, if the data type is REG_EXPAND_SZ these functions will go ahead and expand out the string,
 ; and "massage" the returned *pdwType to be REG_SZ.
-Prototype.l SHQueryValueEx(hkey.l,*lpValueName,*pdwReserved.Long,*pdwType.Long,*pvData,*pcbData.Long)
+Prototype.l SHQueryValueEx(hKey.l,*lpValueName,*pdwReserved.Long,*pdwType.Long,*pvData,*pcbData.Long)
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluea
@@ -1080,7 +1035,6 @@ CompilerIf #DETOUR_SHREGGETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHRegGetValueA = @Detour_SHRegGetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHREGGETVALUEW
 	Global Original_SHRegGetValueW.SHRegGetValue
@@ -1101,7 +1055,6 @@ CompilerIf #DETOUR_SHREGGETVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHRegGetValueW = @Detour_SHRegGetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shreggetintw
@@ -1134,7 +1087,6 @@ CompilerIf #DETOUR_REGSETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetValueA = @Detour_RegSetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGSETVALUEW
 	Global Original_RegSetValueW.RegSetValue
@@ -1156,7 +1108,6 @@ CompilerIf #DETOUR_REGSETVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetValueW = @Detour_RegSetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetvalueexa
@@ -1180,7 +1131,6 @@ CompilerIf #DETOUR_REGSETVALUEEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetValueExA = @Detour_RegSetValueExA()
 CompilerEndIf
 CompilerIf #DETOUR_REGSETVALUEEXW
 	Global Original_RegSetValueExW.RegSetValueEx
@@ -1201,7 +1151,6 @@ CompilerIf #DETOUR_REGSETVALUEEXW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetValueExW = @Detour_RegSetValueExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetkeyvaluea
@@ -1226,7 +1175,6 @@ CompilerIf #DETOUR_REGSETKEYVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetKeyValueA = @Detour_RegSetKeyValueA()
 CompilerEndIf
 CompilerIf #DETOUR_REGSETKEYVALUEW
 	Global Original_RegSetKeyValueW.RegSetKeyValue
@@ -1248,7 +1196,6 @@ CompilerIf #DETOUR_REGSETKEYVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegSetKeyValueW = @Detour_RegSetKeyValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shsetvaluea
@@ -1273,7 +1220,6 @@ CompilerIf #DETOUR_SHSETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHSetValueA = @Detour_SHSetValueA()
 CompilerEndIf
 CompilerIf #DETOUR_SHSETVALUEW
 	Global Original_SHSetValueW.SHSetValue
@@ -1295,7 +1241,6 @@ CompilerIf #DETOUR_SHSETVALUEW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHSetValueW = @Detour_SHSetValueW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shregsetvalue
@@ -1321,7 +1266,6 @@ CompilerEndIf
 ; 		RegCriticalLeave
 ; 		ProcedureReturn Result
 ; 	EndProcedure
-; 	;Global Trampoline_SHRegSetValue = @Detour_SHRegSetValue()
 ; CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shregsetpatha
@@ -1380,7 +1324,6 @@ CompilerIf #DETOUR_REGQUERYINFOKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryInfoKeyA = @Detour_RegQueryInfoKeyA()
 CompilerEndIf
 CompilerIf #DETOUR_REGQUERYINFOKEYW
 	Global Original_RegQueryInfoKeyW.RegQueryInfoKey
@@ -1432,7 +1375,6 @@ CompilerIf #DETOUR_REGQUERYINFOKEYW
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegQueryInfoKeyW = @Detour_RegQueryInfoKeyW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shqueryinfokeya
@@ -1498,14 +1440,11 @@ CompilerIf #DETOUR_REGFLUSHKEY
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_RegFlushKey = @Detour_RegFlushKey()
 CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 1443
-; FirstLine = 1432
-; Folding = -----------
+; Folding = AAAAAAAAAA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

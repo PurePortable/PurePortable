@@ -25,7 +25,6 @@ CompilerIf #DBG_PROFILE_STRINGS And Not Defined(DBG_ALWAYS,#PB_Constant)
 CompilerEndIf
 
 CompilerIf #DBG_PROFILE_STRINGS
-	;UndefineMacro DbgAny : DbgAnyDef
 	Global DbgProfMode = #DBG_PROFILE_STRINGS
 	Procedure DbgProf(txt.s)
 		If DbgProfMode
@@ -70,7 +69,6 @@ Procedure.l Detour_GetPrivateProfileSectionA(*lpAppName,*lpReturnedString,nSize,
 		ProcedureReturn Original_GetPrivateProfileSectionA(*lpAppName,*lpReturnedString,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileSectionA = @Detour_GetPrivateProfileSectionA()
 Global Original_GetPrivateProfileSectionW.GetPrivateProfileSection
 Procedure.l Detour_GetPrivateProfileSectionW(*lpAppName,*lpReturnedString,nSize,*lpFileName)
 	DbgProf("GetPrivateProfileSectionW: «"+PeekSZ(*lpAppName)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -85,7 +83,6 @@ Procedure.l Detour_GetPrivateProfileSectionW(*lpAppName,*lpReturnedString,nSize,
 		ProcedureReturn Original_GetPrivateProfileSectionW(*lpAppName,*lpReturnedString,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileSectionW = @Detour_GetPrivateProfileSectionW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l GetPrivateProfileSectionNames(*lpReturnBuffer,nSize,*lpFileName)
 Global Original_GetPrivateProfileSectionNamesA.GetPrivateProfileSectionNames
@@ -105,7 +102,6 @@ Procedure.l Detour_GetPrivateProfileSectionNamesA(*lpReturnBuffer,nSize,*lpFileN
 		ProcedureReturn Original_GetPrivateProfileSectionNamesA(*lpReturnBuffer,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileSectionNamesA = @Detour_GetPrivateProfileSectionNamesA()
 Global Original_GetPrivateProfileSectionNamesW.GetPrivateProfileSectionNames
 Procedure.l Detour_GetPrivateProfileSectionNamesW(*lpReturnBuffer,nSize,*lpFileName)
 	DbgProf("GetPrivateProfileSectionNamesW: «"+PeekSZ(*lpFileName)+"»")
@@ -120,7 +116,6 @@ Procedure.l Detour_GetPrivateProfileSectionNamesW(*lpReturnBuffer,nSize,*lpFileN
 		ProcedureReturn Original_GetPrivateProfileSectionNamesW(*lpReturnBuffer,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileSectionNamesW = @Detour_GetPrivateProfileSectionNamesW()
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getprivateprofilestring
 ; https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getprivateprofilestringa
@@ -142,7 +137,6 @@ Procedure.l Detour_GetPrivateProfileStringA(*lpSection,*lpKeyName,*lpDefault,*lp
 		ProcedureReturn Original_GetPrivateProfileStringA(*lpSection,*lpKeyName,*lpDefault,*lpReturnedString,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileStringA = @Detour_GetPrivateProfileStringA()
 Global Original_GetPrivateProfileStringW.GetPrivateProfileString
 Procedure.l Detour_GetPrivateProfileStringW(*lpSection,*lpKeyName,*lpDefault,*lpReturnedString,nSize,*lpFileName)
 	DbgProf("GetPrivateProfileStringW: «"+PeekSZ(*lpSection)+"» «"+PeekSZ(*lpKeyName)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -157,7 +151,6 @@ Procedure.l Detour_GetPrivateProfileStringW(*lpSection,*lpKeyName,*lpDefault,*lp
 		ProcedureReturn Original_GetPrivateProfileStringW(*lpSection,*lpKeyName,*lpDefault,*lpReturnedString,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileStringW = @Detour_GetPrivateProfileStringW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l GetPrivateProfileStruct(*lpSection,*lpKeyName,*lpStruct,nSize,*lpFileName)
 Global Original_GetPrivateProfileStructA.GetPrivateProfileStruct
@@ -177,7 +170,6 @@ Procedure.l Detour_GetPrivateProfileStructA(*lpSection,*lpKeyName,*lpStruct,nSiz
 		ProcedureReturn Original_GetPrivateProfileStructA(*lpSection,*lpKeyName,*lpStruct,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileStructA = @Detour_GetPrivateProfileStructA()
 Global Original_GetPrivateProfileStructW.GetPrivateProfileStruct
 Procedure.l Detour_GetPrivateProfileStructW(*lpSection,*lpKeyName,*lpStruct,nSize,*lpFileName)
 	DbgProf("GetPrivateProfileStructW: «"+PeekSZ(*lpSection)+"» «"+PeekSZ(*lpKeyName)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -192,7 +184,6 @@ Procedure.l Detour_GetPrivateProfileStructW(*lpSection,*lpKeyName,*lpStruct,nSiz
 		ProcedureReturn Original_GetPrivateProfileStructW(*lpSection,*lpKeyName,*lpStruct,nSize,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileStructW = @Detour_GetPrivateProfileStructW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l GetPrivateProfileInt(*lpAppName,*lpKeyName,nDefault,*lpFileName)
 Global Original_GetPrivateProfileIntA.GetPrivateProfileInt
@@ -212,7 +203,6 @@ Procedure.l Detour_GetPrivateProfileIntA(*lpAppName,*lpKeyName,nDefault,*lpFileN
 		ProcedureReturn Original_GetPrivateProfileIntA(*lpAppName,*lpKeyName,nDefault,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileIntA = @Detour_GetPrivateProfileIntA()
 Global Original_GetPrivateProfileIntW.GetPrivateProfileInt
 Procedure.l Detour_GetPrivateProfileIntW(*lpAppName,*lpKeyName,nDefault,*lpFileName)
 	DbgProf("GetPrivateProfileIntW: «"+PeekSZ(*lpKeyName)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -227,7 +217,6 @@ Procedure.l Detour_GetPrivateProfileIntW(*lpAppName,*lpKeyName,nDefault,*lpFileN
 		ProcedureReturn Original_GetPrivateProfileIntW(*lpAppName,*lpKeyName,nDefault,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileIntW = @Detour_GetPrivateProfileIntW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l GetProfileSection(*lpAppName,*lpReturnedString,nSize)
 Global Original_GetProfileSectionA.GetProfileSection
@@ -239,7 +228,6 @@ Procedure.l Detour_GetProfileSectionA(*lpAppName,*lpReturnedString,nSize)
 		ProcedureReturn Original_GetPrivateProfileSectionA(*lpAppName,*lpReturnedString,nSize,*ProfileStringFileNameA)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetProfileSectionA = @Detour_GetProfileSectionA()
 Global Original_GetProfileSectionW.GetProfileSection
 Procedure.l Detour_GetProfileSectionW(*lpAppName,*lpReturnedString,nSize)
 	DbgProf("GetProfileSectionW: «"+PeekSZ(*lpAppName)+"»")
@@ -249,11 +237,9 @@ Procedure.l Detour_GetProfileSectionW(*lpAppName,*lpReturnedString,nSize)
 		ProcedureReturn Original_GetPrivateProfileSectionW(*lpAppName,*lpReturnedString,nSize,@ProfileStringFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetProfileSectionW = @Detour_GetProfileSectionW()
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getprofilestringa
 ; Возврат: количество скопированных символов, исключая нулевой
-; TODO
 Prototype.l GetProfileString(*lpAppName,*lpKeyName,*lpDefault,*lpReturnedString,nSize)
 Global Original_GetProfileStringA.GetProfileString
 Procedure.l Detour_GetProfileStringA(*lpAppName,*lpKeyName,*lpDefault,*lpReturnedString,nSize)
@@ -264,7 +250,6 @@ Procedure.l Detour_GetProfileStringA(*lpAppName,*lpKeyName,*lpDefault,*lpReturne
 		ProcedureReturn Original_GetPrivateProfileStringA(*lpAppName,*lpKeyName,*lpDefault,*lpReturnedString,nSize,*ProfileStringFileNameA)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetProfileStringA = @Detour_GetProfileStringA()
 Global Original_GetProfileStringW.GetProfileString
 Procedure.l Detour_GetProfileStringW(*lpAppName,*lpKeyName,*lpDefault,*lpReturnedString,nSize)
 	DbgProf("GetProfileStringW: «"+PeekSZ(*lpAppName)+"» «"+PeekSZ(*lpKeyName)+"»")
@@ -274,9 +259,7 @@ Procedure.l Detour_GetProfileStringW(*lpAppName,*lpKeyName,*lpDefault,*lpReturne
 		ProcedureReturn Original_GetPrivateProfileStringW(*lpAppName,*lpKeyName,*lpDefault,*lpReturnedString,nSize,@ProfileStringFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetProfileStringW = @Detour_GetProfileStringW()
 ;;----------------------------------------------------------------------------------------------------------------------
-; TODO
 Prototype GetProfileInt(*lpAppName,*lpKeyName,nDefault)
 Global Original_GetProfileIntA.GetProfileInt
 Procedure Detour_GetProfileIntA(*lpAppName,*lpKeyName,nDefault)
@@ -287,7 +270,6 @@ Procedure Detour_GetProfileIntA(*lpAppName,*lpKeyName,nDefault)
 		ProcedureReturn Original_GetPrivateProfileIntA(*lpAppName,*lpKeyName,nDefault,*ProfileStringFileNameA)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetProfileIntA = @Detour_GetProfileIntA()
 Global Original_GetProfileIntW.GetProfileInt
 Procedure Detour_GetProfileIntW(*lpAppName,*lpKeyName,nDefault)
 	DbgProf("GetProfileIntW: «"+PeekSZ(*lpAppName)+"» «"+PeekSZ(*lpKeyName)+"»")
@@ -297,7 +279,6 @@ Procedure Detour_GetProfileIntW(*lpAppName,*lpKeyName,nDefault)
 		ProcedureReturn Original_GetPrivateProfileIntW(*lpAppName,*lpKeyName,nDefault,@ProfileStringFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetProfileIntA = @Detour_GetProfileIntA()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l WritePrivateProfileSection(*lpAppName,*lpString,*lpFileName)
 Global Original_WritePrivateProfileSectionA.WritePrivateProfileSection
@@ -317,7 +298,6 @@ Procedure.l Detour_WritePrivateProfileSectionA(*lpAppName,*lpString,*lpFileName)
 		ProcedureReturn Original_WritePrivateProfileSectionA(*lpAppName,*lpString,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileStringA = @Detour_GetPrivateProfileStringA()
 Global Original_WritePrivateProfileSectionW.WritePrivateProfileSection
 Procedure.l Detour_WritePrivateProfileSectionW(*lpAppName,*lpString,*lpFileName)
 	DbgProf("WritePrivateProfileSectionW: «"+PeekSZ(*lpAppName)+"» «"+PeekSZ(*lpString)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -332,7 +312,6 @@ Procedure.l Detour_WritePrivateProfileSectionW(*lpAppName,*lpString,*lpFileName)
 		ProcedureReturn Original_WritePrivateProfileSectionW(*lpAppName,*lpString,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_GetPrivateProfileStringW = @Detour_GetPrivateProfileStringW()
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-writeprivateprofilesectiona
 Prototype.l WritePrivateProfileString(*lpSection,*lpKeyName,*lpString,*lpFileName)
@@ -353,7 +332,6 @@ Procedure.l Detour_WritePrivateProfileStringA(*lpSection,*lpKeyName,*lpString,*l
 		ProcedureReturn Original_WritePrivateProfileStringA(*lpSection,*lpKeyName,*lpString,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WritePrivateProfileStringA = @Detour_WritePrivateProfileStringA()
 Global Original_WritePrivateProfileStringW.WritePrivateProfileString
 Procedure.l Detour_WritePrivateProfileStringW(*lpSection,*lpKeyName,*lpString,*lpFileName)
 	DbgProf("WritePrivateProfileStringW: «"+PeekSZ(*lpSection)+"» «"+PeekSZ(*lpKeyName)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -368,7 +346,6 @@ Procedure.l Detour_WritePrivateProfileStringW(*lpSection,*lpKeyName,*lpString,*l
 		ProcedureReturn Original_WritePrivateProfileStringW(*lpSection,*lpKeyName,*lpString,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WritePrivateProfileStringW = @Detour_WritePrivateProfileStringW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l WritePrivateProfileStruct(*lpSection,*lpKeyName,*lpStruct,uSizeStruct,*lpFileName)
 Global Original_WritePrivateProfileStructA.WritePrivateProfileStruct
@@ -388,7 +365,6 @@ Procedure.l Detour_WritePrivateProfileStructA(*lpSection,*lpKeyName,*lpStruct,uS
 		ProcedureReturn Original_WritePrivateProfileStructA(*lpSection,*lpKeyName,*lpStruct,uSizeStruct,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WritePrivateProfileStructA = @Detour_WritePrivateProfileStructA()
 Global Original_WritePrivateProfileStructW.WritePrivateProfileStruct
 Procedure.l Detour_WritePrivateProfileStructW(*lpSection,*lpKeyName,*lpStruct,uSizeStruct,*lpFileName)
 	DbgProf("WritePrivateProfileStructW: «"+PeekSZ(*lpSection)+"» «"+PeekSZ(*lpKeyName)+"» «"+PeekSZ(*lpFileName)+"»")
@@ -403,7 +379,6 @@ Procedure.l Detour_WritePrivateProfileStructW(*lpSection,*lpKeyName,*lpStruct,uS
 		ProcedureReturn Original_WritePrivateProfileStructW(*lpSection,*lpKeyName,*lpStruct,uSizeStruct,*lpFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WritePrivateProfileStructW = @Detour_WritePrivateProfileStructW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l WriteProfileSection(*lpAppName,*lpString)
 Global Original_WriteProfileSectionA.WriteProfileSection
@@ -415,7 +390,6 @@ Procedure.l Detour_WriteProfileSectionA(*lpAppName,*lpString)
 		ProcedureReturn Original_WritePrivateProfileSectionA(*lpAppName,*lpString,*ProfileStringFileNameA)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WriteProfileSectionA = @Detour_WriteProfileSectionA()
 Global Original_WriteProfileSectionW.WriteProfileSection
 Procedure.l Detour_WriteProfileSectionW(*lpAppName,*lpString)
 	DbgProf("WriteProfileSectionW: «"+PeekSZ(*lpAppName)+"»")
@@ -425,7 +399,6 @@ Procedure.l Detour_WriteProfileSectionW(*lpAppName,*lpString)
 		ProcedureReturn Original_WritePrivateProfileSectionW(*lpAppName,*lpString,@ProfileStringFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WriteProfileSectionW = @Detour_WriteProfileSectionW()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l WriteProfileString(*lpSection,*lpKeyName,*lpString)
 Global Original_WriteProfileStringA.WriteProfileString
@@ -437,7 +410,6 @@ Procedure.l Detour_WriteProfileStringA(*lpSection,*lpKeyName,*lpString)
 		ProcedureReturn Original_WritePrivateProfileStringA(*lpSection,*lpKeyName,*lpString,*ProfileStringFileNameA)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WriteProfileStringA = @Detour_WriteProfileStringA()
 Global Original_WriteProfileStringW.WriteProfileString
 Procedure.l Detour_WriteProfileStringW(*lpSection,*lpKeyName,*lpString)
 	DbgProf("WriteProfileStringW: «"+PeekSZ(*lpSection)+"» «"+PeekSZ(*lpKeyName)+"»")
@@ -447,7 +419,6 @@ Procedure.l Detour_WriteProfileStringW(*lpSection,*lpKeyName,*lpString)
 		ProcedureReturn Original_WritePrivateProfileStringW(*lpSection,*lpKeyName,*lpString,@ProfileStringFileName)
 	CompilerEndIf
 EndProcedure
-;Global Trampoline_WriteProfileStringW = @Detour_WriteProfileStringW()
 ;;======================================================================================================================
 CompilerIf Defined(PORTABLE_PROFILE_STRINGS_FILENAME,#PB_Constant)
 	CompilerIf #PORTABLE_PROFILE_STRINGS_FILENAME<>""
@@ -501,7 +472,7 @@ AddInitProcedure(_InitProfileStringsHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = -----
+; Folding = CAAAg
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

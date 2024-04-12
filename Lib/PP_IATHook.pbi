@@ -1,4 +1,5 @@
-﻿
+﻿;;======================================================================================================================
+; Установка хуков на таблицу импорта
 ;;======================================================================================================================
 CompilerIf Not Defined(DBG_IAT_HOOK,#PB_Constant) : #DBG_IAT_HOOK = 0 : CompilerEndIf
 CompilerIf #DBG_IAT_HOOK
@@ -31,16 +32,16 @@ Structure IMAGE_IMPORT_DESCRIPTOR ; Эта структура справедли
 	; Каждое двойное слово IMAGE_THUNK_DATA соответствует одной функции, импортируемой данным файлом.
 	; Массив _IMAGE_THUNK_DATA32 называется Import Lookup Table.
 	; Каждый элемент Import Lookup Table содержит RVA на структуру IMAGE_IMPORT_BY_NAME.
-	; Этот массив в процессе загрузки программы не изменяется и может совсем не использоваться
+	; Этот массив в процессе загрузки программы не изменяется и может совсем не использоваться.
 	StructureUnion
 		Characteristics.l
 		OriginalFirstThunk.l
 	EndStructureUnion
 	TimeDateStamp.l
 	ForwarderChain.l
-	Name.l ; RVA строки, содержащей имя DLL, из которой будет производиться импорт
+	Name.l ; RVA строки, содержащей имя DLL, из которой будет производиться импорт.
 	FirstThunk.l ; RVA массива IMAGE_THUNK_DATA32, называемого Import Address Table.
-		; До загрузки программы идентичен Import Lookup Table, после загрузки элементы массива содержат проекцию адресов функций
+		; До загрузки программы идентичен Import Lookup Table, после загрузки элементы массива содержат проекцию адресов функций.
 EndStructure
 
 Structure IMAGE_DELAYLOAD_DESCRIPTOR
@@ -279,10 +280,8 @@ Macro IAT_EndInitHooks
 EndMacro
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 172
-; FirstLine = 153
-; Folding = ---
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = 8--
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

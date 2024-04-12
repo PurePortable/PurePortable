@@ -34,8 +34,6 @@ Procedure _GlobalInitialization()
 		!MOV [v_DllInstance], RAX
 	CompilerEndIf
 
-	;DisableThreadLibraryCalls_(Instance)
-	
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
 	
 	GetModuleFileName_(0,@buf,#MAX_PATH_EXTEND)
@@ -73,8 +71,8 @@ _GlobalInitialization()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 73
-; FirstLine = 40
+; CursorPosition = 36
+; FirstLine = 13
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

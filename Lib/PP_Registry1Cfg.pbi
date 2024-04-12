@@ -297,7 +297,7 @@ Procedure WriteCfg()
 EndProcedure
 
 ;;======================================================================================================================
-; Процедуры для работы со значениями в виртуальной базе
+; Процедуры для работы со значениями в виртуальном реестре
 ;;======================================================================================================================
 CompilerIf Not Defined(PROC_CFG,#PB_Constant) : #PROC_CFG = 0 : CompilerEndIf
 Procedure SetCfg(sKey.s,sName.s,dwType.l,sData.s,bData.l=0,cbData=1)
@@ -503,9 +503,8 @@ CompilerIf #PROC_CORRECTCFGPATH
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 4
-; Folding = 8B--
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = BAAg
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

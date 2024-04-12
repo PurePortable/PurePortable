@@ -225,7 +225,6 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetKnownFolderPath = @Detour_SHGetKnownFolderPath()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf #DETOUR_SHGETFOLDERPATHEX
@@ -260,7 +259,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHEX
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetFolderPathEx = @Detour_SHGetFolderPathEx()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST
@@ -287,7 +285,6 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetKnownFolderIDList = @Detour_SHGetKnownFolderIDList()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf #CSIDL2PATH Or #CSIDL2PIDL
@@ -372,7 +369,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetFolderPathA = @Detour_SHGetFolderPathA()
 CompilerEndIf
 CompilerIf #DETOUR_SHGETFOLDERPATHW
 	Global Original_SHGetFolderPathW.SHGetFolderPath
@@ -399,7 +395,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHW
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetFolderPathW = @Detour_SHGetFolderPathW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathandsubdira
@@ -435,7 +430,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetFolderPathAndSubDirA = @Detour_SHGetFolderPathAndSubDirA()
 CompilerEndIf
 CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRW
 	Global Original_SHGetFolderPathAndSubDirW.SHGetFolderPathAndSubDir
@@ -468,7 +462,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRW
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetFolderPathAndSubDirW = @Detour_SHGetFolderPathAndSubDirW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetspecialfolderpathw
@@ -477,7 +470,7 @@ CompilerEndIf
 ; fCreate : Если 0, то не создавать специальной папки, если она не существует. В других случаях создавать ее, если она еще не существует
 ; ASK: SHGetSpecialFolderPath - определять через SHGetSpecialFolderPathW ? Иначе, какие-то ошибки и вызовы через ordinal
 ; Эта функция эквивалентна SHGetSpecialFolderPathW ?
-; Procedure.l SHGetSpecialFolderPath(hwnd,*pszPath,csidl,fCreate)
+; Procedure.l Detour_SHGetSpecialFolderPath(hwnd,*pszPath,csidl,fCreate)
 ; EndProcedure
 Prototype.l SHGetSpecialFolderPath(hwnd,*pszPath,csidl,fCreate)
 CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA
@@ -505,7 +498,6 @@ CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetSpecialFolderPathA = @Detour_SHGetSpecialFolderPathA()
 CompilerEndIf
 CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHW
 	Global Original_SHGetSpecialFolderPathW.SHGetSpecialFolderPath
@@ -532,7 +524,6 @@ CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHW
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetSpecialFolderPathW = @Detour_SHGetSpecialFolderPathW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; ASK: Использовать SHParseDisplayName вместо SHILCreateFromPath ???
@@ -576,7 +567,6 @@ CompilerIf #DETOUR_SHGETFOLDERLOCATION
 		;DbgSpec("SHGetFolderLocation ("+csidl2s(csidl)+")("+Hex(*ppidl)+")("+Hex(*ppidl\i)+") ")
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetFolderLocation = @Detour_SHGetFolderLocation()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetspecialfolderlocation
@@ -598,7 +588,6 @@ CompilerIf #DETOUR_SHGETSPECIALFOLDERLOCATION
 		;DbgSpec("SHGetSpecialFolderLocation ("+csidl2s(csidl)+")("+Hex(*ppidl)+")("+Hex(*ppidl\i)+") ")
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_SHGetSpecialFolderLocation = @Detour_SHGetSpecialFolderLocation()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectoryw
@@ -629,7 +618,6 @@ CompilerIf #DETOUR_USERENV
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetUserProfileDirectoryA = @Detour_GetUserProfileDirectoryA()
 	Global Original_GetUserProfileDirectoryW.GetUserProfileDirectory
 	Procedure.l Detour_GetUserProfileDirectoryW(hToken,*lpProfileDir,*lpcchSize.Long)
 		Protected Result
@@ -655,7 +643,6 @@ CompilerIf #DETOUR_USERENV
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetUserProfileDirectoryW = @Detour_GetUserProfileDirectoryW()
 CompilerEndIf
 ;;======================================================================================================================
 XIncludeFile "PP_MinHook.pbi"
@@ -708,9 +695,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 685
-; FirstLine = 664
-; Folding = -----
+; Folding = qAAA-
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
