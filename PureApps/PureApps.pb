@@ -830,9 +830,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 464
-; FirstLine = 168
-; Folding = fmvKFQEAE+
+; Folding = PArKFQAAE+
 ; Markers = 305,676
 ; Optimizer
 ; EnableThread
