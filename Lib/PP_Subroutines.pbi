@@ -781,9 +781,23 @@ Procedure _ValidateProgramL(w.s,v.s,l=0)
 EndProcedure
 ;CompilerEndIf
 ;=======================================================================================================================
+Procedure.s bin2hex(*pb.Byte,cb)
+	Protected *end = *pb + cb
+	Protected Result.s = Space(cb*2) ; по два символа на каждый байт
+	Protected *pc = @Result
+	While *pb < *end
+		PokeS(*pc,RSet(Hex(*pb\b,#PB_Byte),2,"0")) ; пишем по два символа + 0; последний 0 ляжет на 0 в конце строки
+		*pb + 1
+		*pc + 2 + 2
+	Wend
+	ProcedureReturn Result
+EndProcedure
+;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = ---DAGAAg
+; CursorPosition = 785
+; FirstLine = 348
+; Folding = ---DAGAAg-
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger
