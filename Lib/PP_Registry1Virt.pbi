@@ -349,7 +349,7 @@ CompilerEndIf
 
 CompilerIf #DETOUR_REG_UNICODE
 	Procedure.l GetDataW(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,rrfFlags=0)
-		Protected i, cbData.l, dwType.l
+		Protected i, cbData.l, dwType.l, cbDataReq.l
 		If hKey
 			;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ*
 			For i=1 To nCfg
@@ -358,10 +358,11 @@ CompilerIf #DETOUR_REG_UNICODE
 					dwType = Cfg(i)\t
 					DbgRegVirt("GetDataW: "+sName+" type:"+type2str(dwType))
 					DbgRegVirt("GetDataW: *lpType:"+Hex(*lpType)+" *lpData:"+Hex(*lpData)+" *lpcbData:"+Hex(*lpcbData))
+					If *lpcbData : cbDataReq = *lpcbData\l : EndIf
 					If *lpType : *lpType\l = dwType : EndIf
 					If *lpData
-						If *lpcbData\l < cbData ; не хватает места!
-							DbgRegVirt("GetDataW (ERROR_MORE_DATA) len:"+Str(*lpcbData\l)+" need:"+Str(cbData))
+						If cbDataReq < cbData ; не хватает места!
+							DbgRegVirt("GetDataW (ERROR_MORE_DATA) len:"+Str(cbDataReq)+" need:"+Str(cbData))
 							If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
 								*lpcbData\l = cbData+2 ; +1 лишний символ (2 байта)
 							Else
@@ -411,7 +412,8 @@ CompilerIf #DETOUR_REG_UNICODE
 CompilerEndIf
 CompilerIf #DETOUR_REG_ANSI
 	Procedure.l GetDataA(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,rrfFlags=0)
-		Protected i, cbData.l, dwType.l, sBuf.s
+		Protected i, cbData.l, dwType.l, cbDataReq.l
+		Protected sBuf.s
 		Protected *pb.Byte, *pw.Word, *End
 		If hKey
 			;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ*
@@ -420,16 +422,17 @@ CompilerIf #DETOUR_REG_ANSI
 					dwType = Cfg(i)\t
 					DbgRegVirt("GetDataA: "+sName+" type:"+type2str(dwType))
 					DbgRegVirt("GetDataA: *lpType:"+Hex(*lpType)+" *lpData:"+Hex(*lpData)+" *lpcbData:"+Hex(*lpcbData))
-					If *lpType : *lpType\l = dwType : EndIf
 					If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
 						; Так как юникод, строки реально занимают в два раза больше места, чем требуется. И наоборот.
 						cbData = (Cfg(i)\c+1)/2 ; С округлением в большую сторону
 					Else
 						cbData = Cfg(i)\c
 					EndIf
+					If *lpcbData : cbDataReq = *lpcbData\l : EndIf
+					If *lpType : *lpType\l = dwType : EndIf
 					If *lpData
-						If *lpcbData\l < cbData ; не хватает места!
-							DbgRegVirt("GetDataA (ERROR_MORE_DATA) len:"+Str(*lpcbData\l)+" need:"+Str(cbData))
+						If cbDataReq < cbData ; не хватает места!
+							DbgRegVirt("GetDataA (ERROR_MORE_DATA) len:"+Str(cbDataReq)+" need:"+Str(cbData))
 							If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
 								*lpcbData\l = cbData+1 ; +1 лишний символ
 							Else
