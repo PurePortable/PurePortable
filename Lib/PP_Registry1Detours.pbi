@@ -827,7 +827,7 @@ CompilerIf #DETOUR_REGENUMVALUEW
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regqueryvaluea
-Prototype.l RegQueryValue(hKey.l,*lpSubKey,*lpValue,*lpcbValue.Long)
+Prototype.l RegQueryValue(hKey.l,*lpSubKey,*lpData,*lpcbData.Long)
 CompilerIf #DETOUR_REGQUERYVALUEA
 	Global Original_RegQueryValueA.RegQueryValue
 	Procedure.l Detour_RegQueryValueA(hKey.l,*lpSubKey,*lpData,*lpcbData.Long)
@@ -844,7 +844,7 @@ CompilerIf #DETOUR_REGQUERYVALUEA
 				Result = Original_RegQueryValueA(hKey,*lpSubKey,*lpData,*lpcbData)
 			EndIf
 		CompilerEndIf
-		DbgRegExt("RegEnumValueA: "+Result2Str(Result))
+		DbgRegExt("RegQueryValueA: "+Result2Str(Result))
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
@@ -865,7 +865,7 @@ CompilerIf #DETOUR_REGQUERYVALUEW
 				Result = Original_RegQueryValueW(hKey,*lpSubKey,*lpData,*lpcbData)
 			EndIf
 		CompilerEndIf
-		DbgRegExt("RegEnumValueW: "+Result2Str(Result))
+		DbgRegExt("RegQueryValueW: "+Result2Str(Result))
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
