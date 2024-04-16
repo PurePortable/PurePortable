@@ -622,9 +622,15 @@ Procedure DirectoryExist(fn.s)
 	;ProcedureReturn PathIsDirectory_(@fn)
 EndProcedure
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexw
-DeclareImport(shell32,_SHCreateDirectoryExW@12,SHCreateDirectoryExW,SHCreateDirectoryEx_(hWnd,*pszPath,*psa))
+;DeclareImport(shell32,_SHCreateDirectoryExW@12,SHCreateDirectoryExW,SHCreateDirectoryEx_(hWnd,*pszPath,*psa))
 Procedure CreatePath(Path.s)
-	SHCreateDirectoryEx_(0,@Path,#Null)
+	;SHCreateDirectoryEx_(0,@Path,#Null) ; может неправильно работать из dllmain
+	Path = RTrim(Path,"\")+"\"
+	Protected p = FindString(Path,"\")
+	While p
+		CreateDirectory(Left(Path,p-1))
+		p = FindString(Path,"\",p+1)
+	Wend
 EndProcedure
 ;=======================================================================================================================
 ; Проверка версии/имени файла
@@ -795,8 +801,6 @@ EndProcedure
 ;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 785
-; FirstLine = 348
 ; Folding = ---DAGAAg-
 ; EnableAsm
 ; EnableThread
