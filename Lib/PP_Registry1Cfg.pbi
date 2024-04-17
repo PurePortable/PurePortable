@@ -96,7 +96,7 @@ Procedure ReadCfg(AltConfig.s="")
 		nCfg = ArraySize(Cfg())
 		nKeys = ArraySize(Keys())
 		ConfigChanged = #False
-		Protected hCfg = ReadFile(#PB_Any,Config)
+		Protected hCfg = ReadFile(#PB_Any,Config,#PB_File_SharedRead|#PB_File_SharedWrite)
 		If hCfg
 			CodePage = ReadStringFormat(hCfg)
 			While Not Eof(hCfg)
@@ -219,7 +219,7 @@ Procedure WriteCfg()
 	Protected *pb.Byte, *pc.Character, *end
 	RegCriticalEnter
 	If ConfigFile <> "" And ConfigChanged
-		Protected hCfg = CreateFile(#PB_Any,ConfigFile)
+		Protected hCfg = CreateFile(#PB_Any,ConfigFile,#PB_File_SharedRead|#PB_File_SharedWrite)
 		If hCfg
 			;dbg(Str(nKeys)+" "+Str(nCfg))
 			WriteStringFormat(hCfg,#PB_Unicode)
@@ -504,7 +504,9 @@ CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = BAAg
+; CursorPosition = 98
+; FirstLine = 79
+; Folding = HAAg
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
