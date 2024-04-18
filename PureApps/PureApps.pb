@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.16
+;RES_VERSION 4.10.0.17
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -296,6 +296,17 @@ Procedure Detour_GetVolumeInformationW(*RootPathName,*VolumeNameBuffer,nVolumeNa
 		;dbg("GetVolumeInformationW: "+PeekSZ(*RootPathName)+" "+StrU(PeekL(*VolumeSerialNumber),#PB_Long))
 		*VolumeSerialNumber\l = VolumeSerialNumber
 	EndIf
+	ProcedureReturn Result
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/ru-ru/windows/win32/api/fileapi/nf-fileapi-getfileinformationbyhandle
+Prototype GetFileInformationByHandle(hFile,*FileInformation.BY_HANDLE_FILE_INFORMATION)
+Global Original_GetFileInformationByHandle.GetFileInformationByHandle
+Procedure Detour_GetFileInformationByHandle(hFile,*FileInformation.BY_HANDLE_FILE_INFORMATION)
+	Protected Result = Original_GetFileInformationByHandle(hFile,*FileInformation)
+	;dbg("GetFileInformationByHandle: "+Str(hFile))
+	;dbg("  VolumeSerialNumber: "+StrU(*FileInformation\dwVolumeSerialNumber,#PB_Long))
+	*FileInformation\dwVolumeSerialNumber = VolumeSerialNumber
 	ProcedureReturn Result
 EndProcedure
 ;}
@@ -663,6 +674,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	If VolumeSerialNumber
 		MH_HookApi(kernel32,GetVolumeInformationA)
 		MH_HookApi(kernel32,GetVolumeInformationW)
+		MH_HookApi(kernel32,GetFileInformationByHandle)
 	EndIf
 	;}
 	;{ Установка хуков для подмены даты
@@ -833,21 +845,19 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 449
-; FirstLine = 89
-; Folding = PArKFQEAE+
-; Markers = 305,679
+; Folding = PArKNgAAI9
+; Markers = 316,691
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.16
+; VersionField0 = 4.10.0.17
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.16
+; VersionField5 = 4.10.0.17
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

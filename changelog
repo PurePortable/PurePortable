@@ -4,6 +4,9 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.17] 2023-04-18 17:00:00
+(+) PureApps: VolumeSerialNumber в GetFileInformationByHandle
+
 [4.10.0.16] 2023-04-17 12:00:00
 (+) PureApps: параметр RegistryShlwapi для управления перехватом функций из shlwapi.
 
