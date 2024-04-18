@@ -6,7 +6,8 @@ Global PrgPath.s ; полный путь к исполняемому файлу 
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
 Global PrgName.s ; имя программы (без расширения)
-Global DllPath.s, DllDir.s, DllDirN.s, DllName.s
+Global DllPath.s, DllName.s
+;Global DllDir.s, DllDirN.s
 
 ;Global LogFile.s
 Global PreferenceFile.s
@@ -38,15 +39,15 @@ Procedure _GlobalInitialization()
 	
 	GetModuleFileName_(0,@buf,#MAX_PATH_EXTEND)
 	PrgPath = PeekS(@buf) ; полный путь к исполняемому файлу программы
-	PrgDir = GetPathPart(PrgPath)
-	PrgDirN = RTrim(PrgDir,"\")
 	PrgName = GetFilePart(PrgPath,#PB_FileSystem_NoExtension)
+	;PrgDir = GetPathPart(PrgPath)
+	;PrgDirN = RTrim(PrgDir,"\")
 	
 	GetModuleFileName_(DllInstance,@buf,#MAX_PATH_EXTEND)
 	DllPath = PeekS(@buf) ; полный путь к прокси-dll
-	DllDir = GetPathPart(DllPath)
-	DllDirN = RTrim(DllDir,"\")
 	DllName = GetFilePart(DllPath,#PB_FileSystem_NoExtension)
+	PrgDir = GetPathPart(DllPath)
+	PrgDirN = RTrim(PrgDir,"\")
 	
 	GetWindowsDirectory_(@buf,#MAX_PATH_EXTEND)
 	WinDir = RTrim(buf,"\")
@@ -70,9 +71,9 @@ _GlobalInitialization()
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 36
-; FirstLine = 13
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 49
+; FirstLine = 39
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

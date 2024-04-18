@@ -238,11 +238,11 @@ Procedure.s PreferencePath(Path.s="")
 	Path = _ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
 	;dbg("PreferencePath: *"+Path)
 	If Path="."
-		Path = DllDirN
+		Path = PrgDirN
 	;ElseIf Path=".." Or Left(Path,2)=".\" Or Left(Path,3)="..\"
-	;	Path = DllDir+Path
+	;	Path = PrgDir+Path
 	ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
-		Path = DllDir+Path
+		Path = PrgDir+Path
 	EndIf
 	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
@@ -357,20 +357,20 @@ ProcedureDLL.l AttachProcess(Instance)
 	Protected i, j
 
 	;{ Файл конфигурации
-	PureAppsPrefs = DllDir+DllName
+	PureAppsPrefs = PrgDir+DllName
 	
 	If FileExist(PureAppsPrefs+".prefs")
 		PureAppsPrefs+".prefs"
 	ElseIf FileExist(PureAppsPrefs+".ini")
 		PureAppsPrefs+".ini"
-	ElseIf FileExist(DllDir+"PurePort.prefs")
-		PureAppsPrefs = DllDir+"PurePort.prefs"
-	ElseIf FileExist(DllDir+"PurePort.ini")
-		PureAppsPrefs = DllDir+"PurePort.ini"
-	ElseIf FileExist(DllDir+"PurePortable.prefs")
-		PureAppsPrefs = DllDir+"PurePortable.prefs"
-	ElseIf FileExist(DllDir+"PurePortable.ini")
-		PureAppsPrefs = DllDir+"PurePortable.ini"
+	ElseIf FileExist(PrgDir+"PurePort.prefs")
+		PureAppsPrefs = PrgDir+"PurePort.prefs"
+	ElseIf FileExist(PrgDir+"PurePort.ini")
+		PureAppsPrefs = PrgDir+"PurePort.ini"
+	ElseIf FileExist(PrgDir+"PurePortable.prefs")
+		PureAppsPrefs = PrgDir+"PurePortable.prefs"
+	ElseIf FileExist(PrgDir+"PurePortable.ini")
+		PureAppsPrefs = PrgDir+"PurePortable.ini"
 	EndIf
 	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
 		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
@@ -435,10 +435,10 @@ ProcedureDLL.l AttachProcess(Instance)
 	;}
 	;{ Установка переменных среды
 	SetEnvironmentVariable("PP_PrgPath",PrgPath)
-	;SetEnvironmentVariable("PP_PrgName",PrgName)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
-	SetEnvironmentVariable("PP_DllPath",DllPath)
-	SetEnvironmentVariable("PP_DllDir",DllDirN)
+	;SetEnvironmentVariable("PP_PrgName",PrgName)
+	;SetEnvironmentVariable("PP_PrgPath",DllPath)
+	;SetEnvironmentVariable("PP_DllDir",DllDirN)
 	If PreferenceGroup("EnvironmentVariables")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
@@ -659,7 +659,7 @@ ProcedureDLL.l AttachProcess(Instance)
 				k = Left(k,i-1)
 				o = GetCfgS(k,v)
 				If p=""
-					p = DllDirN
+					p = PrgDirN
 				EndIf
 				n = CorrectPath(o,p)
 				If n And n<>o
@@ -770,7 +770,7 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 		CleanupRootDir = PreferencePath(ReadPreferenceString("CleanupRootDir",""))
 	EndIf
 	If CleanupRootDir = ""
-		CleanupRootDir = DllDirN
+		CleanupRootDir = PrgDirN
 	EndIf
 	DbgCln("CleanupRootDir: "+CleanupRootDir)
 	CleanupRootDir = LCase(CleanupRootDir+"\") ; обязательно "\" в конце
@@ -843,9 +843,11 @@ ProcedureDLL ShowVolumeSerialNumber(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = PArKNgAAI9
+; CursorPosition = 772
+; FirstLine = 26
+; Folding = PArKFgAAI9
 ; Markers = 316,691
 ; Optimizer
 ; EnableThread
