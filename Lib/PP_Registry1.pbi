@@ -473,6 +473,7 @@ CompilerEndIf
 XIncludeFile "PP_MinHook.pbi"
 ;;======================================================================================================================
 Global RegistryPermit = 1
+Global RegistryShlwapiPermit = 1
 Procedure _InitRegistryHooks()
 	If RegistryPermit
 		CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_KERNELBASE) = 0
@@ -565,26 +566,28 @@ Procedure _InitRegistryHooks()
 			CompilerIf #DETOUR_REGQUERYINFOKEYW : MH_HookApi(kernelbase,RegQueryInfoKeyW) : CompilerEndIf
 		CompilerEndIf
 		CompilerIf #DETOUR_REG_SHLWAPI_ANY
-			CompilerIf #DETOUR_SHDELETEKEYA : MH_HookApi(shlwapi,SHDeleteKeyA) : CompilerEndIf
-			CompilerIf #DETOUR_SHDELETEKEYW : MH_HookApi(shlwapi,SHDeleteKeyW) : CompilerEndIf
-			CompilerIf #DETOUR_SHDELETEEMPTYKEYA : MH_HookApi(shlwapi,SHDeleteEmptyKeyA) : CompilerEndIf
-			CompilerIf #DETOUR_SHDELETEEMPTYKEYW : MH_HookApi(shlwapi,SHDeleteEmptyKeyW) : CompilerEndIf
-			CompilerIf #DETOUR_SHDELETEVALUEA : MH_HookApi(shlwapi,SHDeleteValueA) : CompilerEndIf
-			CompilerIf #DETOUR_SHDELETEVALUEW : MH_HookApi(shlwapi,SHDeleteValueW) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETVALUEA : MH_HookApi(shlwapi,SHGetValueA) : CompilerEndIf
-			CompilerIf #DETOUR_SHGETVALUEW : MH_HookApi(shlwapi,SHGetValueW) : CompilerEndIf
-			;CompilerIf #DETOUR_SHQUERYVALUEEXA : MH_HookApi(shlwapi,SHQueryValueA) : CompilerEndIf
-			;CompilerIf #DETOUR_SHQUERYVALUEEXW : MH_HookApi(shlwapi,SHQueryValueW) : CompilerEndIf
-			CompilerIf #DETOUR_SHREGGETVALUEA : MH_HookApi(shlwapi,SHRegGetValueA) : CompilerEndIf
-			CompilerIf #DETOUR_SHREGGETVALUEW : MH_HookApi(shlwapi,SHRegGetValueW) : CompilerEndIf
-			;CompilerIf #DETOUR_SHREGGETBOOLUSVALUEA : MH_HookApi(shlwapi,SHRegGetBoolUSValueA) : CompilerEndIf
-			;CompilerIf #DETOUR_SHREGGETBOOLUSVALUEW : MH_HookApi(shlwapi,SHRegGetBoolUSValueW) : CompilerEndIf
-			CompilerIf #DETOUR_SHSETVALUEA : MH_HookApi(shlwapi,SHSetValueA) : CompilerEndIf
-			CompilerIf #DETOUR_SHSETVALUEW : MH_HookApi(shlwapi,SHSetValueW) : CompilerEndIf
-			;CompilerIf #DETOUR_SHCOPYKEYA : MH_HookApi(shlwapi,SHCopyKeyA) : CompilerEndIf
-			;CompilerIf #DETOUR_SHCOPYKEYW : MH_HookApi(shlwapi,SHCopyKeyW) : CompilerEndIf
-			CompilerIf #DETOUR_SHQUERYINFOKEYA : MH_HookApi(shlwapi,SHQueryInfoKeyA) : CompilerEndIf
-			CompilerIf #DETOUR_SHQUERYINFOKEYW : MH_HookApi(shlwapi,SHQueryInfoKeyW) : CompilerEndIf
+			If RegistryShlwapiPermit
+				CompilerIf #DETOUR_SHDELETEKEYA : MH_HookApi(shlwapi,SHDeleteKeyA) : CompilerEndIf
+				CompilerIf #DETOUR_SHDELETEKEYW : MH_HookApi(shlwapi,SHDeleteKeyW) : CompilerEndIf
+				CompilerIf #DETOUR_SHDELETEEMPTYKEYA : MH_HookApi(shlwapi,SHDeleteEmptyKeyA) : CompilerEndIf
+				CompilerIf #DETOUR_SHDELETEEMPTYKEYW : MH_HookApi(shlwapi,SHDeleteEmptyKeyW) : CompilerEndIf
+				CompilerIf #DETOUR_SHDELETEVALUEA : MH_HookApi(shlwapi,SHDeleteValueA) : CompilerEndIf
+				CompilerIf #DETOUR_SHDELETEVALUEW : MH_HookApi(shlwapi,SHDeleteValueW) : CompilerEndIf
+				CompilerIf #DETOUR_SHGETVALUEA : MH_HookApi(shlwapi,SHGetValueA) : CompilerEndIf
+				CompilerIf #DETOUR_SHGETVALUEW : MH_HookApi(shlwapi,SHGetValueW) : CompilerEndIf
+				;CompilerIf #DETOUR_SHQUERYVALUEEXA : MH_HookApi(shlwapi,SHQueryValueA) : CompilerEndIf
+				;CompilerIf #DETOUR_SHQUERYVALUEEXW : MH_HookApi(shlwapi,SHQueryValueW) : CompilerEndIf
+				CompilerIf #DETOUR_SHREGGETVALUEA : MH_HookApi(shlwapi,SHRegGetValueA) : CompilerEndIf
+				CompilerIf #DETOUR_SHREGGETVALUEW : MH_HookApi(shlwapi,SHRegGetValueW) : CompilerEndIf
+				;CompilerIf #DETOUR_SHREGGETBOOLUSVALUEA : MH_HookApi(shlwapi,SHRegGetBoolUSValueA) : CompilerEndIf
+				;CompilerIf #DETOUR_SHREGGETBOOLUSVALUEW : MH_HookApi(shlwapi,SHRegGetBoolUSValueW) : CompilerEndIf
+				CompilerIf #DETOUR_SHSETVALUEA : MH_HookApi(shlwapi,SHSetValueA) : CompilerEndIf
+				CompilerIf #DETOUR_SHSETVALUEW : MH_HookApi(shlwapi,SHSetValueW) : CompilerEndIf
+				;CompilerIf #DETOUR_SHCOPYKEYA : MH_HookApi(shlwapi,SHCopyKeyA) : CompilerEndIf
+				;CompilerIf #DETOUR_SHCOPYKEYW : MH_HookApi(shlwapi,SHCopyKeyW) : CompilerEndIf
+				CompilerIf #DETOUR_SHQUERYINFOKEYA : MH_HookApi(shlwapi,SHQueryInfoKeyA) : CompilerEndIf
+				CompilerIf #DETOUR_SHQUERYINFOKEYW : MH_HookApi(shlwapi,SHQueryInfoKeyW) : CompilerEndIf
+			EndIf
 		CompilerEndIf
 	EndIf
 EndProcedure
@@ -592,6 +595,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = H----v--
+; Folding = H----vf-
 ; DisableDebugger
 ; EnableExeConstant

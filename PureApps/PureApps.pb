@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.13
+;RES_VERSION 4.10.0.15
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -446,6 +446,9 @@ ProcedureDLL.l AttachProcess(Instance)
 	Protected SpoofDateP.s
 	If PreferenceGroup("Portable")
 		RegistryPermit = ReadPreferenceInteger("Registry",0)
+		If RegistryPermit
+			RegistryShlwapiPermit = ReadPreferenceInteger("RegistryShlwapi",1)
+		EndIf
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
 		p = ReadPreferenceString("DataFile","")
@@ -830,19 +833,21 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PArKFQAAE+
-; Markers = 305,676
+; CursorPosition = 449
+; FirstLine = 89
+; Folding = PArKFQEAE+
+; Markers = 305,679
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.13
+; VersionField0 = 4.10.0.15
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.13
+; VersionField5 = 4.10.0.15
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
