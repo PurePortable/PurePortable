@@ -529,6 +529,8 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 394
+; FirstLine = 270
 ; Folding = HHv-8
 ; EnableAsm
 ; DisableDebugger
