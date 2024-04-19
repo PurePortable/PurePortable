@@ -4,6 +4,10 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.18]
+(*) Удалены переменные DllDir и DllDirN. Вместо них использовать PrgDir и PrgDirN.
+(*) Переменные PrgDir и PrgDirN определяются через путь к dll.
+
 [4.10.0.17] 2023-04-18 17:00:00
 (+) PureApps: VolumeSerialNumber в GetFileInformationByHandle
 
@@ -26,26 +30,26 @@
 (+) PureApps: Параметр SpoofDate
 (*) SpecialFolders: Загрузка shfolder по полному пути
 (+) PureApps: Перехват shfolder
-(+) Секция Startup.SetEnvironmentVariables переименована в EnvironmentVariables
+(+) PureApps: Секция Startup.SetEnvironmentVariables переименована в EnvironmentVariables
 
 [4.10.0.11] 2024-04-06 20:00:00
 (+) PureApps: Перехват GetVolumeInformation и подмена серийного номера диска
 (+) Дополнительная трассировка: добавлены функции CreateDirectory, CreateDirectoryEx, SHCreateDirectoryEx, SHFileOperation
 
 [4.10.0.10] 2024-04-01 23:00:00
-(+) В секцию [Portable] добавлен параметр ValidateProgram через который можно отключить обработку секции [ValidateProgram].
-(+) В секцию [SpecialFolders] добавлена возможность перенаправлять папки по CSIDL и RFID.
+(+) PureApps: В секцию [Portable] добавлен параметр ValidateProgram через который можно отключить обработку секции [ValidateProgram].
+(+) PureApps: В секцию [SpecialFolders] добавлена возможность перенаправлять папки по CSIDL и RFID.
 
 [4.10.0.9] 2024-03-28 15:00:00
-(*) Изменение параметров Compile-ProxyDll.ps1
-(+) Compile-ProxyDll.ps1 - компиляция полных dll
+(*) PureApps: Изменение параметров Compile-ProxyDll.ps1
+(+) PureApps: Compile-ProxyDll.ps1 - компиляция полных dll
 (*) Изменения вывода сообщений об ошибках при инициализации прокси-функций (не доделано)
-(+) PureApps: Добавочная отладочная информация при аттаче dll.
 (*) Изменение и исправление вывода сообщений об ошибках при установке хуков MinHook.
 (*) Константа #MIN_HOOK_CHECKRESULT depricated.
 (*) Константа #PROXY_DLL_ERROR_IGNORE depricated.
 (+) Управление обработкой ошибок инициализации прокси-функций. PureApps параметр ProxyErrorMode.
 (+) Управление обработкой ошибок установкой хуков MinHook. PureApps параметр MinHookErrorMode.
+(+) PureApps: Добавочная отладочная информация при аттаче dll.
 
 [4.10.0.8] 2024-03-25 23:00:00
 (+) PP_Subroutines.pbi: Добавлена общая процедура CreatePath для создания папки, включая создание промежуточных папок.
