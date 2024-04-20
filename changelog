@@ -7,6 +7,7 @@
 [4.10.0.18]
 (*) Удалены переменные DllDir и DllDirN. Вместо них использовать PrgDir и PrgDirN.
 (*) Переменные PrgDir и PrgDirN определяются через путь к dll.
+(!) Исправления с ValidateProgram.
 
 [4.10.0.17] 2023-04-18 17:00:00
 (+) PureApps: VolumeSerialNumber в GetFileInformationByHandle

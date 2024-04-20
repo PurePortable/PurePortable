@@ -383,7 +383,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	Protected retcode
 
 	;{ Проверка, та ли программа запущена
-	Protected ValidateProgram = 1
+	Protected ValidateProgram
 	Protected InvalidProgram
 	Protected InvalidReaction = 1
 	If LCase(PrgName) = "rundll32"
@@ -397,7 +397,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			k = PreferenceKeyName()
 			v = PreferenceKeyValue()
 			Select LCase(k)
-				Case "programname"
+				Case "programname","programfilename"
 					If _ValidateProgramL(PrgName,v,1)
 						InvalidProgram = 0
 						Break
@@ -843,11 +843,9 @@ ProcedureDLL ShowVolumeSerialNumber(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 772
-; FirstLine = 26
-; Folding = PArKFgAAI9
+; Folding = PArKFgAAA9
 ; Markers = 316,691
 ; Optimizer
 ; EnableThread
