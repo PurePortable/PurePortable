@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.16
+;RES_VERSION 4.10.0.18
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -33,10 +33,10 @@ ProcedureDLL.l AttachProcess(Instance)
 	CompilerElse
 		Protected dll.s = "PurePort64.dll"
 	CompilerEndIf
-	If FileExist(DllDir+dll)
-		dll = DllDir+dll
-	ElseIf FileExist(DllDir+"PurePort.dll")
-		dll = DllDir+"PurePort.dll"
+	If FileExist(PrgDir+dll)
+		dll = PrgDir+dll
+	ElseIf FileExist(PrgDir+"PurePort.dll")
+		dll = PrgDir+"PurePort.dll"
 	EndIf
 	LoadLibrary_(@dll)
 	;PPInitialization
@@ -60,11 +60,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.16
+; VersionField0 = 4.10.0.18
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.16
+; VersionField5 = 4.10.0.18
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
