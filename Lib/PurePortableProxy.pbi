@@ -25,10 +25,8 @@ CompilerEndIf
 ;Global WinDir.s
 Global SysDir.s
 ;Global TempDir.s
-Global PrgPath.s
+Global PrgPath.s, PrgDir.s, PrgDirN.s
 Global DllPath.s
-Global DllDir.s
-Global DllDirN.s
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
 Procedure _GlobalInitialization()
@@ -70,8 +68,8 @@ Procedure _GlobalInitialization()
 	; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovefilespeca
 	DllPath = PeekS(*buf)
 	PathRemoveFileSpec_(*buf) ; Удаляет имя файла в конце и обратную косую черту из пути, если они присутствуют.
-	DllDirN = PeekS(*buf)
-	DllDir = DllDirN+"\"
+	PrgDirN = PeekS(*buf)
+	PrgDir = PrgDirN+"\"
 	; https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemdirectorya
 	GetSystemDirectory_(*buf,#MAX_PATH_EXTEND) ; Системная директория без \
 	SysDir = PeekS(*buf)
@@ -107,8 +105,8 @@ CompilerEndIf
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 82
-; FirstLine = 71
+; CursorPosition = 27
+; FirstLine = 13
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
