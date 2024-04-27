@@ -315,9 +315,9 @@ CompilerIf #DBG_REGISTRY_MODE
 	Procedure DbgRegAliens(txt.s)
 		If DbgRegMode=#DBG_REG_MODE_ALIENS
 			;Global KeyExclude.s = "clsid|software\classes|"
-			If txt<>"software" And Left(txt,5)<>"clsid" And Left(txt,16)<>"software\classes"
-				dbg("ALIEN: "+txt)
-			EndIf
+			;If txt<>"software" And Left(txt,5)<>"clsid" And Left(txt,16)<>"software\classes"
+			dbg("ALIEN: "+txt)
+			;EndIf
 		EndIf
 	EndProcedure
 CompilerElse
@@ -451,7 +451,7 @@ XIncludeFile "PP_Registry1Cfg.pbi"
 XIncludeFile "PP_Registry1Detours.pbi"
 
 ;;======================================================================================================================
-; Принудительная статическая линковка dll, так как если программа имеет только отложенный импорт, MinHook вызывается с ошибкой.
+;{ Принудительная статическая линковка dll, так как если программа имеет только отложенный импорт, MinHook вызывается с ошибкой.
 ; https://learn.microsoft.com/en-us/cpp/build/reference/include-force-symbol-references
 CompilerIf #True
 	Import "advapi32.lib" : EndImport
@@ -469,6 +469,7 @@ CompilerIf #DETOUR_REG_SHLWAPI_ANY
 		Import "/INCLUDE:SHGetValueW" : EndImport
 	CompilerEndIf
 CompilerEndIf
+;}
 ;;======================================================================================================================
 XIncludeFile "PP_MinHook.pbi"
 ;;======================================================================================================================
@@ -595,8 +596,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 454
-; FirstLine = 364
-; Folding = H----v--
+; Folding = DHH--vf+
 ; DisableDebugger
 ; EnableExeConstant
