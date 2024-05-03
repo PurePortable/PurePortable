@@ -135,6 +135,7 @@ CompilerEndIf
 ; Windows XP
 ; advapi32.dll comdlg32.dll gdi32.dll imagehlp.dll kernel32.dll lz32.dll ole32.dll oleaut32.dll olecli32.dll olecnv32.dll
 ; olesvr32.dll olethk32.dll rpcrt4.dll shell32.dll url.dll urlmon.dll user32.dll version.dll wininet.dll wldap32.dll
+; !!! Отлиция от следующих версий: lz32.dll url.dll urlmon.dll version.dll wininet.dll
 
 ;;======================================================================================================================
 ; Выбор proxy-dll по имени
@@ -255,7 +256,7 @@ CompilerEndIf
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
 ; CursorPosition = 137
-; FirstLine = 129
+; FirstLine = 105
 ; Folding = --
 ; EnableThread
 ; DisableDebugger
