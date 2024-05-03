@@ -96,12 +96,19 @@ EndProcedure
 CompilerIf Not Defined(PROC_CORRECTCFGPATH,#PB_Constant) : #PROC_CORRECTCFGPATH = 0 : CompilerEndIf
 CompilerIf #PROC_CORRECTCFGPATH
 	Procedure CorrectCfgPath(Key.s,Value.s,Base.s,Flags=0)
-		SetCfgS(Key,Value,CorrectPath(GetCfgS(Key,Value),Base,Flags))
+		Protected Path.s = CorrectPath(GetCfgS(Key,Value),Base,Flags)
+		If Flags & #CORRECTPATH_REAL_PATH
+			If Path
+				SetCfgS(Key,Value,Path)
+			EndIf
+		Else
+			SetCfgS(Key,Value,Path)
+		EndIf
 	EndProcedure
 CompilerEndIf 
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = HA-
+; Folding = AA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
