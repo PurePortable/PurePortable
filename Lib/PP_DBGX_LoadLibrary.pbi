@@ -33,8 +33,8 @@ CompilerIf #DETOUR_SETDEFAULTDLLDIRECTORIES
 		If DirectoryFlags & #LOAD_LIBRARY_SEARCH_APPLICATION_DIR ; 0x00000200
 			DirectoryFlagsText + " LOAD_LIBRARY_SEARCH_APPLICATION_DIR"
 		EndIf
-		If DirectoryFlags & #LOAD_LIBRARY_SEARCH_SYSTEM32 ; 0x00001000
-			DirectoryFlagsText + " LOAD_LIBRARY_SEARCH_SYSTEM32"
+		If DirectoryFlags & #LOAD_LIBRARY_SEARCH_DEFAULT_DIRS ; 0x00001000
+			DirectoryFlagsText + " LOAD_LIBRARY_SEARCH_DEFAULT_DIRS"
 		EndIf
 		If DirectoryFlags & #LOAD_LIBRARY_SEARCH_SYSTEM32 ; 0x00000800
 			DirectoryFlagsText + " LOAD_LIBRARY_SEARCH_SYSTEM32"
@@ -188,28 +188,28 @@ CompilerEndIf
 XIncludeFile "PP_MinHook.pbi"
 
 Procedure _InitDbgxLoadLibrary()
-	CompilerIf #DETOUR_ADDDLLDIRECTORY And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_ADDDLLDIRECTORY
 		MH_HookApi(kernel32,AddDllDirectory)
 	CompilerEndIf
-	CompilerIf #DETOUR_SETDEFAULTDLLDIRECTORIES And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_SETDEFAULTDLLDIRECTORIES
 		MH_HookApi(kernel32,SetDefaultDllDirectories)
 	CompilerEndIf
-	CompilerIf #DETOUR_SETDLLDIRECTORY And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_SETDLLDIRECTORY
 		MH_HookApi(kernel32,SetDllDirectoryA)
 		MH_HookApi(kernel32,SetDllDirectoryW)
 	CompilerEndIf
-	CompilerIf #DETOUR_SETSEARCHPATHMODE And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_SETSEARCHPATHMODE
 		MH_HookApi(kernel32,SetSearchPathMode)
 	CompilerEndIf
-	CompilerIf #DETOUR_LOADLIBRARY And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_LOADLIBRARY
 		MH_HookApi(kernel32,LoadLibraryA)
 		MH_HookApi(kernel32,LoadLibraryW)
 	CompilerEndIf
-	CompilerIf #DETOUR_LOADLIBRARYEX And #PROXY_DLL_KERNEL32<=0
+	CompilerIf #DETOUR_LOADLIBRARYEX
 		MH_HookApi(kernel32,LoadLibraryExA)
 		MH_HookApi(kernel32,LoadLibraryExW)
 	CompilerEndIf
-	CompilerIf #DETOUR_GETPROCADDRESS And #PROXY_DLL_KERNEL32<=0 And #DBGX_LOAD_LIBRARY=1
+	CompilerIf #DETOUR_GETPROCADDRESS And #DBGX_LOAD_LIBRARY=1
 		MH_HookApi(kernel32,GetProcAddress)
 	CompilerEndIf
 EndProcedure
@@ -217,9 +217,9 @@ AddInitProcedure(_InitDbgxLoadLibrary)
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 218
-; FirstLine = 185
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 36
+; FirstLine = 23
 ; Folding = ---
 ; EnableThread
 ; DisableDebugger

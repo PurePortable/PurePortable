@@ -82,7 +82,8 @@ DeclareExportFunc(CloseDesktop,user32,_CloseDesktop@4,CloseDesktop)
 DeclareExportFunc(CloseGestureInfoHandle,user32,_CloseGestureInfoHandle@4,CloseGestureInfoHandle)
 DeclareExportFunc(CloseTouchInputHandle,user32,_CloseTouchInputHandle@4,CloseTouchInputHandle)
 DeclareExportFunc(CloseWind__,user32,_CloseWindow@4,CloseWindow) ; conflict name
-DeclareExportFunc(CloseWind__Station,user32,_CloseWindowStation@4,CloseWindowStation)
+DeclareExportFunc(CloseWindowStation,user32,_CloseWindowStation@4,CloseWindowStation)
+;DeclareExportFunc(CloseWind__Station,user32,_CloseWindowStation@4,CloseWindowStation)
 DeclareExportFunc(CopyAcceleratorTableA,user32,_CopyAcceleratorTableA@12,CopyAcceleratorTableA)
 DeclareExportFunc(CopyAcceleratorTableW,user32,_CopyAcceleratorTableW@12,CopyAcceleratorTableW)
 DeclareExportFunc(CopyIcon,user32,_CopyIcon@4,CopyIcon)
@@ -434,9 +435,12 @@ DeclareExportFunc(IsRectEmpty,user32,_IsRectEmpty@4,IsRectEmpty)
 DeclareExportFunc(IsTouchWindow,user32,_IsTouchWindow@8,IsTouchWindow)
 DeclareExportFunc(IsWinEventHookInstalled,user32,_IsWinEventHookInstalled@4,IsWinEventHookInstalled)
 DeclareExportFunc(IsWind__,user32,_IsWindow@4,IsWindow) ; conflict name
-DeclareExportFunc(IsWind__Enabled,user32,_IsWindowEnabled@4,IsWindowEnabled)
-DeclareExportFunc(IsWind__Unicode,user32,_IsWindowUnicode@4,IsWindowUnicode)
-DeclareExportFunc(IsWind__Visible,user32,_IsWindowVisible@4,IsWindowVisible)
+DeclareExportFunc(IsWindowEnabled,user32,_IsWindowEnabled@4,IsWindowEnabled)
+DeclareExportFunc(IsWindowUnicode,user32,_IsWindowUnicode@4,IsWindowUnicode)
+DeclareExportFunc(IsWindowVisible,user32,_IsWindowVisible@4,IsWindowVisible)
+;DeclareExportFunc(IsWind__Enabled,user32,_IsWindowEnabled@4,IsWindowEnabled)
+;DeclareExportFunc(IsWind__Unicode,user32,_IsWindowUnicode@4,IsWindowUnicode)
+;DeclareExportFunc(IsWind__Visible,user32,_IsWindowVisible@4,IsWindowVisible)
 DeclareExportFunc(IsWow64Message,user32,_IsWow64Message@0,IsWow64Message)
 DeclareExportFunc(IsZoomed,user32,_IsZoomed@4,IsZoomed)
 DeclareExportFunc(KillTimer,user32,_KillTimer@8,KillTimer)
@@ -705,8 +709,9 @@ DeclareExportFunc(wvsprintfA,user32,_wvsprintfA@12,wvsprintfA)
 DeclareExportFunc(wvsprintfW,user32,_wvsprintfW@12,wvsprintfW)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 13
-; Markers = 84,89,110,242,431,436,567
+; CursorPosition = 437
+; FirstLine = 431
+; Markers = 84,90,111,243,432,437,571
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

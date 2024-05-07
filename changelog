@@ -4,10 +4,19 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.19] 2023-05-07
+(+) CorrectCfgPath: Обработка флага #CORRECTPATH_REAL_PATH
+(+) PureApps: Вариант dll без модуля для реестра.
+(*) Правки в модулях DBGX.
+(*) Правки в proxy связанные конфликтными функциями.
+(+) Прокси comctl32.
+(*) Изменения в PPCorrectExportC для comctl32.
+
 [4.10.0.18]
 (*) Удалены переменные DllDir и DllDirN. Вместо них использовать PrgDir и PrgDirN.
 (*) Переменные PrgDir и PrgDirN определяются через путь к dll.
 (!) Исправления с ValidateProgram.
+(*) Мелкие правки
 
 [4.10.0.17] 2023-04-18 17:00:00
 (+) PureApps: VolumeSerialNumber в GetFileInformationByHandle

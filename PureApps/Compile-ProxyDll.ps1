@@ -33,6 +33,9 @@ param (
 )
 $CurrentDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
 
+$Compiler32 = "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe"
+$Compiler64 = "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe"
+
 $Tmp = "~tmp.pb"
 $SubDir = "."
 $SrcFile = "$Src.pb"
@@ -94,7 +97,7 @@ if ($x32 -or ((-not $x32) -and (-not $x64))) { # Компиляция x32
 			New-Item $SubDir -Type Directory
 		}
 	}
-	& "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe" /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
+	& $Compiler32 /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
 	if ($CorrectExport) {
 		.\PPCorrectExportC "$SubDir\$OutFile"
 	}
@@ -108,7 +111,7 @@ if ($x64 -or ((-not $x32) -and (-not $x64))) { # Компиляция x64
 			New-Item $SubDir -Type Directory
 		}
 	}
-	& "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe" /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
+	& $Compiler64 /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
 	if ($CorrectExport) {
 		.\PPCorrectExportC "$SubDir\$OutFile"
 	}

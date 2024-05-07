@@ -25,13 +25,11 @@ CompilerIf #DETOUR_SHELLEXECUTE
 		dbg("ShellExecuteA: «"+PeekSZ(lpOperation,-1,#PB_Ascii)+"» «"+PeekSZ(lpFile,-1,#PB_Ascii)+"» «"+PeekSZ(lpParameters,-1,#PB_Ascii)+"»")
 		ProcedureReturn Original_ShellExecuteA(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
 	EndProcedure
-	;Global Trampoline_ShellExecuteA = @Detour_ShellExecuteA()
 	Global Original_ShellExecuteW.ShellExecute
 	Procedure Detour_ShellExecuteW(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
 		dbg("ShellExecuteW: «"+PeekSZ(lpOperation)+"» «"+PeekSZ(lpFile)+"» «"+PeekSZ(lpParameters)+"»")
 		ProcedureReturn Original_ShellExecuteW(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
 	EndProcedure
-	;Global Trampoline_ShellExecuteW = @Detour_ShellExecuteW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecuteexw
@@ -44,13 +42,11 @@ CompilerIf #DETOUR_SHELLEXECUTEEX
 		dbg("ShellExecuteExA: verb: «"+PeekSZ(*pExecInfo\lpVerb,-1,#PB_Ascii)+"» file: «"+PeekSZ(*pExecInfo\lpFile,-1,#PB_Ascii)+"» params: «"+PeekSZ(*pExecInfo\lpParameters,-1,#PB_Ascii)+"»")
 		ProcedureReturn Original_ShellExecuteExA(*pExecInfo)
 	EndProcedure
-	;Global Trampoline_ShellExecuteExA = @Detour_ShellExecuteExA()
 	Global Original_ShellExecuteExW.ShellExecuteEx
 	Procedure Detour_ShellExecuteExW(*pExecInfo.SHELLEXECUTEINFO)
 		dbg("ShellExecuteExW: verb: «"+PeekSZ(*pExecInfo\lpVerb)+"» file: «"+PeekSZ(*pExecInfo\lpFile)+"» params: «"+PeekSZ(*pExecInfo\lpParameters)+"»")
 		ProcedureReturn Original_ShellExecuteExW(*pExecInfo)
 	EndProcedure
-	;Global Trampoline_ShellExecuteExW = @Detour_ShellExecuteExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
@@ -69,7 +65,6 @@ CompilerIf #DETOUR_CREATEPROCESS
 		;ProcedureReturn Original_CreateProcessA(@ApplicationNameEx,@CommandLineEx,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
 		ProcedureReturn Original_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
 	EndProcedure
-	;Global Trampoline_CreateProcessA = @Detour_()
 	Global Original_CreateProcessW.CreateProcess
 	Procedure Detour_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
 		Protected ApplicationName.s = PeekSZ(lpApplicationName)
@@ -80,13 +75,15 @@ CompilerIf #DETOUR_CREATEPROCESS
 		;ProcedureReturn Original_CreateProcessW(@ApplicationNameEx,@CommandLineEx,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
 		ProcedureReturn Original_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
 	EndProcedure
-	;Global Trampoline_CreateProcessW = @Detour_CreateProcessW()
 CompilerEndIf
 ;;======================================================================================================================
 
 XIncludeFile "PP_MinHook.pbi"
 
 Procedure _InitDbgxExecuteHooks()
+	CompilerIf #DETOUR_SHELLEXECUTE Or #DETOUR_SHELLEXECUTEEX
+		LoadLibrary_(@"shell32.dll")
+	CompilerEndIf
 	CompilerIf #DETOUR_SHELLEXECUTE : MH_HookApi(shell32,ShellExecuteA) : CompilerEndIf
 	CompilerIf #DETOUR_SHELLEXECUTE : MH_HookApi(shell32,ShellExecuteW) : CompilerEndIf
 	CompilerIf #DETOUR_SHELLEXECUTEEX : MH_HookApi(shell32,ShellExecuteExA) : CompilerEndIf
@@ -99,9 +96,9 @@ EndProcedure
 AddInitProcedure(_InitDbgxExecuteHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 86
-; FirstLine = 68
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 21
+; FirstLine = 10
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

@@ -37,13 +37,11 @@ CompilerIf #DETOUR_GETFULLPATHNAME
 		dbg("GetFullPathNameA: "+PeekS(lpFileName,-1,#PB_Ascii))
 		ProcedureReturn Original_GetFullPathNameA(lpFileName,nBufferLength,lpBuffer,*lpFilePart)
 	EndProcedure
-	;Global Trampoline_GetFullPathNameA = @Detour_GetFullPathNameA()
 	Global Original_GetFullPathNameW.GetFullPathName
 	Procedure Detour_GetFullPathNameW(lpFileName,nBufferLength,lpBuffer,*lpFilePart)
 		dbg("GetFullPathNameW: "+PeekS(lpFileName))
 		ProcedureReturn Original_GetFullPathNameW(lpFileName,nBufferLength,lpBuffer,*lpFilePart)
 	EndProcedure
-	;Global Trampoline_GetFullPathNameW = @Detour_GetFullPathNameW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew
@@ -55,13 +53,11 @@ CompilerIf #DETOUR_FINDFIRSTFILE
 		dbg("FindFirstFileA: "+PeekS(lpFileName,-1,#PB_Ascii))
 		ProcedureReturn Original_FindFirstFileA(lpFileName,lpFindFileData)
 	EndProcedure
-	;Global Trampoline_FindFirstFileA = @Detour_FindFirstFileA()
 	Global Original_FindFirstFileW.FindFirstFile
 	Procedure Detour_FindFirstFileW(lpFileName,lpFindFileData)
 		dbg("FindFirstFileW: "+PeekS(lpFileName))
 		ProcedureReturn Original_FindFirstFileW(lpFileName,lpFindFileData)
 	EndProcedure
-	;Global Trampoline_FindFirstFileW = @Detour_FindFirstFileW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfileexw
@@ -73,13 +69,11 @@ CompilerIf #DETOUR_FINDFIRSTFILEEX
 		dbg("FindFirstFileExA: "+PeekS(lpFileName,-1,#PB_Ascii))
 		ProcedureReturn Original_FindFirstFileExA(lpFileName,fInfoLevelId,lpFindFileData,fSearchOp,lpSearchFilter,dwAdditionalFlags)
 	EndProcedure
-	;Global Trampoline_FindFirstFileExA = @Detour_FindFirstFileExA()
 	Global Original_FindFirstFileExW.FindFirstFileEx
 	Procedure Detour_FindFirstFileExW(lpFileName,fInfoLevelId,lpFindFileData,fSearchOp,lpSearchFilter,dwAdditionalFlags)
 		dbg("FindFirstFileExW: "+PeekS(lpFileName))
 		ProcedureReturn Original_FindFirstFileExW(lpFileName,fInfoLevelId,lpFindFileData,fSearchOp,lpSearchFilter,dwAdditionalFlags)
 	EndProcedure
-	;Global Trampoline_FindFirstFileExW = @Detour_FindFirstFileExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesw
@@ -91,13 +85,11 @@ CompilerIf #DETOUR_GETFILEATTRIBUTES
 		dbg("GetFileAttributesA: "+PeekS(lpFileName,-1,#PB_Ascii))
 		ProcedureReturn Original_GetFileAttributesA(lpFileName)
 	EndProcedure
-	;Global Trampoline_GetFileAttributesA = @Detour_GetFileAttributesA()
 	Global Original_GetFileAttributesW.GetFileAttributes
 	Procedure.l Detour_GetFileAttributesW(lpFileName)
 		dbg("GetFileAttributesW: "+PeekS(lpFileName))
 		ProcedureReturn Original_GetFileAttributesW(lpFileName)
 	EndProcedure
-	;Global Trampoline_GetFileAttributesW = @Detour_GetFileAttributesW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesexw
@@ -109,13 +101,11 @@ CompilerIf #DETOUR_GETFILEATTRIBUTESEX
 		dbg("GetFileAttributesExA: "+Str(fInfoLevelId)+" "+PeekS(lpFileName,-1,#PB_Ascii))
 		ProcedureReturn Original_GetFileAttributesExA(lpFileName,fInfoLevelId,*lpFileInformation)
 	EndProcedure
-	;Global Trampoline_GetFileAttributesExA = @Detour_GetFileAttributesExA()
 	Global Original_GetFileAttributesExW.GetFileAttributesEx
 	Procedure Detour_GetFileAttributesExW(lpFileName,fInfoLevelId,*lpFileInformation.WIN32_FILE_ATTRIBUTE_DATA)
 		dbg("GetFileAttributesExW: "+Str(fInfoLevelId)+" "+PeekS(lpFileName))
 		ProcedureReturn Original_GetFileAttributesExW(lpFileName,fInfoLevelId,*lpFileInformation)
 	EndProcedure
-	;Global Trampoline_GetFileAttributesExW = @Detour_GetFileAttributesExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Prototype Open__Fi(lpFileName,lpReOpenBuff,uStyle)
@@ -133,20 +123,17 @@ CompilerIf #DETOUR_CREATEFILE
 		dbg("CreateFile2: "+PeekS(lpFileName))
 		ProcedureReturn Original_CreateFile2(lpFileName,dwDesiredAccess,dwShareMode,dwCreationDisposition,pCreateExParams)
 	EndProcedure
-	;Global Trampoline_CreateFile2 = @Detour_CreateFile2()
 	Prototype CreateFile(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
 	Global Original_CreateFileA.CreateFile
 	Procedure Detour_CreateFileA(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
 		dbg("CreateFileA: "+PeekS(lpFileName,-1,#PB_Ascii))
 		ProcedureReturn Original_CreateFileA(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
 	EndProcedure
-	;Global Trampoline_CreateFileA = @Detour_CreateFileA()
 	Global Original_CreateFileW.CreateFile
 	Procedure Detour_CreateFileW(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
 		dbg("CreateFileW: "+PeekS(lpFileName))
 		ProcedureReturn Original_CreateFileW(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
 	EndProcedure
-	;Global Trampoline_CreateFileW = @Detour_CreateFileW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya
@@ -183,7 +170,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexa
 CompilerIf Not Defined(DETOUR_SHCREATEDIRECTORYEX,#PB_Constant) : #DETOUR_SHCREATEDIRECTORYEX=1 : CompilerEndIf
-CompilerIf #DETOUR_CREATEDIRECTORYEX
+CompilerIf #DETOUR_SHCREATEDIRECTORYEX
 	Prototype SHCreateDirectoryEx(hwnd,pszPath,*psa)
 	Global Original_SHCreateDirectoryExA.CreateDirectoryEx
 	Procedure Detour_SHCreateDirectoryExA(hwnd,pszPath,*psa)
@@ -251,6 +238,9 @@ Procedure _InitDbgxFileOperations()
 		MH_HookApi(kernel32,CreateDirectoryExA)
 		MH_HookApi(kernel32,CreateDirectoryExW)
 	CompilerEndIf
+	CompilerIf #DETOUR_SHCREATEDIRECTORYEX Or #DETOUR_SHFILEOPERATION
+		LoadLibrary_(@"shell32.dll")
+	CompilerEndIf
 	CompilerIf #DETOUR_SHCREATEDIRECTORYEX
 		MH_HookApi(shell32,SHCreateDirectoryExA)
 		MH_HookApi(shell32,SHCreateDirectoryExW)
@@ -263,9 +253,9 @@ EndProcedure
 AddInitProcedure(_InitDbgxFileOperations)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 205
-; FirstLine = 201
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 136
+; FirstLine = 113
 ; Folding = ----
 ; EnableAsm
 ; DisableDebugger

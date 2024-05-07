@@ -149,12 +149,18 @@ DeclareExportFunc(CreateSymbolicLinkTransactedA,kernel32,_CreateSymbolicLinkTran
 DeclareExportFunc(CreateSymbolicLinkTransactedW,kernel32,_CreateSymbolicLinkTransactedW@16,CreateSymbolicLinkTransactedW)
 DeclareExportFunc(CreateTapePartition,kernel32,_CreateTapePartition@16,CreateTapePartition)
 DeclareExportFunc(CreateThre__,kernel32,_CreateThread@24,CreateThread) ; conflict name
-DeclareExportFunc(CreateThre__pool,kernel32,_CreateThreadpool@4,CreateThreadpool)
-DeclareExportFunc(CreateThre__poolCleanupGroup,kernel32,_CreateThreadpoolCleanupGroup@0,CreateThreadpoolCleanupGroup)
-DeclareExportFunc(CreateThre__poolIo,kernel32,_CreateThreadpoolIo@16,CreateThreadpoolIo)
-DeclareExportFunc(CreateThre__poolTimer,kernel32,_CreateThreadpoolTimer@12,CreateThreadpoolTimer)
-DeclareExportFunc(CreateThre__poolWait,kernel32,_CreateThreadpoolWait@12,CreateThreadpoolWait)
-DeclareExportFunc(CreateThre__poolWork,kernel32,_CreateThreadpoolWork@12,CreateThreadpoolWork)
+DeclareExportFunc(CreateThreadpool,kernel32,_CreateThreadpool@4,CreateThreadpool)
+DeclareExportFunc(CreateThreadpoolCleanupGroup,kernel32,_CreateThreadpoolCleanupGroup@0,CreateThreadpoolCleanupGroup)
+DeclareExportFunc(CreateThreadpoolIo,kernel32,_CreateThreadpoolIo@16,CreateThreadpoolIo)
+DeclareExportFunc(CreateThreadpoolTimer,kernel32,_CreateThreadpoolTimer@12,CreateThreadpoolTimer)
+DeclareExportFunc(CreateThreadpoolWait,kernel32,_CreateThreadpoolWait@12,CreateThreadpoolWait)
+DeclareExportFunc(CreateThreadpoolWork,kernel32,_CreateThreadpoolWork@12,CreateThreadpoolWork)
+;DeclareExportFunc(CreateThre__pool,kernel32,_CreateThreadpool@4,CreateThreadpool)
+;DeclareExportFunc(CreateThre__poolCleanupGroup,kernel32,_CreateThreadpoolCleanupGroup@0,CreateThreadpoolCleanupGroup)
+;DeclareExportFunc(CreateThre__poolIo,kernel32,_CreateThreadpoolIo@16,CreateThreadpoolIo)
+;DeclareExportFunc(CreateThre__poolTimer,kernel32,_CreateThreadpoolTimer@12,CreateThreadpoolTimer)
+;DeclareExportFunc(CreateThre__poolWait,kernel32,_CreateThreadpoolWait@12,CreateThreadpoolWait)
+;DeclareExportFunc(CreateThre__poolWork,kernel32,_CreateThreadpoolWork@12,CreateThreadpoolWork)
 DeclareExportFunc(CreateTimerQueue,kernel32,_CreateTimerQueue@0,CreateTimerQueue)
 DeclareExportFunc(CreateTimerQueueTimer,kernel32,_CreateTimerQueueTimer@28,CreateTimerQueueTimer)
 DeclareExportFunc(CreateToolhelp32Snapshot,kernel32,_CreateToolhelp32Snapshot@8,CreateToolhelp32Snapshot)
@@ -791,9 +797,12 @@ DeclareExportFunc(NotifyUILanguageChange,kernel32,_NotifyUILanguageChange@20,Not
 DeclareExportFunc(OpenEventA,kernel32,_OpenEventA@12,OpenEventA)
 DeclareExportFunc(OpenEventW,kernel32,_OpenEventW@12,OpenEventW)
 DeclareExportFunc(OpenFi__,kernel32,_OpenFile@12,OpenFile) ; conflict name
-DeclareExportFunc(OpenFi__ById,kernel32,_OpenFileById@24,OpenFileById)
-DeclareExportFunc(OpenFi__MappingA,kernel32,_OpenFileMappingA@12,OpenFileMappingA)
-DeclareExportFunc(OpenFi__MappingW,kernel32,_OpenFileMappingW@12,OpenFileMappingW)
+DeclareExportFunc(OpenFileById,kernel32,_OpenFileById@24,OpenFileById)
+DeclareExportFunc(OpenFileMappingA,kernel32,_OpenFileMappingA@12,OpenFileMappingA)
+DeclareExportFunc(OpenFileMappingW,kernel32,_OpenFileMappingW@12,OpenFileMappingW)
+;DeclareExportFunc(OpenFi__ById,kernel32,_OpenFileById@24,OpenFileById)
+;DeclareExportFunc(OpenFi__MappingA,kernel32,_OpenFileMappingA@12,OpenFileMappingA)
+;DeclareExportFunc(OpenFi__MappingW,kernel32,_OpenFileMappingW@12,OpenFileMappingW)
 DeclareExportFunc(OpenJobObjectA,kernel32,_OpenJobObjectA@12,OpenJobObjectA)
 DeclareExportFunc(OpenJobObjectW,kernel32,_OpenJobObjectW@12,OpenJobObjectW)
 DeclareExportFunc(OpenMutexA,kernel32,_OpenMutexA@12,OpenMutexA)
@@ -857,8 +866,10 @@ DeclareExportFunc(ReadConsoleOutputCharacterA,kernel32,_ReadConsoleOutputCharact
 DeclareExportFunc(ReadConsoleOutputCharacterW,kernel32,_ReadConsoleOutputCharacterW@20,ReadConsoleOutputCharacterW)
 DeclareExportFunc(ReadDirectoryChangesW,kernel32,_ReadDirectoryChangesW@32,ReadDirectoryChangesW)
 DeclareExportFunc(ReadFi__,kernel32,_ReadFile@20,ReadFile) ; conflict name
-DeclareExportFunc(ReadFi__Ex,kernel32,_ReadFileEx@20,ReadFileEx)
-DeclareExportFunc(ReadFi__Scatter,kernel32,_ReadFileScatter@20,ReadFileScatter)
+DeclareExportFunc(ReadFileEx,kernel32,_ReadFileEx@20,ReadFileEx)
+DeclareExportFunc(ReadFileScatter,kernel32,_ReadFileScatter@20,ReadFileScatter)
+;DeclareExportFunc(ReadFi__Ex,kernel32,_ReadFileEx@20,ReadFileEx)
+;DeclareExportFunc(ReadFi__Scatter,kernel32,_ReadFileScatter@20,ReadFileScatter)
 DeclareExportFunc(ReadProcessMemory,kernel32,_ReadProcessMemory@20,ReadProcessMemory)
 DeclareExportFunc(ReadThreadProfilingData,kernel32,_ReadThreadProfilingData@12,ReadThreadProfilingData)
 DeclareExportFunc(RegisterApplicationRecoveryCallback,kernel32,_RegisterApplicationRecoveryCallback@16,RegisterApplicationRecoveryCallback)
@@ -1171,8 +1182,9 @@ DeclareExportFunc(lstrlenA,kernel32,_lstrlenA@4,lstrlenA)
 DeclareExportFunc(lstrlenW,kernel32,_lstrlenW@4,lstrlenW)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 9
-; Markers = 151,307,793,859,897
+; CursorPosition = 157
+; FirstLine = 147
+; Markers = 151,313,799,868,908
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
