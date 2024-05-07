@@ -147,27 +147,29 @@ Procedure.s CheckCSIDL(csidl) ; Принимается csidl & ~#CSIDL_FLAG_MASK
 EndProcedure
 ;}
 ;{ REGISTRY
-Structure KEYDATA
-	chk.s
-	clen.i
-	ccut.i
-	virt.s
-	;vlen.i ; ???
-EndStructure
-Global Dim KeyData.KEYDATA(0), nKeyData
-Procedure.s CheckKey(hKey.l,Key.s)
-	Protected i
-	For i=1 To nKeyData
-		If Left(Key,KeyData(i)\clen)=KeyData(i)\chk
-			If KeyData(i)\ccut ; обрезаем символы до указанного
-				ProcedureReturn KeyData(i)\virt+Mid(Key,KeyData(i)\ccut)
-			Else
-				ProcedureReturn KeyData(i)\virt+Mid(Key,KeyData(i)\clen+1)
+CompilerIf #PORTABLE_REGISTRY
+	Structure KEYDATA
+		chk.s
+		clen.i
+		ccut.i
+		virt.s
+		;vlen.i ; ???
+	EndStructure
+	Global Dim KeyData.KEYDATA(0), nKeyData
+	Procedure.s CheckKey(hKey.l,Key.s)
+		Protected i
+		For i=1 To nKeyData
+			If Left(Key,KeyData(i)\clen)=KeyData(i)\chk
+				If KeyData(i)\ccut ; обрезаем символы до указанного
+					ProcedureReturn KeyData(i)\virt+Mid(Key,KeyData(i)\ccut)
+				Else
+					ProcedureReturn KeyData(i)\virt+Mid(Key,KeyData(i)\clen+1)
+				EndIf
 			EndIf
-		EndIf
-	Next
-	ProcedureReturn ""
-EndProcedure
+		Next
+		ProcedureReturn ""
+	EndProcedure
+CompilerEndIf
 ;}
 ;{ PROFILE STRINGS
 CompilerIf #PORTABLE_PROFILE_STRINGS
@@ -456,20 +458,22 @@ ProcedureDLL.l AttachProcess(Instance)
 	;{ Общие параметры
 	Protected SpoofDateP.s
 	If PreferenceGroup("Portable")
-		RegistryPermit = ReadPreferenceInteger("Registry",0)
-		If RegistryPermit
-			RegistryShlwapiPermit = ReadPreferenceInteger("RegistryShlwapi",1)
-		EndIf
+		CompilerIf #PORTABLE_REGISTRY
+			RegistryPermit = ReadPreferenceInteger("Registry",0)
+			If RegistryPermit
+				RegistryShlwapiPermit = ReadPreferenceInteger("RegistryShlwapi",1)
+			EndIf
+			p = ReadPreferenceString("DataFile","")
+			If p
+				ConfigFile = PreferencePath(p)
+			EndIf
+			p = ReadPreferenceString("InitFile","")
+			If p
+				PermanentFile = PreferencePath(p)
+			EndIf
+		CompilerEndIf
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
-		p = ReadPreferenceString("DataFile","")
-		If p
-			ConfigFile = PreferencePath(p)
-		EndIf
-		p = ReadPreferenceString("InitFile","")
-		If p
-			PermanentFile = PreferencePath(p)
-		EndIf
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
@@ -497,41 +501,43 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf
 	;}
 	;{ Обрабатываемые ключи реестра
-	If RegistryPermit And PreferenceGroup("Registry")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = Trim(LCase(PreferenceKeyName()),"\")
-			v = LCase(PreferenceKeyValue())
-			If v
-				nKeyData+1
-				ReDim KeyData(nKeyData)
-				KeyData(nKeyData)\chk = k
-				KeyData(nKeyData)\clen = Len(k)
-				i = FindString(v,"|")
-				If i
-					KeyData(nKeyData)\ccut = Val(Mid(v,i+1))
-					KeyData(nKeyData)\virt = Left(v,i-1)
-				Else
-					KeyData(nKeyData)\virt = v
-					;KeyData(nKeyData)\vlen = Len(v)
-				EndIf
-			Else ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
-				If Left(k,9)="software\"
+	CompilerIf #PORTABLE_REGISTRY
+		If RegistryPermit And PreferenceGroup("Registry")
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = Trim(LCase(PreferenceKeyName()),"\")
+				v = LCase(PreferenceKeyValue())
+				If v
 					nKeyData+1
 					ReDim KeyData(nKeyData)
 					KeyData(nKeyData)\chk = k
 					KeyData(nKeyData)\clen = Len(k)
-					k = Mid(k,10)
-					KeyData(nKeyData)\virt = k
-					nKeyData+1
-					ReDim KeyData(nKeyData)
-					KeyData(nKeyData)\chk = k
-					KeyData(nKeyData)\clen = Len(k)
-					KeyData(nKeyData)\virt = k
+					i = FindString(v,"|")
+					If i
+						KeyData(nKeyData)\ccut = Val(Mid(v,i+1))
+						KeyData(nKeyData)\virt = Left(v,i-1)
+					Else
+						KeyData(nKeyData)\virt = v
+						;KeyData(nKeyData)\vlen = Len(v)
+					EndIf
+				Else ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
+					If Left(k,9)="software\"
+						nKeyData+1
+						ReDim KeyData(nKeyData)
+						KeyData(nKeyData)\chk = k
+						KeyData(nKeyData)\clen = Len(k)
+						k = Mid(k,10)
+						KeyData(nKeyData)\virt = k
+						nKeyData+1
+						ReDim KeyData(nKeyData)
+						KeyData(nKeyData)\chk = k
+						KeyData(nKeyData)\clen = Len(k)
+						KeyData(nKeyData)\virt = k
+					EndIf
 				EndIf
-			EndIf
-		Wend
-	EndIf
+			Wend
+		EndIf
+	CompilerEndIf
 	;}
 	;{ Перенаправляемые специальные папки
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
@@ -628,47 +634,53 @@ ProcedureDLL.l AttachProcess(Instance)
 		Wend
 	EndIf
 	;}
-	;{ Чтение реестр
-	ReadCfg()
+	;{ Чтение реестра
+	CompilerIf #PORTABLE_REGISTRY
+		ReadCfg()
+	CompilerEndIf
 	;}
 	;{ Установка путей в реестре
-	If RegistryPermit And PreferenceGroup("Registry.SetPaths")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			p = PreferencePath()
-			i = FindString(k,"|")
-			If i
-				v = Mid(k,i+1)
-				k = Left(k,i-1)
-				SetCfgS(k,v,p)
-			Else ; значение по умолчанию?
-			EndIf
-		Wend
-	EndIf
+	CompilerIf #PORTABLE_REGISTRY
+		If RegistryPermit And PreferenceGroup("Registry.SetPaths")
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = PreferenceKeyName()
+				p = PreferencePath()
+				i = FindString(k,"|")
+				If i
+					v = Mid(k,i+1)
+					k = Left(k,i-1)
+					SetCfgS(k,v,p)
+				Else ; значение по умолчанию?
+				EndIf
+			Wend
+		EndIf
+	CompilerEndIf
 	;}
 	;{ Коррекция путей в реестре
-	If RegistryPermit And PreferenceGroup("Registry.CorrectPaths")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			p = PreferencePath()
-			i = FindString(k,"|")
-			If i
-				v = Mid(k,i+1)
-				k = Left(k,i-1)
-				o = GetCfgS(k,v)
-				If p=""
-					p = PrgDirN
+	CompilerIf #PORTABLE_REGISTRY
+		If RegistryPermit And PreferenceGroup("Registry.CorrectPaths")
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = PreferenceKeyName()
+				p = PreferencePath()
+				i = FindString(k,"|")
+				If i
+					v = Mid(k,i+1)
+					k = Left(k,i-1)
+					o = GetCfgS(k,v)
+					If p=""
+						p = PrgDirN
+					EndIf
+					n = CorrectPath(o,p)
+					If n And n<>o
+						SetCfgS(k,v,n)
+					EndIf
+				Else ; значение по умолчанию?
 				EndIf
-				n = CorrectPath(o,p)
-				If n And n<>o
-					SetCfgS(k,v,n)
-				EndIf
-			Else ; значение по умолчанию?
-			EndIf
-		Wend
-	EndIf
+			Wend
+		EndIf
+	CompilerEndIf
 	;}
 	;{ Установка хуков для подмены серийного номера диска
 	If VolumeSerialNumber
@@ -731,9 +743,12 @@ ProcedureDLL.l DetachProcess(Instance)
 	EndIf
 		
 	MH_Uninitialize()
-	If RegistryPermit
-		WriteCfg()
-	EndIf
+	
+	CompilerIf #PORTABLE_REGISTRY
+		If RegistryPermit
+			WriteCfg()
+		EndIf
+	CompilerEndIf
 	
 	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
 		Goto EndDetach
@@ -845,8 +860,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PArKFgAAA9
-; Markers = 316,691
+; Folding = PAPAFgAAA9
+; Markers = 318,703
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
