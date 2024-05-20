@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.19
+;RES_VERSION 4.10.0.20
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -356,6 +356,7 @@ EndProcedure
 ;;======================================================================================================================
 Global PureAppsPrefs.s
 ProcedureDLL.l AttachProcess(Instance)
+	PPPreparation
 	Protected i, j
 
 	;{ Файл конфигурации
@@ -481,6 +482,10 @@ ProcedureDLL.l AttachProcess(Instance)
 		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
 		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
 		BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
+		p = ReadPreferenceString("CurrentDir","")
+		If p <> ""
+			SetCurrentDirectory(PreferencePath(p))
+		EndIf
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -860,19 +865,21 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PAPAFgAAA9
-; Markers = 318,703
+; CursorPosition = 358
+; FirstLine = 89
+; Folding = PALgFgIAA9
+; Markers = 318,708
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.19
+; VersionField0 = 4.10.0.20
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.19
+; VersionField5 = 4.10.0.20
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

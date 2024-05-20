@@ -211,6 +211,7 @@ CompilerEndIf
 ;}
 ;;======================================================================================================================
 ProcedureDLL.l AttachProcess(Instance)
+	PPPreparation
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgramName(1,"program",1) ; Проверка, та ли программа запущена
 	;Protected FileInfo.s = LCase(GetFileVersionInfo(PrgPath,"InternalName"))
@@ -301,6 +302,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 213
+; FirstLine = 102
 ; Folding = YwrG0
 ; Optimizer
 ; EnableThread
@@ -314,7 +317,7 @@ EndProcedure
 ; VersionField4 = 4.0.9.0
 ; VersionField5 = 4.00.0.0
 ; VersionField6 = Proxy dll
-; VersionField7 = 400.dll
+; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024
 ; VersionField18 = Comments
 ; VersionField21 = PAM Project

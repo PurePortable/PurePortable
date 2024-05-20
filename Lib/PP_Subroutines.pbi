@@ -605,6 +605,20 @@ Procedure.s NormalizePath(Path.s)
 	EndIf
 	ProcedureReturn Path
 EndProcedure
+;{ Procedure.s NormalizePath2(Path.s)
+; 	If Path ; Иначе вернём корень текущего диска
+; 		Path + "\."
+; 		Protected Len = GetFullPathName_(@NewPath,0,#Null,#Null)
+; 		Protected Result.s
+; 		If Len
+; 			Result = Space(Len)
+; 			GetFullPathName_(@Path,Len,@Result,#Null)
+; 			ProcedureReturn Result
+; 		EndIf
+; 	EndIf
+; 	ProcedureReturn Path
+; EndProcedure
+;}
 ;CompilerEndIf
 
 ;=======================================================================================================================
@@ -801,7 +815,9 @@ EndProcedure
 ;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = ---DAGAAg-
+; CursorPosition = 592
+; FirstLine = 305
+; Folding = ---DAGAAA-
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

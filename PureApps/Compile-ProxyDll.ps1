@@ -97,7 +97,7 @@ if ($x32 -or ((-not $x32) -and (-not $x64))) { # Компиляция x32
 			New-Item $SubDir -Type Directory
 		}
 	}
-	& $Compiler32 /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
+	& $Compiler32 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
 	if ($CorrectExport) {
 		.\PPCorrectExportC "$SubDir\$OutFile"
 	}
@@ -111,7 +111,7 @@ if ($x64 -or ((-not $x32) -and (-not $x64))) { # Компиляция x64
 			New-Item $SubDir -Type Directory
 		}
 	}
-	& $Compiler64 /dll /optimizer /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
+	& $Compiler64 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RCFile" "$Tmp"
 	if ($CorrectExport) {
 		.\PPCorrectExportC "$SubDir\$OutFile"
 	}

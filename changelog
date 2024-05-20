@@ -4,7 +4,14 @@
 (-) удалено
 (?) непонятно ))
 
-[4.10.0.19] 2023-05-07
+[4.10.0.20] 2024-05-17
+(*) Возвращён ключ /thread для пакетной компиляции dll. Добавлена проверка #PB_Compiler_Thread.
+(*) PureApps: Изменена нумерация версий прокси-dll загрузчиков. Теперь она отдельно от основной dll.
+(+) PureApps: Добавлен параметр CurrentDir в секцию [Portable].
+(+) PureApps: проверка pureport1.dll, pureport2.dll
+(+) Макрос PPPreparation в AttachProcess для дальнейших возможных доработок.
+
+[4.10.0.19] 2024-05-07
 (+) CorrectCfgPath: Обработка флага #CORRECTPATH_REAL_PATH
 (+) PureApps: Вариант dll без модуля для реестра.
 (*) Правки в модулях DBGX.
@@ -18,19 +25,19 @@
 (!) Исправления с ValidateProgram.
 (*) Мелкие правки
 
-[4.10.0.17] 2023-04-18 17:00:00
+[4.10.0.17] 2024-04-18 17:00:00
 (+) PureApps: VolumeSerialNumber в GetFileInformationByHandle
 
-[4.10.0.16] 2023-04-17 12:00:00
+[4.10.0.16] 2024-04-17 12:00:00
 (+) PureApps: параметр RegistryShlwapi для управления перехватом функций из shlwapi.
 
-[4.10.0.15] 2023-04-16 12:00:00
+[4.10.0.15] 2024-04-16 12:00:00
 (*) Изменение работы CreatePath (отказ от SHCreateDirectoryEx)
 
-[4.10.0.14] 2023-04-14 17:00:00
+[4.10.0.14] 2024-04-14 17:00:00
 (*) Изменения в GetDataW и GetDataA для глючных случаев, когда *lpType == *lpcbData
 
-[4.10.0.13] 2023-04-11 14:00:00
+[4.10.0.13] 2024-04-11 14:00:00
 (*) Динамическая линковка wininet, winhttp, wsock32 и ws2_32 вместо статической.
 (+) PureApps: Блокировка интернета. Параметры BlockWinInet, BlockWinHttp, BlockWinSocks для управления блокировкой.
 (*) PureApps: Обработка секции Registry.SetPaths раньше секции Registry.CorrectPaths.

@@ -1,12 +1,15 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.10.03
+; PurePortable main lib 4.10.0.20
 #PP_MAINVERSION = 4.10
 ;;======================================================================================================================
 
 CompilerIf Not Defined(PB_Compiler_Backend,#PB_Constant) : #PB_Compiler_Backend = 0 : CompilerEndIf
 CompilerIf Not Defined(PB_Backend_Asm,#PB_Constant) : #PB_Backend_Asm = 0 : CompilerEndIf
-CompilerIf #PB_Compiler_Backend<>#PB_Backend_Asm
+CompilerIf #PB_Compiler_Backend <> #PB_Backend_Asm
 	CompilerError "Compiler Backend must be ASM in Compiler-Option"
+CompilerEndIf
+CompilerIf Not #PB_Compiler_Thread
+	CompilerError "Enable threadsafe in compiler options"
 CompilerEndIf
 
 ;;======================================================================================================================
@@ -253,10 +256,14 @@ CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFo
 	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
+; Это заглушка на случай дальнейших доработок
+Macro PPPreparation
+EndMacro
+;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 137
-; FirstLine = 105
+; CursorPosition = 258
+; FirstLine = 227
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

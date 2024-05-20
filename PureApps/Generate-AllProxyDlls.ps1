@@ -15,8 +15,10 @@ $Dir64 = "x64"
 ) | foreach { .\Compile-ProxyDll "Proxy" $_ -Dir32 $Dir32 -Dir64 $Dir64 }
 
 @(
-	"msimg32", "comctl32"
-	#"shell32", "user32"
+	"msimg32"
+	#"comctl32"
+	#"shell32"
+	#"user32"
 ) | foreach {.\Compile-ProxyDll "Proxy" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
 
 .\Compile-ProxyDll "Proxy" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"
