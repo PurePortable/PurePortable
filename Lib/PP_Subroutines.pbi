@@ -813,11 +813,41 @@ Procedure.s bin2hex(*pb.Byte,cb)
 	ProcedureReturn Result
 EndProcedure
 ;=======================================================================================================================
+; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpw
+; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpnw
+; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpiw
+; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpniw
+CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+	Import "shlwapi.lib" : StrCmp(psz1,psz2) As "_StrCmpW@8" : EndImport
+	Import "shlwapi.lib" : StrCmpI(psz1,psz2) As "_StrCmpIW@8" : EndImport
+	Import "shlwapi.lib" : StrCmpN(psz1,psz2,nChar) As "_StrCmpNW@12" : EndImport
+	Import "shlwapi.lib" : StrCmpNI(psz1,psz2,nChar) As "_StrCmpNIW@12" : EndImport
+CompilerElse
+	Import "shlwapi.lib" : StrCmp(psz1,psz2) As "StrCmpW" : EndImport
+	Import "shlwapi.lib" : StrCmpI(psz1,psz2) As "StrCmpIW" : EndImport
+	Import "shlwapi.lib" : StrCmpN(psz1,psz2,nChar) As "StrCmpNW" : EndImport
+	Import "shlwapi.lib" : StrCmpNI(psz1,psz2,nChar) As "StrCmpNIW" : EndImport
+CompilerEndIf
+Procedure.i StartWith(s.s,t.s,cs=0)
+	Protected l = Len(t)
+	If cs
+		ProcedureReturn Bool(StrCmpN(@s,@t,l)=0)
+	EndIf
+	ProcedureReturn Bool(StrCmpNI(@s,@t,l)=0)
+EndProcedure
+Procedure.i StartWithKey(s.s,t.s,cs=0)
+	Protected l = Len(t)
+	If cs
+		ProcedureReturn Bool(StrCmp(@s,@t)=0 Or (StrCmpN(@s,@t,l)=0 And PeekW(@s+l<<1)=92))
+	EndIf
+	ProcedureReturn Bool(StrCmpI(@s,@t)=0 Or (StrCmpNI(@s,@t,l)=0 And PeekW(@s+l<<1)=92))
+EndProcedure
+;=======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 592
-; FirstLine = 305
-; Folding = ---DAGAAA-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 840
+; FirstLine = 409
+; Folding = ---DAGIgQ-
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

@@ -4,15 +4,27 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.22] 2024-05-30
+(*) PureApps: CurrentDir -> CurrentDirectory.
+(*) PureApps: CleanupRootDir -> CleanupDirectory.
+(+) PureApps: SetCurrentDirectory(CleanupDirectory).
+(*) PureApps: Ошибка при упрощённом добавлении ключей в список.
+(-) PureApps: Удалено задание ключей удалением начальной части.
+(+) PureApps: Точное и неточное сравнение ключей.
+(+) Функции StartWith и StartWithKey.
+
+[4.10.0.21]
+Промежуточная нераспространяемая версия.
+
 [4.10.0.20] 2024-05-17
 (*) Возвращён ключ /thread для пакетной компиляции dll. Добавлена проверка #PB_Compiler_Thread.
 (*) PureApps: Изменена нумерация версий прокси-dll загрузчиков. Теперь она отдельно от основной dll.
 (+) PureApps: Добавлен параметр CurrentDir в секцию [Portable].
-(+) PureApps: проверка pureport1.dll, pureport2.dll
+(+) PureApps: проверка pureport1.dll, pureport2.dll.
 (+) Макрос PPPreparation в AttachProcess для дальнейших возможных доработок.
 
 [4.10.0.19] 2024-05-07
-(+) CorrectCfgPath: Обработка флага #CORRECTPATH_REAL_PATH
+(+) CorrectCfgPath: Обработка флага #CORRECTPATH_REAL_PATH.
 (+) PureApps: Вариант dll без модуля для реестра.
 (*) Правки в модулях DBGX.
 (*) Правки в proxy связанные конфликтными функциями.

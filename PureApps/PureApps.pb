@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.20
+;RES_VERSION 4.10.0.22
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -14,6 +14,7 @@
 ;RES_PRODUCTVERSION 4.10.0.0
 ;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
+;PP_X32_COPYAS "P:\PurePortable\Test\HelpScribble\PurePort.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
@@ -151,23 +152,35 @@ CompilerIf #PORTABLE_REGISTRY
 	Structure KEYDATA
 		chk.s
 		clen.i
-		ccut.i
+		exact.i
 		virt.s
-		;vlen.i ; ???
 	EndStructure
 	Global Dim KeyData.KEYDATA(0), nKeyData
 	Procedure.s CheckKey(hKey.l,Key.s)
-		Protected i
+		Protected i, l, c, k.s
 		For i=1 To nKeyData
-			If Left(Key,KeyData(i)\clen)=KeyData(i)\chk
-				If KeyData(i)\ccut ; обрезаем символы до указанного
-					ProcedureReturn KeyData(i)\virt+Mid(Key,KeyData(i)\ccut)
-				Else
-					ProcedureReturn KeyData(i)\virt+Mid(Key,KeyData(i)\clen+1)
+			l = KeyData(i)\clen
+			k = KeyData(i)\chk
+			; было If Left(Key,KeyData(i)\clen)=KeyData(i)\chk
+			If KeyData(i)\exact
+				If StrCmp(@Key,@k)=0 Or (StrCmpN(@Key,@k,l)=0 And PeekW(@Key+l<<1)=92)
+					ProcedureReturn KeyData(i)\virt+Mid(Key,l+1)
 				EndIf
+			ElseIf StrCmpN(@Key,@k,l)=0
+				ProcedureReturn KeyData(i)\virt+Mid(Key,l+1)
 			EndIf
 		Next
 		ProcedureReturn ""
+	EndProcedure
+	Procedure AddKeyData(k.s,v.s)
+		If k
+			nKeyData+1
+			ReDim KeyData(nKeyData)
+			KeyData(nKeyData)\exact = Bool(Right(k,1)="\")
+			KeyData(nKeyData)\chk = RTrim(k,"\")
+			KeyData(nKeyData)\clen = Len(KeyData(nKeyData)\chk)
+			KeyData(nKeyData)\virt = RTrim(v,"\")
+		EndIf
 	EndProcedure
 CompilerEndIf
 ;}
@@ -482,7 +495,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
 		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
 		BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
-		p = ReadPreferenceString("CurrentDir","")
+		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
 			SetCurrentDirectory(PreferencePath(p))
 		EndIf
@@ -510,35 +523,14 @@ ProcedureDLL.l AttachProcess(Instance)
 		If RegistryPermit And PreferenceGroup("Registry")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
-				k = Trim(LCase(PreferenceKeyName()),"\")
+				k = LCase(PreferenceKeyName())
 				v = LCase(PreferenceKeyValue())
 				If v
-					nKeyData+1
-					ReDim KeyData(nKeyData)
-					KeyData(nKeyData)\chk = k
-					KeyData(nKeyData)\clen = Len(k)
-					i = FindString(v,"|")
-					If i
-						KeyData(nKeyData)\ccut = Val(Mid(v,i+1))
-						KeyData(nKeyData)\virt = Left(v,i-1)
-					Else
-						KeyData(nKeyData)\virt = v
-						;KeyData(nKeyData)\vlen = Len(v)
-					EndIf
-				Else ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
-					If Left(k,9)="software\"
-						nKeyData+1
-						ReDim KeyData(nKeyData)
-						KeyData(nKeyData)\chk = k
-						KeyData(nKeyData)\clen = Len(k)
-						k = Mid(k,10)
-						KeyData(nKeyData)\virt = k
-						nKeyData+1
-						ReDim KeyData(nKeyData)
-						KeyData(nKeyData)\chk = k
-						KeyData(nKeyData)\clen = Len(k)
-						KeyData(nKeyData)\virt = k
-					EndIf
+					AddKeyData(k,v)
+				ElseIf Left(k,9)="software\" ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
+					v = Mid(k,10)
+					AddKeyData(k,v)
+					AddKeyData(v,v)
 				EndIf
 			Wend
 		EndIf
@@ -779,7 +771,7 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	Protected RetCode
 	Protected Heap = HeapCreate_(0,0,0)
 	Protected *buf = HeapAlloc_(Heap,#HEAP_ZERO_MEMORY,4)
-	Protected CleanupRootDir.s, lCleanupRootDir
+	Protected CleanupDirectory.s, lCleanupDirectory
 	If PreferenceGroup("Debug")
 		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
 	EndIf
@@ -787,14 +779,15 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 		;If ReadPreferenceInteger("Cleanup",0) = 0
 		;	ProcedureReturn
 		;EndIf
-		CleanupRootDir = PreferencePath(ReadPreferenceString("CleanupRootDir",""))
+		CleanupDirectory = PreferencePath(ReadPreferenceString("CleanupDirectory",""))
 	EndIf
-	If CleanupRootDir = ""
-		CleanupRootDir = PrgDirN
+	If CleanupDirectory = ""
+		CleanupDirectory = PrgDirN
 	EndIf
-	DbgCln("CleanupRootDir: "+CleanupRootDir)
-	CleanupRootDir = LCase(CleanupRootDir+"\") ; обязательно "\" в конце
-	lCleanupRootDir = Len(CleanupRootDir)
+	DbgCln("CleanupDirectory: "+CleanupDirectory)
+	SetCurrentDirectory(CleanupDirectory)
+	CleanupDirectory = LCase(CleanupDirectory+"\") ; обязательно "\" в конце
+	lCleanupDirectory = Len(CleanupDirectory)
 	
 	; Чистка
 	Protected SHFileOp.SHFILEOPSTRUCT
@@ -804,7 +797,7 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 			p = PreferencePath(PreferenceKeyName())
 			DbgCln("Cleanup: "+p)
 			; Для безопасности проверим путь - начало пути должно совпадать с CleanupRootDir
-			If LCase(Left(p,lCleanupRootDir)) <> CleanupRootDir
+			If LCase(Left(p,lCleanupDirectory)) <> CleanupDirectory
 				DbgCln("Cleanup: Wrong path!"+p)
 				Continue
 			EndIf
@@ -865,21 +858,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 358
-; FirstLine = 89
-; Folding = PALgFgIAA9
-; Markers = 318,708
+; Folding = PAbAIABAA6
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.20
+; VersionField0 = 4.10.0.22
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.20
+; VersionField5 = 4.10.0.22
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
