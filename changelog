@@ -4,6 +4,23 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.23]
+(*) Рефакторинг
+(-) PureApps: Удалена функция ShowVolumeSerialNumber
+(*) Proxy: Изменён порядок поиска dll.
+(*) Многие константы, начинающиеся с #PROC_ - depricated. Сами процедуры помещены в папку proc и должны загружаться через XInclude.
+(*) Процедура StartWithKey переименована в StartWithPath
+(*) Правильное сообщение при ошибке загрузки куста в Registry2.
+(+) Процедура ErrorMessage
+(+) Logging, WriteLog
+(+) PureApps: Очистка всегда разрешена в %TEMP%.
+(+) Глобальная переменная FirstProcess - истина, если не было других процессов, присоединивших dll.
+(+) PureApps: Секции [RunOnAttach] и [RunOnDetach] для запуска процессов.
+	- Запуск из [RunOnAttach] производится только для первого процесса. Для [RunOnDetach] для каждого.
+	- wait не работает, виснут обе задачи.
+(+) DisableThreadLibraryCalls
+(-) PureApps: Больше не используются файлы конфигурации PurePortable.prefs и PurePortable.ini.
+
 [4.10.0.22] 2024-05-30
 (*) PureApps: CurrentDir -> CurrentDirectory.
 (*) PureApps: CleanupRootDir -> CleanupDirectory.
@@ -12,6 +29,7 @@
 (-) PureApps: Удалено задание ключей удалением начальной части.
 (+) PureApps: Точное и неточное сравнение ключей.
 (+) Функции StartWith и StartWithKey.
+(*) Изменение сообщений в PP_DBGX_Execute
 
 [4.10.0.21]
 Промежуточная нераспространяемая версия.

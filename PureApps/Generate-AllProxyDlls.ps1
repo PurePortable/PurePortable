@@ -3,8 +3,11 @@ $CurrentDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
 Set-Location -Lit $CurrentDir
 [System.IO.Directory]::SetCurrentDirectory($CurrentDir)
 
-$Dir32 = "x32"
-$Dir64 = "x64"
+$Dir32 = "bin\x32\loaders"
+$Dir64 = "bin\x64\loaders"
+
+#New-Item $Dir32 -Type Dir
+#New-Item $Dir64 -Type Dir
 
 @(
 	"winmm", "version", "version+"
@@ -16,9 +19,10 @@ $Dir64 = "x64"
 
 @(
 	"msimg32"
+	"shell32"
+	"user32"
+	"advapi32"
 	#"comctl32"
-	#"shell32"
-	#"user32"
 ) | foreach {.\Compile-ProxyDll "Proxy" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
 
 .\Compile-ProxyDll "Proxy" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"

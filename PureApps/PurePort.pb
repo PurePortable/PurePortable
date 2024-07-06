@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.22
+;RES_VERSION 4.10.0.23
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -14,7 +14,6 @@
 ;RES_PRODUCTVERSION 4.10.0.0
 ;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
-;PP_X32_COPYAS "P:\PurePortable\Test\HelpScribble\PurePort.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
@@ -264,33 +263,7 @@ Procedure.s PreferencePath(Path.s="")
 EndProcedure
 ;}
 ;;======================================================================================================================
-;{ Преобразование строки в GUID
-Prototype GUIDFromString(*psz,*pguid)
-Procedure s2guid(guid.s,*guid.GUID)
-	Static GUIDFromString.GUIDFromString
-	Static hDll
-	If hDll = 0
-		hDll = LoadLibrary_("shell32.dll")
-	EndIf
-	If GUIDFromString = 0
-		GUIDFromString = GetProcAddress_(hDll,704)
-	EndIf
-	ProcedureReturn GUIDFromString(@guid,*guid)
-EndProcedure
-; Procedure s2guid2(guid.s,*guid.GUID)
-; 	*guid\Data1 = Val("$"+Mid(guid,2,8))
-; 	*guid\Data2 = Val("$"+Mid(guid,11,4))
-; 	*guid\Data3 = Val("$"+Mid(guid,16,4))
-; 	*guid\Data4[0] = Val("$"+Mid(guid,21,2))
-; 	*guid\Data4[1] = Val("$"+Mid(guid,23,2))
-; 	*guid\Data4[2] = Val("$"+Mid(guid,26,2))
-; 	*guid\Data4[3] = Val("$"+Mid(guid,28,2))
-; 	*guid\Data4[4] = Val("$"+Mid(guid,30,2))
-; 	*guid\Data4[5] = Val("$"+Mid(guid,32,2))
-; 	*guid\Data4[6] = Val("$"+Mid(guid,34,2))
-; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
-; EndProcedure
-;}
+XIncludeFile "proc\s2guid.pbi"
 ;;======================================================================================================================
 ;{ Перехват VolumeSerialNumber
 Global VolumeSerialNumber
@@ -368,6 +341,26 @@ EndProcedure
 ;}
 ;;======================================================================================================================
 Global PureAppsPrefs.s
+XIncludeFile "proc\Execute.pbi"
+Procedure RunOn(k.s,p.s)
+	Protected i
+	Protected Dim Flags.s(0)
+	Protected ExecuteFlags
+	SplitArray(Flags(),k,",")
+	For i=1 To ArraySize(Flags())
+		Select LCase(Flags(i))
+			Case "nowait"
+				ExecuteFlags & (~#EXECUTE_WAIT)
+			Case "wait"
+				ExecuteFlags | #EXECUTE_WAIT
+			Case "hide"
+				ExecuteFlags | #EXECUTE_HIDE
+		EndSelect
+	Next
+	;dbg("Execute: "+p)
+	Execute("",p,ExecuteFlags)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL.l AttachProcess(Instance)
 	PPPreparation
 	Protected i, j
@@ -383,10 +376,6 @@ ProcedureDLL.l AttachProcess(Instance)
 		PureAppsPrefs = PrgDir+"PurePort.prefs"
 	ElseIf FileExist(PrgDir+"PurePort.ini")
 		PureAppsPrefs = PrgDir+"PurePort.ini"
-	ElseIf FileExist(PrgDir+"PurePortable.prefs")
-		PureAppsPrefs = PrgDir+"PurePortable.prefs"
-	ElseIf FileExist(PrgDir+"PurePortable.ini")
-		PureAppsPrefs = PrgDir+"PurePortable.ini"
 	EndIf
 	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
 		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
@@ -396,6 +385,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	;}
 	
 	Protected k.s, v.s, p.s, n.s, o.s ; для обработки preferences
+	Protected f
 	Protected retcode
 
 	;{ Проверка, та ли программа запущена
@@ -636,8 +626,9 @@ ProcedureDLL.l AttachProcess(Instance)
 		ReadCfg()
 	CompilerEndIf
 	;}
-	;{ Установка путей в реестре
+	;{ Пути в реестре
 	CompilerIf #PORTABLE_REGISTRY
+		; Установка путей
 		If RegistryPermit And PreferenceGroup("Registry.SetPaths")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -652,10 +643,7 @@ ProcedureDLL.l AttachProcess(Instance)
 				EndIf
 			Wend
 		EndIf
-	CompilerEndIf
-	;}
-	;{ Коррекция путей в реестре
-	CompilerIf #PORTABLE_REGISTRY
+		; Коррекция путей
 		If RegistryPermit And PreferenceGroup("Registry.CorrectPaths")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -673,7 +661,7 @@ ProcedureDLL.l AttachProcess(Instance)
 					If n And n<>o
 						SetCfgS(k,v,n)
 					EndIf
-				Else ; значение по умолчанию?
+				Else ; дефолтное значение?
 				EndIf
 			Wend
 		EndIf
@@ -718,6 +706,15 @@ ProcedureDLL.l AttachProcess(Instance)
 		Wend
 	EndIf
 	;}
+	;{ Запуск приложений
+	If FirstProcess And PreferenceGroup("RunOnAttach")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			;dbg("RunOnAttach: "+PreferenceKeyName()+" :: "+PreferenceKeyValue())
+			RunOn(PreferenceKeyName(),PreferenceKeyValue())
+		Wend
+	EndIf		
+	;}
 	
 	PPInitialization
 
@@ -733,7 +730,6 @@ Procedure DbgCln(txt.s)
 		dbg(txt)
 	EndIf
 EndProcedure
-Declare Execute(prg.s,prm.s,dir.s="")
 ProcedureDLL.l DetachProcess(Instance)
 	If LCase(PrgName) = "rundll32"
 		ProcedureReturn
@@ -757,10 +753,16 @@ ProcedureDLL.l DetachProcess(Instance)
 		EndIf
 	EndIf
 	
+	If PreferenceGroup("RunOnDetach")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			RunOn(PreferenceKeyName(),PreferenceKeyValue())
+		Wend
+	EndIf
+	
 	EndDetach:
 	PPFinish
 EndProcedure
-
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
@@ -797,8 +799,9 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 			p = PreferencePath(PreferenceKeyName())
 			DbgCln("Cleanup: "+p)
 			; Для безопасности проверим путь - начало пути должно совпадать с CleanupRootDir
-			If LCase(Left(p,lCleanupDirectory)) <> CleanupDirectory
-				DbgCln("Cleanup: Wrong path!"+p)
+			;If LCase(Left(p,lCleanupDirectory)) <> CleanupDirectory
+			If Not StartWithPath(p,CleanupDirectory) And Not StartWithPath(p,TempDir)
+				DbgCln("Cleanup: Wrong path! "+p)
 				Continue
 			EndIf
 			v = p+"#"
@@ -823,53 +826,23 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	ClosePreferences()
 EndProcedure
 
-;;----------------------------------------------------------------------------------------------------------------------
-Procedure Execute(prg.s,prm.s,dir.s="") ; TODO: dir
-	Protected si.STARTUPINFO
-	Protected pi.PROCESS_INFORMATION
-	Protected flags, error
-	With si
-		\cb = SizeOf(STARTUPINFO)
-		;\wShowWindow = #SW_SHOWMAXIMIZED
-	EndWith
-	Protected cmdline.s = Chr(34)+prg+Chr(34)
-	If prm
-		cmdline+" "+prm
-	EndIf
-	DbgCln("Execute: "+cmdline)
-	If CreateProcess_(#Null,@cmdline,#Null,#Null,#False,flags,#Null,#Null,si,pi)
-		WaitForSingleObject_(pi\hProcess,#INFINITE)
-	Else
-		DbgCln(GetLastErrorStr())
-	EndIf
-EndProcedure
-;;======================================================================================================================
-ProcedureDLL ShowVolumeSerialNumber(hWnd,hInst,*lpszCmdLine,nCmdShow)
-	SetErrorMode_(#SEM_FAILCRITICALERRORS)
-	Protected RootPathName.s = Left(WinDir,3)
-	Protected VolumeNameBuffer.s = Space(#MAX_PATH)
-	Protected VolumeSerialNumber, MaximumComponentLength, FileSystemFlags
-	GetVolumeInformation_(@RootPathName,@VolumeNameBuffer,#MAX_PATH,@VolumeSerialNumber,@MaximumComponentLength,@FileSystemFlags,#Null,0)
-	If MessageBox_(#Null,"Disk serial number:"+#CRLF$+StrU(VolumeSerialNumber,#PB_Long)+#CRLF$+"Copy to clipboard?","PurePortable",#MB_YESNO) = #IDYES
-		SetClipboardText(StrU(VolumeSerialNumber,#PB_Long))
-	EndIf
-EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PAbAIABAA6
+; CursorPosition = 16
+; Folding = PAfAAgAA5-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.22
+; VersionField0 = 4.10.0.23
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.22
+; VersionField5 = 4.10.0.23
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
