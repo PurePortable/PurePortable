@@ -25,12 +25,14 @@ CompilerEndIf
 CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 	CompilerCase 2
 		DeclareImport(advapi32,_RegLoadAppKeyW@20,RegLoadAppKeyW,RegLoadAppKey_(lpFile,phkResult,samDesired,dwOptions,Reserved))
-		;Global AppRootKey.s = "PurePortable"
 		Procedure ReadCfg()
-			Protected err = RegLoadAppKey_(@ConfigFile,@hAppKey,#KEY_ALL_ACCESS,0,0)
-			DbgReg("REGLOADAPPKEY: "+Str(err)+" «"+ConfigFile+"»")
+			Protected err.l = RegLoadAppKey_(@ConfigFile,@hAppKey,#KEY_ALL_ACCESS,0,0)
+			DbgReg("REGLOADAPPKEY: "+Str(err)+" "+ConfigFile)
+			WriteLog("REGLOADAPPKEY: "+Str(err)+" "+ConfigFile)
 			If err<>#ERROR_SUCCESS
-				MessageBox_(0,"Error load hive "+#CR$+GetLastErrorStr(),"PurePortable",#MB_ICONERROR)
+				DbgReg("REGLOADAPPKEY: "+GetLastErrorStr(err))
+				WriteLog("REGLOADAPPKEY: "+GetLastErrorStr(err))
+				PPErrorMessage("RegLoadAppKey"+#CR$+"Error load hive ",err)
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			EndIf
@@ -38,10 +40,11 @@ CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 	CompilerCase 3
 		Global AppRootKey.s = "PurePortable"
 		Procedure ReadCfg()
-			Protected err = RegLoadKey_(#HKEY_USERS,@ConfigFile,@AppRootKey)
-			DbgReg("REGLOADKEY: "+Str(err)+" «"+ConfigFile+"»")
+			Protected err.l = RegLoadKey_(#HKEY_USERS,@ConfigFile,@AppRootKey)
+			DbgReg("REGLOADKEY: "+Str(err)+" "+ConfigFile)
 			If err<>#ERROR_SUCCESS
-				MessageBox_(0,"Error load hive "+#CR$+GetLastErrorStr(),"PurePortable",#MB_ICONERROR)
+				DbgReg("REGLOADKEY: "+GetLastErrorStr(err))
+				PPErrorMessage("RegLoadKey"+#CR$+"Error load hive ",err)
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			EndIf
@@ -108,7 +111,9 @@ CompilerIf #PROC_CORRECTCFGPATH
 CompilerEndIf 
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AA-
+; CursorPosition = 36
+; FirstLine = 15
+; Folding = DA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

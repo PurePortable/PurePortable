@@ -44,11 +44,3 @@ Procedure Execute(Prg.s,Prm.s,Flags=0,Dir.s="") ; TODO: Dir
 		CloseHandle_(ProcessInfo\hThread)
 	EndIf
 EndProcedure
-
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 39
-; FirstLine = 12
-; Folding = -
-; EnableThread
-; DisableDebugger
-; EnableExeConstant

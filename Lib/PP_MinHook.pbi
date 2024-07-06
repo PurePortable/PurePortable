@@ -155,7 +155,7 @@ Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.I
 				;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
 				DbgMinHookError("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
 				If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-					MessageBox_(0,"Error enable hook "+pszModule+"."+pszProcName+#CR$+ErrorText,"PurePortable",#MB_ICONERROR)
+					PPErrorMessage("Error enable hook "+pszModule+"."+pszProcName+#CR$+ErrorText)
 					If MinHookErrorMode = 2
 						;RaiseError(#ERROR_DLL_INIT_FAILED)
 						TerminateProcess_(GetCurrentProcess_(),0)
@@ -168,7 +168,7 @@ Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.I
 		;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
 		DbgMinHook("MINHOOK CREATE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
 		If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-			MessageBox_(0,"Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText,"PurePortable",#MB_ICONERROR)
+			PPErrorMessage("Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText)
 			If MinHookErrorMode = 2
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
@@ -183,6 +183,8 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = -j
+; CursorPosition = 157
+; FirstLine = 105
+; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant

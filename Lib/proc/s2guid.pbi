@@ -26,10 +26,3 @@ EndProcedure
 ; 	*guid\Data4[6] = Val("$"+Mid(guid,34,2))
 ; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
 ; EndProcedure
-
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 15
-; Folding = -
-; EnableThread
-; DisableDebugger
-; EnableExeConstant

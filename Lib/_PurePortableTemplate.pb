@@ -98,18 +98,9 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 ;{ Некоторые дополнительные процедуры
 #PROC_GETVERSIONINFO = 1 ; Получение информации о файле
-#PROC_FINDMEMORYSTRING = 0 ; Поиск в памяти
-#PROC_FINDMEMORYBINARY = 0 ; Поиск в памяти
-#PROC_REPLACEMEMORYSTRING = 0 ; Поиск и замена в памяти
-#PROC_REPLACEMEMORYBINARY = 0 ; Поиск и замена в памяти
 #PROC_CORRECTPATH = 0 ; Процедуры коррекции локальных путей. 1: если не найдено, возвращает пустую строку, 2: если не найдено, возвращает прежнее значение.
 #PROC_CORRECTCFGPATH = 0 ; Если используется, должна быть установлена #PROC_CORRECTPATH
 ;#PROC_GUID2S = 0 ; Преобразование GUID/CLSID в строку вида {4AABE186-2666-4663-9E3E-5DFD6EAAAB60}
-#PROC_CORRECTCHECKSUM = 0
-#PROC_CORRECTCHECKSUMADR = 0
-#PROC_REMOVECERTIFICATES = 0
-#PROC_GETBITNESS = 0 ; Определение разрядность исполняемого файла
-#PROC_GETFILEBITNESS = 0 ; Определение разрядность исполняемого файла
 ;}
 #INCLUDE_MIN_HOOK = 0 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
@@ -302,9 +293,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 213
-; FirstLine = 102
-; Folding = YwrG0
+; CursorPosition = 103
+; FirstLine = 60
+; Folding = Y1rG0
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll

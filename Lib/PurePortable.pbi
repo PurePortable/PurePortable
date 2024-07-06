@@ -20,6 +20,7 @@ CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPAT
 #MAX_PATH_EXTEND = 32767
 XIncludeFile "PurePortableCustom.pbi"
 XIncludeFile "PP_Debug.pbi"
+XIncludeFile "PP_Logging.pbi"
 XIncludeFile "PP_Subroutines.pbi"
 XIncludeFile "PP_Initialization.pbi"
 XIncludeFile "PP_Proxy.pbi"
@@ -262,8 +263,8 @@ EndMacro
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 258
-; FirstLine = 227
+; CursorPosition = 23
+; FirstLine = 4
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

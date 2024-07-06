@@ -53,27 +53,31 @@ CompilerEndIf
 ;Global ApplicationNameEx.s, CommandLineEx.s
 CompilerIf Not Defined(DETOUR_CREATEPROCESS,#PB_Constant) : #DETOUR_CREATEPROCESS=0 : CompilerEndIf
 CompilerIf #DETOUR_CREATEPROCESS
-	Prototype CreateProcess(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
+	Prototype CreateProcess(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
 	Global Original_CreateProcessA.CreateProcess
-	Procedure Detour_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
+	Procedure Detour_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
 		Protected ApplicationName.s = PeekSZ(lpApplicationName,-1,#PB_Ascii)
 		Protected ApplicationNameA.s
 		Protected CommandLine.s = PeekSZ(lpCommandLine,-1,#PB_Ascii)
 		dbg("CreateProcessA: «"+ApplicationName+"» «"+CommandLine+"»")
 		;ApplicationNameEx = ExpandEnvironmentStrings(ApplicationName)
 		;CommandLineEx = ExpandEnvironmentStrings(CommandLine)
-		;ProcedureReturn Original_CreateProcessA(@ApplicationNameEx,@CommandLineEx,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
-		ProcedureReturn Original_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
+		;ProcedureReturn Original_CreateProcessA(@ApplicationNameEx,@CommandLineEx,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo,*ProcessInformation)
+		Protected Result = Original_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo,*ProcessInformation)
+		dbg("CreateProcessA: "+StrU(*ProcessInformation\dwProcessId))
+		ProcedureReturn Result
 	EndProcedure
 	Global Original_CreateProcessW.CreateProcess
-	Procedure Detour_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
+	Procedure Detour_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
 		Protected ApplicationName.s = PeekSZ(lpApplicationName)
 		Protected CommandLine.s = PeekSZ(lpCommandLine)
 		dbg("CreateProcessW: «"+ApplicationName+"» «"+CommandLine+"»")
 		;ApplicationNameEx = ExpandEnvironmentStrings(ApplicationName)
 		;CommandLineEx = ExpandEnvironmentStrings(CommandLine)
-		;ProcedureReturn Original_CreateProcessW(@ApplicationNameEx,@CommandLineEx,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
-		ProcedureReturn Original_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation)
+		;ProcedureReturn Original_CreateProcessW(@ApplicationNameEx,@CommandLineEx,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation)
+		Protected Result = Original_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation)
+		dbg("CreateProcessW: "+StrU(*ProcessInformation\dwProcessId))
+		ProcedureReturn Result
 	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
@@ -97,8 +101,8 @@ AddInitProcedure(_InitDbgxExecuteHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 21
-; FirstLine = 10
+; CursorPosition = 78
+; FirstLine = 67
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

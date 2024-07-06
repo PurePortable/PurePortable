@@ -28,7 +28,7 @@ CompilerEndIf
 CompilerIf #DBG_ENVIRONMENT_VARIABLES
 	;UndefineMacro DbgAny : DbgAnyDef
 	Global DbgEnvMode = #DBG_ENVIRONMENT_VARIABLES
-	Global DbgEnvList.s = "appdata|localappdata|userprofile|allusersprofile|programdata|public|home|homedrive|homepath|temp|tmp|tmpdir|programdir|commonprogramfiles|commonprogramfiles(x86)|commonprogramw6432|programdata|programfiles|programfiles(x86)|programw6432|systemroot|windir|driverdata"
+	Global DbgEnvList.s = "appdata|localappdata|userprofile|allusersprofile|programdata|public|home|homedrive|homepath|temp|tmp|tmpdir|programdir|commonprogramfiles|commonprogramfiles(x86)|commonprogramw6432|programfiles|programfiles(x86)|programw6432|systemroot|windir|driverdata"
 	Procedure DbgEnv(txt.s,var.s="")
 		If DbgEnvMode
 			If var="" Or (DbgEnvMode=1 And FindString(DbgEnvList,LCase(var))>0) Or DbgEnvMode=2
@@ -268,7 +268,7 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 				Path = env2path(Left(Env,n-1))
 				If Path
 					Env = Left(Env,n)+Path
-					DbgEnv("  -> "+Env+"="+Path)
+					DbgEnv("  -> "+Env)
 				EndIf
 			EndIf
 			EnvSize = Len(Env)+1
@@ -369,7 +369,7 @@ CompilerEndIf
 ; Но! Переменная не раскрывается, если она существует, но не влезает в буфер. Рузультат обрезается по эту переменную.
 ; Здесь будет несовместимость.
 CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
-	Declare.s _ExpandEnvironmentStrings(s.s)
+	XIncludeFile "proc\ExpandEnvironment.pbi"
 	Prototype.l ExpandEnvironmentStrings(lpSrc,lpDst,nSize)
 	Global Original_ExpandEnvironmentStringsA.ExpandEnvironmentStrings
 	Procedure.l Detour_ExpandEnvironmentStringsA(lpSrc,lpDst,nSize)
@@ -378,7 +378,7 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_ExpandEnvironmentStringsA(lpSrc,lpDst,nSize)
 		CompilerElse
-			Protected s.s = _ExpandEnvironmentStrings(PeekS(lpSrc,-1,#PB_Ascii))
+			Protected s.s = ExpandEnvironment(PeekS(lpSrc,-1,#PB_Ascii))
 			Result = Len(s)+1
 			If nSize > Result
 				PokeSZ(lpDst,s,-1,#PB_Ascii)
@@ -396,7 +396,7 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_ExpandEnvironmentStringsW(lpSrc,lpDst,nSize)
 		CompilerElse
-			Protected s.s = _ExpandEnvironmentStrings(PeekS(lpSrc))
+			Protected s.s = ExpandEnvironment(PeekS(lpSrc))
 			Result = Len(s)+1
 			If nSize > Result
 				PokeSZ(lpDst,s)
@@ -407,47 +407,7 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		DbgEnv("ExpandEnvironmentStringsW (2): «"+PeekSZ(lpDst)+"» Result: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-	Procedure.s _ExpandEnvironmentStrings(s.s)
-		Protected r.s, e.s, v.s
-		Protected p1, p2
-		p1 = FindString(s,"%")
-		While p1
-			p2 = FindString(s,"%",p1+1)
-			If p2
-				v = Mid(s,p1+1,p2-p1-1)
-				e = env2path(v)
-				If e="" And v<>""
-					e = GetEnvironmentVariable(v)
-				EndIf
-				If e=""
-					e = Mid(s,p1,p2-p1+1)
-				EndIf
-				r + Left(s,p1-1)+e
-				s = Mid(s,p2+1)
-			Else ; нет парного %
-				Break
-			EndIf
-			p1 = FindString(s,"%")
-		Wend
-		ProcedureReturn r+s
-	EndProcedure
-;{ 	Procedure.s _ExpandEnvironmentStrings2(s.s)
-; 		Protected r.s
-; 		Protected p0,p1, p2
-; 		p1 = FindString(s,"%")
-; 		While p1
-; 			p2 = FindString(s,"%",p1+1)
-; 			If p2
-; 				r + Left(s,p1-1)+env2path(Mid(p1+1,p2-p1-1))
-; 				s = Mid(s,p2+1)
-; 			Else
-; 				Break
-; 			EndIf
-; 			p1 = FindString(s,"%")
-; 		Wend
-; 		ProcedureReturn r+s
-; 	EndProcedure
-;}
+
 CompilerEndIf
 
 ;;======================================================================================================================
@@ -672,6 +632,6 @@ AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = CAAA9
+; Folding = OIAA-
 ; DisableDebugger
 ; EnableExeConstant

@@ -8,6 +8,7 @@ Global PrgDirN.s ; директория программы без "\" на ко�
 Global PrgName.s ; имя программы (без расширения)
 Global DllPath.s, DllName.s
 ;Global DllDir.s, DllDirN.s
+;Global ProcessID.l
 
 ;Global LogFile.s
 Global PreferenceFile.s
@@ -26,15 +27,29 @@ Macro EndInitHooks : EndMacro ; заглушка
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
+Global FirstProcess
 Procedure _GlobalInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
 		!MOV [v_DllInstance], EAX
+		!CMP DWORD [AttachProcessCnt],0
+		!JNE @f
+		!INC [v_FirstProcess]
+		!@@:
+		!INC DWORD [AttachProcessCnt]
 	CompilerElse
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
+		!CMP DWORD [AttachProcessCnt],0
+		!JNE @f
+		!INC [v_FirstProcess]
+		!@@:
+		!INC DWORD [AttachProcessCnt]
 	CompilerEndIf
-
+	DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
+	;dbg("AttachProcessCnt: "+StrU(PeekL(?AttachProcessCnt)))
+	;ProcessID = GetCurrentProcessId_()
+	
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
 	
 	GetModuleFileName_(0,@buf,#MAX_PATH_EXTEND)
@@ -66,14 +81,32 @@ Procedure _GlobalInitialization()
 			PreferenceFile = PrgDir+PrgName+".prefs"
 		CompilerEndIf
 	CompilerEndIf
+	
+	CompilerIf Defined(LOGGING_FILENAME,#PB_Constant)
+		Global LoggingFile.s
+		CompilerIf #LOGGING_FILENAME<>""
+			LoggingFile = PrgDir+#LOGGING_FILENAME
+			If GetExtensionPart(LoggingFile)=""
+				LoggingFile + ".log"
+			EndIf
+		CompilerElse
+			LoggingFile = PrgDir+PrgName+".log"
+		CompilerEndIf
+	CompilerEndIf
 EndProcedure
+DataSection
+	!section '.share' data readable writeable shareable
+	AttachProcessCnt:
+	!AttachProcessCnt: DD 0
+	!section '.data' Data readable writeable
+EndDataSection
 _GlobalInitialization()
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 49
-; FirstLine = 39
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 48
+; FirstLine = 18
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

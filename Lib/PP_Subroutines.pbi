@@ -109,63 +109,6 @@ Procedure.i FindStringReverse(String.s,StringToFind.s,StartPosition=0,CaseInSens
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
-; Преобразование GUID в строку
-CompilerIf Not Defined(PROC_GUIDINFO,#PB_Constant) : #PROC_GUIDINFO = 0 : CompilerEndIf
-CompilerIf Not Defined(DBG_SPECIAL_FOLDERS,#PB_Constant) : #DBG_SPECIAL_FOLDERS = 0 : CompilerEndIf
-;CompilerIf Not Defined(PROC_GUID2S,#PB_Constant) : #PROC_GUID2S = 0 : CompilerEndIf
-Procedure.s guid2s(*id)
-	Protected guid.s = Space(40)
-	StringFromGUID2_(*id,@guid,40)
-	ProcedureReturn Trim(guid)
-EndProcedure
-
-CompilerIf #PROC_GUIDINFO Or #DBG_SPECIAL_FOLDERS
-	; HKEY_CURRENT_USER\SOFTWARE\Classes\CLSID ???
-	;Procedure RegOpenKeyS(hKey,key.s,*hk)
-	;	ProcedureReturn Bool(RegOpenKey_(hKey,@key,*hk)=#ERROR_SUCCESS)
-	;EndProcedure
-	Procedure.s GuidInfo(*id)
-		;Protected guid.s = guid2s(*id)
-		Protected guid.s = Space(40)
-		StringFromGUID2_(*id,@guid,40)
-		;guid = Trim(guid)
-		Protected hk, size
-		Protected info.s ;= Space(256)
-		If guid
-			If RegOpenKey_(#HKEY_CLASSES_ROOT,"CLSID\"+guid,@hk)=#ERROR_SUCCESS
-				info = Space(256)
-				size = 512
-				If RegQueryValueEx_(hk,#Null,#Null,#Null,@info,@size)=#ERROR_SUCCESS
-					info = "HKCR\CLSID\"+guid+" «"+info+"»"
-				Else
-					info = guid
-				EndIf
-			ElseIf RegOpenKey_(#HKEY_CLASSES_ROOT,"Interface\"+guid,@hk)=#ERROR_SUCCESS
-				info = Space(256)
-				size = 512
-				If RegQueryValueEx_(hk,#Null,#Null,#Null,@info,@size)=#ERROR_SUCCESS
-					info = "HKCR\Interface\"+guid+" «"+info+"»"
-				Else
-					info = guid
-				EndIf
-			ElseIf RegOpenKey_(#HKEY_CLASSES_ROOT,"TypeLib\"+guid,@hk)=#ERROR_SUCCESS
-				info = Space(256)
-				size = 512
-				If RegQueryValueEx_(hk,#Null,#Null,#Null,@info,@size)=#ERROR_SUCCESS
-					info = "HKCR\TypeLib\"+guid+" «"+info+"»"
-				Else
-					info = guid
-				EndIf
-			Else
-				info = guid
-			EndIf
-			RegCloseKey_(hk)
-		EndIf
-		ProcedureReturn info
-	EndProcedure
-CompilerEndIf
-
-;;----------------------------------------------------------------------------------------------------------------------
 ; PeekS/PokeS с проверкой адреса.
 Procedure.s PeekSZ(*MemoryBuffer,Length=-1,Format=#PB_Unicode)
 	If *MemoryBuffer
@@ -210,152 +153,6 @@ Procedure PokeSZA(*MemoryBuffer,Text.s,cb=-1)
 	ProcedureReturn 0
 EndProcedure
 
-;=======================================================================================================================
-; Поиск в памяти
-CompilerIf Not Defined(PROC_FINDMEMORYSTRING,#PB_Constant) : #PROC_FINDMEMORYSTRING = 0 : CompilerEndIf
-CompilerIf #PROC_FINDMEMORYSTRING
-	Procedure.i FindMemoryString(*mem,*end,txt.s,codepage=#PB_Ascii)
-		Protected sizechar = 1
-		If codepage = #PB_Unicode : sizechar = 2 : EndIf
-		Protected bufsize = Len(txt)*sizechar
-		Protected *last = *end-bufsize
-		Protected *buf = AllocateMemory(bufsize+sizechar)
-		PokeS(*buf,txt,-1,codepage)
-		Protected *adr = *mem
-		While *adr < *last
-			If CompareMemoryString(*adr,*buf,#PB_String_NoCase,-1,codepage) = #PB_String_Equal
-				FreeMemory(*buf)
-				ProcedureReturn *adr
-			EndIf
-			*adr + sizechar ; или лучше всё-таки 1???
-		Wend
-		FreeMemory(*buf)
-		ProcedureReturn #Null
-	EndProcedure
-CompilerEndIf
-
-;=======================================================================================================================
-; Замена в памяти
-; txt2 усекается или дополняется нулями до длины txt1!
-CompilerIf Not Defined(PROC_REPLACEMEMORYSTRING,#PB_Constant) : #PROC_REPLACEMEMORYSTRING = 0 : CompilerEndIf
-CompilerIf #PROC_REPLACEMEMORYSTRING
-	Procedure.i ReplaceMemoryString(*mem,*end,txt1.s,txt2.s,num=0,codepage=#PB_Ascii)
-		Protected cnt
-		Protected sizechar = 1
-		If codepage = #PB_Unicode : sizechar = 2 : EndIf
-		Protected bufsize = Len(txt1)*sizechar
-		Protected *buf1 = AllocateMemory(bufsize+sizechar)
-		PokeS(*buf1,txt1,-1,codepage)
-		Protected *buf2 = AllocateMemory(bufsize+sizechar)
-		PokeS(*buf2,txt2,Len(txt1),codepage)
-		Protected *last = *end-bufsize
-		Protected *adr = *mem
-		While *adr < *last
-			If CompareMemoryString(*adr,*buf1,#PB_String_NoCase,-1,codepage) = #PB_String_Equal
-				cnt+1
-				CopyMemory(*buf2,*adr,bufsize)
-				If cnt = num
-					Break
-				EndIf
-			EndIf
-			*adr + sizechar
-		Wend
-		FreeMemory(*buf1)
-		FreeMemory(*buf2)
-		ProcedureReturn cnt
-	EndProcedure
-CompilerEndIf
-
-CompilerIf Not Defined(PROC_REPLACEMEMORYBINARY,#PB_Constant) : #PROC_REPLACEMEMORYBINARY = 0 : CompilerEndIf
-CompilerIf #PROC_REPLACEMEMORYBINARY
-	Procedure.i ReplaceMemoryBinary(*mem,*end,*bin1,*bin2,binlen,num=0)
-		Protected cnt
-		Protected *last = *end-binlen
-		Protected *adr = *mem
-		While *adr < *last
-			If CompareMemory(*adr,*bin1,binlen)
-				cnt+1
-				CopyMemory(*bin2,*adr,binlen)
-				If cnt = num
-					Break
-				EndIf
-			EndIf
-			*adr + 1
-		Wend
-		ProcedureReturn cnt
-	EndProcedure
-CompilerEndIf
-
-;=======================================================================================================================
-; Определение битности файла
-CompilerIf Not Defined(PROC_GETBITNESS,#PB_Constant) : #PROC_GETBITNESS = 0 : CompilerEndIf
-CompilerIf #PROC_GETBITNESS
-	;IMAGE_DOS_HEADER\e_magic
-	#IMAGE_DOS_HEADER=$5A4D ; Magic number
-	;IMAGE_NT_HEADERS\Signature
-	#IMAGE_NT_SIGNATURE=$00004550
-	
-	;IMAGE_FILE_HEADER\Machine
-	#IMAGE_FILE_MACHINE_I386 = $014C ; x86 (стандартное значение для x32 приложений)
-	#IMAGE_FILE_MACHINE_I486 = $014D ; ?
-	#IMAGE_FILE_MACHINE_I586 = $014E ; ?
-	#IMAGE_FILE_MACHINE_IA64 = $0200 ; Intel Itanium
-	#IMAGE_FILE_MACHINE_AMD64 = $8664 ; x64 (стандартное значение для x64 приложений)
-	; https://www.purebasic.fr/english/viewtopic.php?f=13&t=44869
-	; https://www.purebasic.fr/english/viewtopic.php?f=12&t=67345
-	; https://habr.com/ru/post/266831/
-	Procedure GetBitness(file.s)
-		Define IMAGE_DOS_HEADER.IMAGE_DOS_HEADER
-		Define IMAGE_NT_HEADERS64.IMAGE_NT_HEADERS64
-		Define IMAGE_NT_HEADERS32.IMAGE_NT_HEADERS32
-		;Define hfile = ReadFile(#PB_Any,file)
-		Define hfile = CreateFile_(@file,#GENERIC_READ,0,#Null,#OPEN_EXISTING,#FILE_ATTRIBUTE_NORMAL,#Null)
-		If hfile<>#INVALID_HANDLE_VALUE
-			;ReadData(hfile,@IMAGE_DOS_HEADER,SizeOf(IMAGE_DOS_HEADER))
-			ReadFile_(hfile,@IMAGE_DOS_HEADER,SizeOf(IMAGE_DOS_HEADER),#Null,#Null)
-			;If IMAGE_DOS_HEADER\e_magic <> #IMAGE_DOS_HEADER : ProcedureReturn 0 : EndIf
-			;FileSeek(hfile,IMAGE_DOS_HEADER\e_lfanew)
-			SetFilePointer_(hfile,IMAGE_DOS_HEADER\e_lfanew,#Null,#FILE_BEGIN) ; #FILE_CURRENT
-			;ReadData(hfile,@IMAGE_NT_HEADERS32,SizeOf(IMAGE_NT_HEADERS32))
-			;ReadData(hfile,@IMAGE_NT_HEADERS32,SizeOf(IMAGE_NT_HEADERS32))
-			ReadFile_(hfile,@IMAGE_NT_HEADERS32,SizeOf(IMAGE_NT_HEADERS32),#Null,#Null)
-			;CloseFile(hfile)
-			CloseHandle_(hfile)
-		EndIf
-		ProcedureReturn IMAGE_NT_HEADERS32\FileHeader\Machine & $0000FFFF
-	EndProcedure
-CompilerEndIf
-;=======================================================================================================================
-CompilerIf Not Defined(PROC_GETFILEBITNESS,#PB_Constant) : #PROC_GETFILEBITNESS = 0 : CompilerEndIf
-CompilerIf #PROC_GETFILEBITNESS
-	Procedure GetFileBitness(file.s)
-		Define IMAGE_DOS_HEADER.IMAGE_DOS_HEADER
-		Define IMAGE_NT_HEADERS32.IMAGE_NT_HEADERS32
-		Define hfile = ReadFile(#PB_Any,file)
-		If hfile
-			ReadData(hfile,@IMAGE_DOS_HEADER,SizeOf(IMAGE_DOS_HEADER))
-			If (IMAGE_DOS_HEADER\e_magic & $0000FFFF) <> $5A4D ; #IMAGE_DOS_HEADER_MAGIC
-				CloseFile(hfile)
-				ProcedureReturn 0
-			EndIf
-			FileSeek(hfile,IMAGE_DOS_HEADER\e_lfanew)
-			ReadData(hfile,@IMAGE_NT_HEADERS32,SizeOf(IMAGE_NT_HEADERS32))
-			;If (IMAGE_NT_HEADERS32\Signature & $0000FFFF) <> $00004550
-			;	CloseFile(hfile)
-			;	ProcedureReturn 0
-			;EndIf
-			CloseFile(hfile)
-		EndIf
-		Define Bitness = IMAGE_NT_HEADERS32\FileHeader\Machine & $0000FFFF
-		If Bitness=$8664 ; #IMAGE_FILE_MACHINE_AMD64
-			ProcedureReturn 2
-		EndIf
-		If Bitness=$014C ; #IMAGE_FILE_MACHINE_I386
-			ProcedureReturn 1
-		EndIf
-		ProcedureReturn 0
-	EndProcedure
-CompilerEndIf
 ;=======================================================================================================================
 ; Коррекция путей
 CompilerIf Not Defined(PROC_CORRECTPATH,#PB_Constant) : #PROC_CORRECTPATH = 0 : CompilerEndIf
@@ -438,24 +235,6 @@ CompilerIf #PROC_CORRECTPATH Or #PROC_CORRECTCFGPATH
 CompilerEndIf
 
 ;=======================================================================================================================
-; https://docs.microsoft.com/ru-ru/windows/win32/debug/retrieving-the-last-error-code
-CompilerIf Not Defined(PROC_GETLASTERRORSTR,#PB_Constant) : #PROC_GETLASTERRORSTR = 0 : CompilerEndIf
-;CompilerIf #PROC_GETLASTERRORSTR
-Procedure.s GetLastErrorStr(Error=0)
-	If Error=0
-		Error = GetLastError_()
-	EndIf
-	Protected *Buffer, Result.s
-	Protected Length = FormatMessage_(#FORMAT_MESSAGE_ALLOCATE_BUFFER|#FORMAT_MESSAGE_FROM_SYSTEM,0,Error,0,@*Buffer,0,0)
-	If Length
-		Result = PeekS(*Buffer,Length-2) ; кроме последнего перевода строки
-		LocalFree_(*Buffer)
-		ProcedureReturn Result
-	EndIf
-EndProcedure
-;CompilerEndIf
-
-;=======================================================================================================================
 CompilerIf Not Defined(PROC_ADDARRAYS,#PB_Constant) : #PROC_ADDARRAYS = 0 : CompilerEndIf
 ;CompilerIf #PROC_ADDARRAYS
 Procedure AddArrayS(Array arr.s(1),v.s)
@@ -533,55 +312,63 @@ EndProcedure
 ;CompilerEndIf
 
 ;=======================================================================================================================
-; https://docs.microsoft.com/en-us/windows/win32/api/imagehlp/nf-imagehlp-checksummappedfile
+;{ Дополнительные процедуры. Константы оставлены только для совместимости.
+CompilerIf Not Defined(PROC_FINDMEMORYSTRING,#PB_Constant) : #PROC_FINDMEMORYSTRING = 0 : CompilerEndIf
+CompilerIf #PROC_FINDMEMORYSTRING
+	XIncludeFile "Proc\FindMemoryString.pbi"	
+CompilerEndIf
+CompilerIf Not Defined(PROC_REPLACEMEMORYSTRING,#PB_Constant) : #PROC_REPLACEMEMORYSTRING = 0 : CompilerEndIf
+CompilerIf #PROC_REPLACEMEMORYSTRING
+	XIncludeFile "Proc\FindMemoryString.pbi"
+CompilerEndIf
+CompilerIf Not Defined(PROC_REPLACEMEMORYBINARY,#PB_Constant) : #PROC_REPLACEMEMORYBINARY = 0 : CompilerEndIf
+CompilerIf #PROC_REPLACEMEMORYBINARY
+	XIncludeFile "Proc\ReplaceMemoryBinary.pbi"
+CompilerEndIf
+CompilerIf Not Defined(PROC_GETBITNESS,#PB_Constant) : #PROC_GETBITNESS = 0 : CompilerEndIf
+CompilerIf #PROC_GETBITNESS
+	XIncludeFile "Proc\GetBitness.pbi"
+CompilerEndIf
+CompilerIf Not Defined(PROC_GETFILEBITNESS,#PB_Constant) : #PROC_GETFILEBITNESS = 0 : CompilerEndIf
+CompilerIf #PROC_GETFILEBITNESS
+	XIncludeFile "Proc\GetFileBitness.pbi"
+CompilerEndIf
 CompilerIf Not Defined(PROC_CORRECTCHECKSUM,#PB_Constant) : #PROC_CORRECTCHECKSUM = 0 : CompilerEndIf
 CompilerIf #PROC_CORRECTCHECKSUM
-	Procedure CorrectCheckSum(hFile)
-		Protected *NTHeaders.IMAGE_NT_HEADERS, *BaseAddress
-		Protected HeaderSum, CheckSum, FileSize, LargeFileSize.q
-		Protected hFileMapping = CreateFileMapping_(hFile,#Null,#PAGE_READWRITE,0,0,#Null)
-		GetFileSizeEx_(hFile,@LargeFileSize)
-		FileSize = LargeFileSize
-		If hFileMapping And FileSize
-			*BaseAddress = MapViewOfFile_(hFileMapping,#FILE_MAP_ALL_ACCESS,0,0,0)
-			*NTHeaders = CheckSumMappedFile_(*BaseAddress,FileSize,@HeaderSum,@CheckSum)
-			;dbg("Checksum: "+Hex(*NTHeaders\OptionalHeader\CheckSum)+"/"+Hex(CheckSum))
-			*NTHeaders\OptionalHeader\CheckSum = CheckSum
-			UnmapViewOfFile_(hFileMapping)
-		EndIf
-	EndProcedure
+	XIncludeFile "Proc\CorrectCheckSum.pbi"
 CompilerEndIf
 CompilerIf Not Defined(PROC_CORRECTCHECKSUMADR,#PB_Constant) : #PROC_CORRECTCHECKSUMADR = 0 : CompilerEndIf
 CompilerIf #PROC_CORRECTCHECKSUMADR
-	Procedure CorrectCheckSumAdr(*BaseAddress,FileSize)
-		Protected *NTHeaders.IMAGE_NT_HEADERS
-		Protected HeaderSum, CheckSum
-		*NTHeaders = CheckSumMappedFile_(*BaseAddress,FileSize,@HeaderSum,@CheckSum)
-		;dbg("Checksum: "+Hex(*NTHeaders\OptionalHeader\CheckSum)+"/"+Hex(CheckSum))
-		*NTHeaders\OptionalHeader\CheckSum = CheckSum
-	EndProcedure
+	XIncludeFile "Proc\CorrectCheckSumAdr.pbi"
 CompilerEndIf
-;=======================================================================================================================
-; Удаление сертификатов
-; https://docs.microsoft.com/en-us/windows/win32/api/imagehlp/nf-imagehlp-imageremovecertificate
-; need #FILE_READ_DATA|#FILE_WRITE_DATA ???
 CompilerIf Not Defined(PROC_REMOVECERTIFICATES,#PB_Constant) : #PROC_REMOVECERTIFICATES = 0 : CompilerEndIf
 CompilerIf #PROC_REMOVECERTIFICATES
-	#CERT_SECTION_TYPE_ANY = $FF
-	Procedure.i RemoveCertificates(hFile)
-		Protected CertificateCount, iCert, cCert
-		If ImageEnumerateCertificates_(hFile,#CERT_SECTION_TYPE_ANY,@CertificateCount,#Null,0)
-			;dbg("CertificateCount: "+Str(CertificateCount))
-			For iCert=0 To CertificateCount-1
-				;dbg("Cert: "+Str(iCert))
-				If ImageRemoveCertificate_(hFile,iCert)
-					cCert+1
-				EndIf
-			Next
-		EndIf
-		ProcedureReturn cCert
-	EndProcedure
+	XIncludeFile "Proc\RemoveCertificates.pbi"
 CompilerEndIf
+;}
+;=======================================================================================================================
+; https://docs.microsoft.com/ru-ru/windows/win32/debug/retrieving-the-last-error-code
+;CompilerIf Not Defined(PROC_GETLASTERRORSTR,#PB_Constant) : #PROC_GETLASTERRORSTR = 0 : CompilerEndIf
+;CompilerIf #PROC_GETLASTERRORSTR
+Procedure.s GetLastErrorStr(Error=0)
+	If Error=0
+		Error = GetLastError_()
+	EndIf
+	Protected *Buffer, Result.s
+	Protected Length = FormatMessage_(#FORMAT_MESSAGE_ALLOCATE_BUFFER|#FORMAT_MESSAGE_FROM_SYSTEM,0,Error,0,@*Buffer,0,0)
+	If Length
+		Result = PeekS(*Buffer,Length-2) ; кроме последнего перевода строки
+		LocalFree_(*Buffer)
+		ProcedureReturn StrU(Error)+": "+Result
+	EndIf
+EndProcedure
+;=======================================================================================================================
+Procedure PPErrorMessage(Msg.s,Error=-1)
+	If Error<>-1
+		Msg + #CR$+GetLastErrorStr(Error)
+	EndIf
+	MessageBox_(0,Msg,"PurePortable ("+StrU(GetCurrentProcessID_())+")",#MB_ICONERROR)
+EndProcedure
 ;=======================================================================================================================
 CompilerIf Not Defined(PROC_NORMALIZEPATH,#PB_Constant) : #PROC_NORMALIZEPATH = 0 : CompilerEndIf
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfullpathnamew
@@ -647,7 +434,7 @@ Procedure CreatePath(Path.s)
 	Wend
 EndProcedure
 ;=======================================================================================================================
-; Проверка версии/имени файла
+;{ Проверка версии/имени файла
 
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winver/nf-winver-getfileversioninfoa
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winver/nf-winver-getfileversioninfoexa
@@ -800,6 +587,7 @@ Procedure _ValidateProgramL(w.s,v.s,l=0)
 	ProcedureReturn 0
 EndProcedure
 ;CompilerEndIf
+;}
 ;=======================================================================================================================
 Procedure.s bin2hex(*pb.Byte,cb)
 	Protected *end = *pb + cb
@@ -835,8 +623,14 @@ Procedure.i StartWith(s.s,t.s,cs=0)
 	EndIf
 	ProcedureReturn Bool(StrCmpNI(@s,@t,l)=0)
 EndProcedure
-Procedure.i StartWithKey(s.s,t.s,cs=0)
+Procedure.i StartWithPath(s.s,t.s,cs=0)
+	StrTrim_(@t,"\")
 	Protected l = Len(t)
+	;dbg("StartWithPath")
+	;dbg("  "+s)
+	;dbg("  "+t)
+	;dbg("  "+Str(StrCmpNI(@s,@t,l)))
+	;dbg("  "+Chr(PeekW(@s+l<<1)))
 	If cs
 		ProcedureReturn Bool(StrCmp(@s,@t)=0 Or (StrCmpN(@s,@t,l)=0 And PeekW(@s+l<<1)=92))
 	EndIf
@@ -844,10 +638,10 @@ Procedure.i StartWithKey(s.s,t.s,cs=0)
 EndProcedure
 ;=======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 840
-; FirstLine = 409
-; Folding = ---DAGIgQ-
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 632
+; FirstLine = 235
+; Folding = ---ADMQ9-
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

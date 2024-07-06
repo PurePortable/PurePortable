@@ -8,7 +8,33 @@ CompilerIf Not Defined(PB_Backend_Asm,#PB_Constant) : #PB_Backend_Asm = 0 : Comp
 CompilerIf #PB_Compiler_Backend<>#PB_Backend_Asm
 	CompilerError "Compiler Backend must be ASM in Compiler-Option"
 CompilerEndIf
+CompilerIf Not #PB_Compiler_Thread
+	CompilerError "Enable threadsafe in compiler options"
+CompilerEndIf
 
+;=======================================================================================================================
+; https://docs.microsoft.com/ru-ru/windows/win32/debug/retrieving-the-last-error-code
+;CompilerIf Not Defined(PROC_GETLASTERRORSTR,#PB_Constant) : #PROC_GETLASTERRORSTR = 0 : CompilerEndIf
+;CompilerIf #PROC_GETLASTERRORSTR
+Procedure.s GetLastErrorStr(Error=0)
+	If Error=0
+		Error = GetLastError_()
+	EndIf
+	Protected *Buffer, Result.s
+	Protected Length = FormatMessage_(#FORMAT_MESSAGE_ALLOCATE_BUFFER|#FORMAT_MESSAGE_FROM_SYSTEM,0,Error,0,@*Buffer,0,0)
+	If Length
+		Result = PeekS(*Buffer,Length-2) ; кроме последнего перевода строки
+		LocalFree_(*Buffer)
+		ProcedureReturn StrU(Error)+": "+Result
+	EndIf
+EndProcedure
+;=======================================================================================================================
+Procedure PPErrorMessage(Msg.s,Error=-1)
+	If Error<>-1
+		Msg + #CR$+GetLastErrorStr(Error)
+	EndIf
+	MessageBox_(0,Msg,"PurePortable ("+StrU(GetCurrentProcessID_())+")",#MB_ICONERROR)
+EndProcedure
 ;;======================================================================================================================
 
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
@@ -105,9 +131,9 @@ CompilerEndIf
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 27
+; CursorPosition = 37
 ; FirstLine = 13
-; Folding = -
+; Folding = --
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

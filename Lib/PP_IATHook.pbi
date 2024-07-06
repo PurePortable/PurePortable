@@ -145,7 +145,7 @@ EndProcedure
 Procedure _IAT_Module(*ModuleData.MODULE_DATA,ModuleName.s,fSystem=1)
 	*ModuleData\ImageBase = LoadDll(ModuleName,fSystem)
 	If *ModuleData\ImageBase = #Null
-		MessageBox_(0,"Failed load dll"+Chr(10)+ModuleName,"PurePortable",#MB_ICONERROR)
+		PPErrorMessage("Failed load dll"+#CR$+ModuleName)
 		;RaiseError(#ERROR_DLL_INIT_FAILED)
 		TerminateProcess_(GetCurrentProcess_(),0)
 	EndIf
@@ -281,6 +281,8 @@ EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 147
+; FirstLine = 144
 ; Folding = 8--
 ; EnableThread
 ; DisableDebugger

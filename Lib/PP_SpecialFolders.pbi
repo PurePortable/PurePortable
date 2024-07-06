@@ -63,6 +63,7 @@ CompilerElse
 	Macro DbgSpec(txt) : EndMacro
 CompilerEndIf
 CompilerIf #DBG_SPECIAL_FOLDERS And (#PROXY_DLL_COMPATIBILITY=0 Or #PROXY_DLL_COMPATIBILITY>5)
+	XIncludeFile "Proc\guid2s.pbi"
 	Procedure DbgRfid(func.s,rfid,path.s="")
 		If DbgSpecMode
 			If path : path = ": «"+path+"»" : EndIf
@@ -695,7 +696,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = qAAA-
+; Folding = uAAA-
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

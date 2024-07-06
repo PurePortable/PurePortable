@@ -243,20 +243,23 @@ CompilerEndIf
 ;}
 ;;======================================================================================================================
 ;{ Преобразование относительных путей
-Procedure.s PreferencePath(Path.s="")
+Procedure.s PreferencePath(Path.s="",Dir.s="")
 	Protected Result.s
 	If Path=""
 		Path = PreferenceKeyValue()
 	EndIf
+	If Dir=""
+		Dir = PrgDirN
+	EndIf
 	;dbg("PreferencePath: <"+Path)
-	Path = _ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
+	Path = ExpandEnvironment(Trim(Trim(Path),Chr(34)))
 	;dbg("PreferencePath: *"+Path)
 	If Path="."
-		Path = PrgDirN
+		Path = Dir
 	;ElseIf Path=".." Or Left(Path,2)=".\" Or Left(Path,3)="..\"
-	;	Path = PrgDir+Path
+	;	Path = Dir+"\"+Path
 	ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
-		Path = PrgDir+Path
+		Path = Dir+"\"+Path
 	EndIf
 	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
@@ -830,8 +833,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 16
-; Folding = PAfAAgAA5-
+; CursorPosition = 254
+; FirstLine = 110
+; Folding = PAfADgAA5-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll

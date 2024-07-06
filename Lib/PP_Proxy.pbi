@@ -1,6 +1,8 @@
 ﻿;;======================================================================================================================
-; Описание и иницилизация экспортируемых прокси-функций
+; Иницилизация экспортируемых прокси-функций
 ;;======================================================================================================================
+
+EnableExplicit
 
 CompilerIf Not Defined(DBG_PROXY_DLL,#PB_Constant) : #DBG_PROXY_DLL = 0 : CompilerEndIf
 
@@ -164,7 +166,7 @@ Procedure.i LoadDll(DllName.s,fSystem=1)
 	;Protected hDll = LoadLibraryEx_(@DllFull,#Null,0) ; #LOAD_LIBRARY_SEARCH_SYSTEM32
 	Protected hDll = LoadLibrary_(@DllFull)
 	If hDll = 0
-		MessageBox_(0,"Failed load original dll:"+#LF$+DllName,"PurePortable",#MB_ICONERROR)
+		PPErrorMessage("Failed load original dll:"+#LF$+DllName)
 		;RaiseError(#ERROR_DLL_INIT_FAILED)
 		TerminateProcess_(GetCurrentProcess_(),0)
 	EndIf
@@ -302,7 +304,7 @@ Procedure.i _InitProxyFunc(hDll,*AsciiFuncName)
 	If Not ProcAddr
 		DbgProxyError("InitProxyFunc: "+PeekS(*AsciiFuncName,-1,#PB_Ascii)+" ERROR "+Str(GetLastError_()))
 		If ProxyErrorMode
-			MessageBox_(0,"Error init proxy function "+PeekS(*AsciiFuncName,-1,#PB_Ascii),"PurePortable",#MB_ICONERROR)
+			PPErrorMessage("Error init proxy function "+PeekS(*AsciiFuncName,-1,#PB_Ascii))
 			If ProxyErrorMode=2
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
@@ -318,7 +320,8 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = -AAw
+; CursorPosition = 1
+; Folding = -AE5
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
