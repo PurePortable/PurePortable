@@ -26,7 +26,7 @@ param (
 	[Alias('FD')] [string] $FileDescription
 	,
 	[Parameter(Mandatory=$false)]
-	[Alias('CO','Comments','Comment')] [string] $FileComments
+	[Alias('CO','Comments','Comment')] [string] $FileComment
 	,
 	[Parameter(Mandatory=$false)]
 	[switch] $x32
@@ -128,13 +128,13 @@ Get-Content -Lit $RcFile -Enc Unicode | foreach {
 		$s = $s -replace ',(?<Space>\s*).*',",`"$($Matches.Space)$InternalName\0`""
 	}
 	elseif ($s -match '^\s*VALUE "OriginalFilename"' -and $OriginalFilename -ne "") {
-
+		$s = $s -replace ',(?<Space>\s*).*',",`"$($Matches.Space)$OriginalFilename\0`""
 	}
 	elseif ($s -match '^\s*VALUE "FileDescription"' -and $FileDescription -ne "") {
-
+		$s = $s -replace ',(?<Space>\s*).*',",`"$($Matches.Space)$FileDescription\0`""
 	}
 	elseif ($s -match '^\s*VALUE "Comments"' -and $FileComments -ne "") {
-
+		$s = $s -replace ',(?<Space>\s*).*',",`"$($Matches.Space)$FileComment\0`""
 	}
 	Add-Content -Lit $RcTmp -Value $s -Enc Unicode
 }
