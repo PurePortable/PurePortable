@@ -155,7 +155,7 @@ Procedure ReadCfg(AltConfig.s="")
 							Cfg(i)\a = sData
 							*pc = @Cfg(i)\a
 							*end = *pc + cbData
-							While *pc < *end
+							While *pc < *end ; декодирование управляющих символов 0-31
 								If *pc\c>=#CFG_CHR_NUL And *pc\c<#CFG_CHR_SPACE
 									*pc\c - #CFG_CHR_NUL
 								EndIf
@@ -179,7 +179,7 @@ Procedure ReadCfg(AltConfig.s="")
 							While *pb < *end
 								*pb\b = Val("$"+PeekS(*pc,2))
 								*pb + 1
-								*pc + 2 + 2
+								*pc + 4 ; hex представление байта - два символа в юникоде
 							Wend
 						EndIf
 					EndIf
@@ -257,7 +257,7 @@ Procedure WriteCfg()
 						CopyMemory(@Cfg(i)\a,@sData,cbData)
 						*pc = @sData
 						*end = *pc + cbData - 2 ; кроме завершающего 0
-						While *pc < *end
+						While *pc < *end ; кодирование служебных символов 0-31
 							If *pc\c>=0 And *pc\c<$20
 								*pc\c + #CFG_CHR_NUL
 							EndIf
@@ -277,10 +277,10 @@ Procedure WriteCfg()
 							*pb = @Cfg(i)\a
 						EndIf
 						*end = *pb + cbData
-						While *pb < *end
+						While *pb < *end ; кодирование управляющих символов 0-31
 							PokeS(*pc,RSet(Hex(*pb\b,#PB_Byte),2,"0")) ; пишем по два символа + 0; последний 0 ляжет на 0 в конце строки
 							*pb + 1
-							*pc + 2 + 2
+							*pc + 4 ; hex представление байта - два символа в юникоде
 						Wend
 					EndIf
 					WriteStringN(hCfg,sKey+#CONFIG_SEPARATOR$+sName+#CONFIG_SEPARATOR$+sType+#CONFIG_SEPARATOR$+sData,#PB_Unicode)
@@ -511,7 +511,9 @@ CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AAAg
+; CursorPosition = 282
+; FirstLine = 248
+; Folding = GAAg
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
