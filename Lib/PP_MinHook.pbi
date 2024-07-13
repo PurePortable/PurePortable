@@ -23,9 +23,9 @@ CompilerIf Not Defined(MIN_HOOK_ERROR_MODE,#PB_Constant) : #MIN_HOOK_ERROR_MODE 
 
 ;;======================================================================================================================
 CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-	#MINHOOKLIB = "lib\libMinHook.lib"
+	#MINHOOKLIB = "minhook\libMinHook.lib"
 CompilerElse
-	#MINHOOKLIB = "lib\libMinHook64.lib"
+	#MINHOOKLIB = "minhook\libMinHook64.lib"
 CompilerEndIf
 Import #MINHOOKLIB
 	MH_Initialize()
@@ -183,8 +183,8 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 157
-; FirstLine = 105
+; CursorPosition = 27
+; FirstLine = 9
 ; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant
