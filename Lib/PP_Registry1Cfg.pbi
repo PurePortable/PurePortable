@@ -64,7 +64,7 @@ CompilerIf Not Defined(CFG_SAVE_ON_CLOSE,#PB_Constant) : #CFG_SAVE_ON_CLOSE = 0 
 #CFG_CHR_NUL = $E000 ; 57344 - Из набора символов для частного использования
 #CFG_CHR_SPACE = #CFG_CHR_NUL+$20
 ;;----------------------------------------------------------------------------------------------------------------------
-
+; Поиск специальных символов-разделителей
 Procedure FindCtrl(s.s,start=1)
 	Protected i, c.c, l=Len(s)
 	Protected istart = @s+start*2-2
@@ -511,9 +511,7 @@ CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 282
-; FirstLine = 248
-; Folding = GAAg
+; Folding = AAAg
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
