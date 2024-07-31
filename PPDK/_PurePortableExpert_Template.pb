@@ -15,13 +15,12 @@
 ;RES_INTERNALNAME 400.dll
 ;RES_PRODUCTNAME Pure Portable
 ;RES_PRODUCTVERSION 4.10.0.0
-;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "P:\PurePortable\Apps\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\Apps\proxy64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\lib" ; Для доступа к файлам рядом с исходником можно использовать #PB_Compiler_FilePath
+IncludePath "..\PPDK\Lib" ; Для доступа к файлам рядом с исходником можно использовать #PB_Compiler_FilePath
 XIncludeFile "PurePortableCustom.pbi"
 
 ; Для подменяемой dll для объявление экспорта прокси-dll
@@ -36,7 +35,6 @@ XIncludeFile "PurePortableCustom.pbi"
 ; Если эта константа определена и строка пустая, имя будет то же, что и у программы плюс расширение, заданное константой #CONFIG_FILEEXT.
 ; Если эта константа не определена, имя файла конфигурации надо задавать вручную (полный путь к файлу).
 #CONFIG_FILENAME = "PurePortable"
-;#CONFIG_PERMANENT = #CONFIG_FILENAME+"-Reg"
 ;#CONFIG_INITIAL = #CONFIG_FILENAME+"-Init"
 ;#PREFERENCES_FILENAME = #CONFIG_FILENAME ; Имя файла конфигурации PurePortable
 
@@ -293,8 +291,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 103
-; FirstLine = 60
+; CursorPosition = 38
+; FirstLine = 27
 ; Folding = Y1rG0
 ; Optimizer
 ; EnableThread
@@ -310,5 +308,3 @@ EndProcedure
 ; VersionField6 = Proxy dll
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024
-; VersionField18 = Comments
-; VersionField21 = PAM Project

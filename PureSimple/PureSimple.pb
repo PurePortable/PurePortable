@@ -6,26 +6,25 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.23
+;RES_VERSION 4.10.0.24
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
 ;RES_PRODUCTNAME Pure Portable
 ;RES_PRODUCTVERSION 4.10.0.0
-;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\Lib"
+IncludePath "..\PPDK\Lib"
 XIncludeFile "PurePortableCustom.pbi"
 
 #PROXY_DLL = "pureport"
 #PROXY_DLL_COMPATIBILITY = 0 ; Совместимость: 0 - по умолчанию, 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
 
-;#CONFIG_FILENAME = "PurePortable"
-;#CONFIG_PERMANENT = #CONFIG_FILENAME+"-Init"
+#CONFIG_FILENAME = "registry"
+#CONFIG_PERMANENT = #CONFIG_FILENAME+"-init"
 ;#CONFIG_INITIAL = #CONFIG_FILENAME+"-Init"
 ;#PREFERENCES_FILENAME = #CONFIG_FILENAME ; Имя файла конфигурации PurePortable
 
@@ -38,7 +37,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 #PORTABLE_SPECIAL_FOLDERS = 1 ; Перехват функций для работы со специальными папками
 ;{ Управление хуками PORTABLE_SPECIAL_FOLDERS
-#DETOUR_SHFOLDER = 0 ; Перехват функций из shfolder.dll
+#DETOUR_SHFOLDER = 1 ; Перехват функций из shfolder.dll
 #DETOUR_USERENV = 1	; Перехват функций из userenv.dll
 ;}
 #PORTABLE_ENVIRONMENT_VARIABLES = 1
@@ -345,7 +344,7 @@ EndProcedure
 ;;======================================================================================================================
 Global PureAppsPrefs.s
 XIncludeFile "proc\Execute.pbi"
-Procedure RunOn(k.s,p.s)
+Procedure RunFrom(k.s,p.s)
 	Protected i
 	Protected Dim Flags.s(0)
 	Protected ExecuteFlags
@@ -474,9 +473,15 @@ ProcedureDLL.l AttachProcess(Instance)
 			If p
 				ConfigFile = PreferencePath(p)
 			EndIf
+			If GetExtensionPart(ConfigFile)=""
+				ConfigFile + #CONFIG_FILEEXT
+			EndIf
 			p = ReadPreferenceString("InitFile","")
 			If p
-				PermanentFile = PreferencePath(p)
+				InitialFile = PreferencePath(p)
+			EndIf
+			If GetExtensionPart(InitialFile)=""
+				InitialFile + #CONFIG_INITIALEXT
 			EndIf
 		CompilerEndIf
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
@@ -710,11 +715,11 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf
 	;}
 	;{ Запуск приложений
-	If FirstProcess And PreferenceGroup("RunOnAttach")
+	If FirstProcess And PreferenceGroup("RunFromAttachProcess")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			;dbg("RunOnAttach: "+PreferenceKeyName()+" :: "+PreferenceKeyValue())
-			RunOn(PreferenceKeyName(),PreferenceKeyValue())
+			;dbg("RunFromAttachProcess: "+PreferenceKeyName()+" :: "+PreferenceKeyValue())
+			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 		Wend
 	EndIf		
 	;}
@@ -756,10 +761,10 @@ ProcedureDLL.l DetachProcess(Instance)
 		EndIf
 	EndIf
 	
-	If PreferenceGroup("RunOnDetach")
+	If PreferenceGroup("RunFromDetachProcess")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			RunOn(PreferenceKeyName(),PreferenceKeyValue())
+			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 		Wend
 	EndIf
 	
@@ -833,22 +838,20 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 254
-; FirstLine = 110
-; Folding = PAfADgAA5-
+; CursorPosition = 39
+; FirstLine = 15
+; Folding = PIbAAwIA9-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.23
+; VersionField0 = 4.10.0.24
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.23
+; VersionField5 = 4.10.0.24
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
-; VersionField18 = Comments
-; VersionField21 = PAM Project

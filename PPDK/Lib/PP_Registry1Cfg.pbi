@@ -3,10 +3,11 @@
 ;;======================================================================================================================
 
 Global ConfigFile.s
-Global PermanentFile.s
+Global PermanentFile.s ; depricated
 Global InitialFile.s
 
 CompilerIf Not Defined(CONFIG_FILEEXT,#PB_Constant) : #CONFIG_FILEEXT = ".pport" : CompilerEndIf
+CompilerIf Not Defined(CONFIG_INITIALEXT,#PB_Constant) : #CONFIG_INITIALEXT = #CONFIG_FILEEXT : CompilerEndIf
 CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 	CompilerIf #CONFIG_FILENAME<>""
 		ConfigFile = PrgDir+#CONFIG_FILENAME
@@ -17,24 +18,23 @@ CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 		ConfigFile = PrgDir+PrgName+#CONFIG_FILEEXT
 	CompilerEndIf
 CompilerEndIf
-CompilerIf Defined(CONFIG_PERMANENT,#PB_Constant)
+CompilerIf Defined(CONFIG_PERMANENT,#PB_Constant) ; depricated
 	CompilerIf #CONFIG_PERMANENT<>""
-		PermanentFile = PrgDir+#CONFIG_PERMANENT
-		If GetExtensionPart(PermanentFile)=""
-			PermanentFile + #CONFIG_FILEEXT
+		InitialFile = PrgDir+#CONFIG_PERMANENT
+		If GetExtensionPart(InitialFile)=""
+			InitialFile + #CONFIG_INITIALEXT
 		EndIf
 	CompilerElse
-		PermanentFile = PrgDir+PrgName+"-Data"+#CONFIG_FILEEXT
+		InitialFile = PrgDir+PrgName+"-Init"+#CONFIG_INITIALEXT
 	CompilerEndIf
-CompilerEndIf
-CompilerIf Defined(CONFIG_INITIAL,#PB_Constant)
+CompilerElseIf Defined(CONFIG_INITIAL,#PB_Constant)
 	CompilerIf #CONFIG_INITIAL<>""
 		InitialFile = PrgDir+#CONFIG_INITIAL
 		If GetExtensionPart(InitialFile)=""
-			InitialFile + #CONFIG_FILEEXT
+			InitialFile + #CONFIG_INITIALEXT
 		EndIf
 	CompilerElse
-		InitialFile = PrgDir+PrgName+"-Init"+#CONFIG_FILEEXT
+		InitialFile = PrgDir+PrgName+"-Init"+#CONFIG_INITIALEXT
 	CompilerEndIf
 CompilerEndIf
 CompilerIf Defined(CONFIG_OLDNAME,#PB_Constant)
@@ -80,136 +80,112 @@ EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Чтение параметров из файла
-Procedure ReadCfg(AltConfig.s="")
-	Protected s.s, hKey, sKey.s, sData.s, cbData, sType.s, sName.s, Config.s
+Procedure ReadCfg1(Config.s)
+	Protected s.s, hKey, sKey.s, sData.s, cbData, sType.s, sName.s
 	Protected x1, x2, x3, i
 	Protected *pb.Byte, *pc.Character, *end
 	Protected CodePage
-	If AltConfig
-		Config = AltConfig
-	ElseIf FileExist(ConfigFile)
-		Config = ConfigFile
-	ElseIf FileExist(InitialFile)
-		Config = InitialFile
-	EndIf
-	If Config <> ""
-		nCfg = ArraySize(Cfg())
-		nKeys = ArraySize(Keys())
-		ConfigChanged = #False
-		Protected hCfg = ReadFile(#PB_Any,Config,#PB_File_SharedRead|#PB_File_SharedWrite)
-		If hCfg
-			CodePage = ReadStringFormat(hCfg)
-			While Not Eof(hCfg)
-				s = ReadString(hCfg,CodePage)
-				x1 = FindCtrl(s)
-				If x1
-					x2 = FindCtrl(s,x1+1)
-					x3 = FindCtrl(s,x2+1)
-					If x2 And x3
-						sKey = LCase(Left(s,x1-1))
-						sName = LCase(Mid(s,x1+1,x2-x1-1))
-						sType = Mid(s,x2+1,x3-x2-1)
-						sData = Mid(s,x3+1)
-						hKey = AddKey(sKey)
-						;dbg("READ CFG: "+HKey2Str(hKey)+" "+sKey+" :: "+sType+" :: "+sName+" :: "+sData)
-						For i=1 To nCfg
-							If Cfg(i)\h=hKey And Cfg(i)\n=sName ; дубликат параметра, заменяем
-								Break
-							EndIf
-						Next
-						; После завершения цикла for, i будет равен либо индексу найденного значения, либо на единицу больше nCfg
-						If i > nCfg
-							nCfg = i
-							ReDim Cfg(nCfg)
+	nCfg = ArraySize(Cfg())
+	nKeys = ArraySize(Keys())
+	ConfigChanged = #False
+	Protected hCfg = ReadFile(#PB_Any,Config,#PB_File_SharedRead|#PB_File_SharedWrite)
+	If hCfg
+		CodePage = ReadStringFormat(hCfg)
+		While Not Eof(hCfg)
+			s = ReadString(hCfg,CodePage)
+			x1 = FindCtrl(s)
+			If x1
+				x2 = FindCtrl(s,x1+1)
+				x3 = FindCtrl(s,x2+1)
+				If x2 And x3
+					sKey = LCase(Left(s,x1-1))
+					sName = LCase(Mid(s,x1+1,x2-x1-1))
+					sType = Mid(s,x2+1,x3-x2-1)
+					sData = Mid(s,x3+1)
+					hKey = AddKey(sKey)
+					For i=1 To nCfg
+						If Cfg(i)\h=hKey And Cfg(i)\n=sName ; дубликат параметра, заменяем
+							Break
 						EndIf
-						;dbg("ADD: "+Str(ArraySize(Cfg()))+" "+Str(i)+" "+sName+" = "+sData)
-						Cfg(i)\h = hKey
-						Cfg(i)\n = sName
-						Select sType
-							Case "s"
-								Cfg(i)\t = #REG_SZ
-							Case "m"
-								Cfg(i)\t = #REG_MULTI_SZ
-							Case "x"
-								Cfg(i)\t = #REG_EXPAND_SZ
-							Case "b"
-								Cfg(i)\t = #REG_BINARY
-							Case "d"
-								Cfg(i)\t = #REG_DWORD
-							Default
-								Cfg(i)\t = Val("$"+sType)
-						EndSelect
-						Select sType
-							Case "s","m","x"
-								cbData = StringByteLength(sData)+2
-							Case "d"
-								cbData = SizeOf(Long)
-							Default
-								cbData = Len(sData)/2 ; два символа кодируют один байт
-						EndSelect
-						; Тип проверяем в строковом виде, так как могут встретиться стандартные типы нестандартной длины.
-						; Такие данные сохраняются с типом в HEX виде.
-						If sType="s" Or sType="m" Or sType="x"
-							Cfg(i)\c = cbData
-							Cfg(i)\m = cbData
-							Cfg(i)\a = sData
-							*pc = @Cfg(i)\a
-							*end = *pc + cbData
-							While *pc < *end ; декодирование управляющих символов 0-31
-								If *pc\c>=#CFG_CHR_NUL And *pc\c<#CFG_CHR_SPACE
-									*pc\c - #CFG_CHR_NUL
-								EndIf
-								*pc + 2
-							Wend
-						ElseIf sType="d" ;And cbData=4
-							Cfg(i)\c = cbData
-							Cfg(i)\l = Val("$"+sData)
-						Else ; данные закодированны в бинарном виде, в том числе и для нестандартной длины REG_DWORD
-							;cbData = Len(sData)/2 ; два символа кодируют один байт
-							Cfg(i)\c = cbData
-							*pc = @sData
-							If (Cfg(i)\t=#REG_DWORD Or Cfg(i)\t=#REG_BINARY) And cbData<=4
-								*pb = @Cfg(i)\l
-							Else
-								Cfg(i)\a = SpaceB(cbData)
-								Cfg(i)\m = cbData
-								*pb = @Cfg(i)\a
-							EndIf
-							*end = *pb+cbData
-							While *pb < *end
-								*pb\b = Val("$"+PeekS(*pc,2))
-								*pb + 1
-								*pc + 4 ; hex представление байта - два символа в юникоде
-							Wend
-						EndIf
+					Next
+					; После завершения цикла for, i будет равен либо индексу найденного значения, либо на единицу больше nCfg
+					If i > nCfg
+						nCfg = i
+						ReDim Cfg(nCfg)
 					EndIf
-				Else ; ключ без значения
-					AddKey(sKey)
+					Cfg(i)\h = hKey
+					Cfg(i)\n = sName
+					Select sType
+						Case "s"
+							Cfg(i)\t = #REG_SZ
+						Case "m"
+							Cfg(i)\t = #REG_MULTI_SZ
+						Case "x"
+							Cfg(i)\t = #REG_EXPAND_SZ
+						Case "b"
+							Cfg(i)\t = #REG_BINARY
+						Case "d"
+							Cfg(i)\t = #REG_DWORD
+						Default
+							Cfg(i)\t = Val("$"+sType)
+					EndSelect
+					Select sType
+						Case "s","m","x"
+							cbData = StringByteLength(sData)+2
+						Case "d"
+							cbData = SizeOf(Long)
+						Default
+							cbData = Len(sData)/2 ; два символа кодируют один байт
+					EndSelect
+					; Тип проверяем в строковом виде, так как могут встретиться стандартные типы нестандартной длины.
+					; Такие данные сохраняются с типом в HEX виде.
+					If sType="s" Or sType="m" Or sType="x"
+						Cfg(i)\c = cbData
+						Cfg(i)\m = cbData
+						Cfg(i)\a = sData
+						*pc = @Cfg(i)\a
+						*end = *pc + cbData
+						While *pc < *end ; декодирование управляющих символов 0-31
+							If *pc\c>=#CFG_CHR_NUL And *pc\c<#CFG_CHR_SPACE
+								*pc\c - #CFG_CHR_NUL
+							EndIf
+							*pc + 2
+						Wend
+					ElseIf sType="d" ;And cbData=4
+						Cfg(i)\c = cbData
+						Cfg(i)\l = Val("$"+sData)
+					Else ; данные закодированны в бинарном виде, в том числе и для нестандартной длины REG_DWORD
+						;cbData = Len(sData)/2 ; два символа кодируют один байт
+						Cfg(i)\c = cbData
+						*pc = @sData
+						If (Cfg(i)\t=#REG_DWORD Or Cfg(i)\t=#REG_BINARY) And cbData<=4
+							*pb = @Cfg(i)\l
+						Else
+							Cfg(i)\a = SpaceB(cbData)
+							Cfg(i)\m = cbData
+							*pb = @Cfg(i)\a
+						EndIf
+						*end = *pb+cbData
+						While *pb < *end
+							*pb\b = Val("$"+PeekS(*pc,2))
+							*pb + 1
+							*pc + 4 ; hex представление байта - два символа в юникоде
+						Wend
+					EndIf
 				EndIf
-			Wend
-		EndIf
+			Else ; ключ без значения
+				AddKey(sKey)
+			EndIf
+		Wend
 		CloseFile(hCfg)
 	EndIf
-	;For i=1 To nKeys ;ArraySize(Keys())
-	;	dbg("CFG: "+Keys(i))
-	;Next
-	;dbgclear()
-	;For i=1 To ArraySize(Cfg())
-	;	If Cfg(i)\t=#REG_DWORD
-	;		dbg("CFG: "+Cfg(i)\n+" : dw : "+HexLA(Cfg(i)\l))
-	;	ElseIf Cfg(i)\t=#REG_BINARY And Cfg(i)\c<=4
-	;		dbg("CFG: "+Cfg(i)\n+" : bd "+Str(Cfg(i)\c)+" : "+HexLA(Cfg(i)\l))
-	;	ElseIf Cfg(i)\t=#REG_BINARY
-	;		dbg("CFG: "+Cfg(i)\n+" : bx "+Str(Cfg(i)\c)+" : "+HexLA(PeekL(@Cfg(i)\a))+"...")
-	;	ElseIf Cfg(i)\t=#REG_SZ
-	;		dbg("CFG: "+Cfg(i)\n+" : sz "+Str(Cfg(i)\c)+" : "+Left(Cfg(i)\a,60))
-	;	Else
-	;		dbg("CFG: "+Cfg(i)\n+" : "+Cfg(i)\t)
-	;	EndIf
-	;Next
-	;dbg("END READ CFG")
-	If AltConfig="" And PermanentFile And FileExist(PermanentFile)
-		ReadCfg(PermanentFile)
+EndProcedure
+Procedure ReadCfg()
+	If FileExist(ConfigFile)
+		ReadCfg1(ConfigFile)
+	EndIf
+	If FileExist(InitialFile)
+		ReadCfg1(InitialFile)
 	EndIf
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -511,7 +487,9 @@ CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AAAg
+; CursorPosition = 186
+; FirstLine = 152
+; Folding = GAAA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -4,6 +4,15 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.24] 2024-07-31
+(*) Реорганизация структуры проекта
+(+) Procedure IsWow64
+(-) Удалён «Comments» из ресурсов.
+(-) #CONFIG_PERMANENT depricated. Вместо него использовать #CONFIG_INITIAL.
+(*) Вместо PermanentFile и InitialFile будет использоваться только InitialFile.
+(-) Констаты DETOUR_REG_ANSI и DETOUR_REG_UNICODE больше не используются.
+(*) Секции RunOnAttach и RunOnDetach переименованны в RunFromAttachProcess и RunFromDetachProcess.
+
 [4.10.0.23] 2024-07-06
 (*) Рефакторинг
 (-) PureApps: Удалена функция ShowVolumeSerialNumber
@@ -11,7 +20,7 @@
 (*) Многие константы, начинающиеся с #PROC_ - depricated. Сами процедуры помещены в папку proc и должны загружаться через XInclude.
 (*) Процедура StartWithKey переименована в StartWithPath
 (*) Правильное сообщение при ошибке загрузки куста в Registry2.
-(+) Процедура ErrorMessage
+(+) Процедура PPErrorMessage
 (+) Logging, WriteLog
 (+) PureApps: Очистка всегда разрешена в %TEMP%.
 (+) Глобальная переменная FirstProcess - истина, если не было других процессов, присоединивших dll.

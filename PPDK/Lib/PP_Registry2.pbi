@@ -28,161 +28,89 @@ CompilerIf Not Defined(DETOUR_REG_UNICODE,#PB_Constant) : #DETOUR_REG_UNICODE = 
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
-;{ Дополнительное управление функциями ANSI (для возможного сокращения размера dll)
-CompilerIf #DETOUR_REG_ANSI
-	CompilerIf Not Defined(DETOUR_REGCREATEKEYA,#PB_Constant)      : #DETOUR_REGCREATEKEYA = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGCREATEKEYEXA,#PB_Constant)    : #DETOUR_REGCREATEKEYEXA = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGOPENKEYA,#PB_Constant)        : #DETOUR_REGOPENKEYA = 1        : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGOPENKEYEXA,#PB_Constant)      : #DETOUR_REGOPENKEYEXA = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYA,#PB_Constant)      : #DETOUR_REGDELETEKEYA = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYEXA,#PB_Constant)    : #DETOUR_REGDELETEKEYEXA = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETETREEA,#PB_Constant)     : #DETOUR_REGDELETETREEA = 1     : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGDELETEVALUEA,#PB_Constant)    : #DETOUR_REGDELETEVALUEA = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYVALUEA,#PB_Constant) : #DETOUR_REGDELETEKEYVALUEA = 1 : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGENUMKEYA,#PB_Constant)        : #DETOUR_REGENUMKEYA = 1        : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGENUMKEYEXA,#PB_Constant)      : #DETOUR_REGENUMKEYEXA = 1      : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGENUMVALUEA,#PB_Constant)      : #DETOUR_REGENUMVALUEA = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGQUERYVALUEA,#PB_Constant)     : #DETOUR_REGQUERYVALUEA = 1     : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGQUERYVALUEEXA,#PB_Constant)   : #DETOUR_REGQUERYVALUEEXA = 1   : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGGETVALUEA,#PB_Constant)       : #DETOUR_REGGETVALUEA = 1       : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGQUERYINFOKEYA,#PB_Constant)   : #DETOUR_REGQUERYINFOKEYA = 1   : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGSETVALUEA,#PB_Constant)       : #DETOUR_REGSETVALUEA = 1       : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGSETVALUEEXA,#PB_Constant)     : #DETOUR_REGSETVALUEEXA = 1     : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGSETKEYVALUEA,#PB_Constant)    : #DETOUR_REGSETKEYVALUEA = 1    : CompilerEndIf
-CompilerEndIf
-CompilerIf #DETOUR_REG_ANSI And (#DETOUR_REG_TRANSACTED Or (#PORTABLE_REGISTRY & #PORTABLE_REG_TRANSACTED))
+;{ Дополнительное управление функциями
+CompilerIf Not Defined(DETOUR_REGCLOSEKEY,#PB_Constant)        : #DETOUR_REGCLOSEKEY = 1        : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGFLUSHKEY,#PB_Constant)        : #DETOUR_REGFLUSHKEY = 1        : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGCREATEKEYA,#PB_Constant)      : #DETOUR_REGCREATEKEYA = 1      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGCREATEKEYW,#PB_Constant)      : #DETOUR_REGCREATEKEYW = 1      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGCREATEKEYEXA,#PB_Constant)    : #DETOUR_REGCREATEKEYEXA = 1    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGCREATEKEYEXW,#PB_Constant)    : #DETOUR_REGCREATEKEYEXW = 1    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGOPENKEYA,#PB_Constant)        : #DETOUR_REGOPENKEYA = 1        : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGOPENKEYW,#PB_Constant)        : #DETOUR_REGOPENKEYW = 1        : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGOPENKEYEXA,#PB_Constant)      : #DETOUR_REGOPENKEYEXA = 1      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGOPENKEYEXW,#PB_Constant)      : #DETOUR_REGOPENKEYEXW = 1      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYA,#PB_Constant)      : #DETOUR_REGDELETEKEYA = 1      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYW,#PB_Constant)      : #DETOUR_REGDELETEKEYW = 1      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYEXA,#PB_Constant)    : #DETOUR_REGDELETEKEYEXA = 1    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYEXW,#PB_Constant)    : #DETOUR_REGDELETEKEYEXW = 1    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETETREEA,#PB_Constant)     : #DETOUR_REGDELETETREEA = 1     : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETETREEW,#PB_Constant)     : #DETOUR_REGDELETETREEW = 1     : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYVALUEA,#PB_Constant) : #DETOUR_REGDELETEKEYVALUEA = 1 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYVALUEW,#PB_Constant) : #DETOUR_REGDELETEKEYVALUEW = 1 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGQUERYVALUEA,#PB_Constant)     : #DETOUR_REGQUERYVALUEA = 1     : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGQUERYVALUEW,#PB_Constant)     : #DETOUR_REGQUERYVALUEW = 1     : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGGETVALUEA,#PB_Constant)       : #DETOUR_REGGETVALUEA = 1       : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGGETVALUEW,#PB_Constant)       : #DETOUR_REGGETVALUEW = 1       : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGSETVALUEA,#PB_Constant)       : #DETOUR_REGSETVALUEA = 1       : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGSETVALUEW,#PB_Constant)       : #DETOUR_REGSETVALUEW = 1       : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGSETKEYVALUEA,#PB_Constant)    : #DETOUR_REGSETKEYVALUEA = 1    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGSETKEYVALUEW,#PB_Constant)    : #DETOUR_REGSETKEYVALUEW = 1    : CompilerEndIf
+
+CompilerIf #PORTABLE_REG_TRANSACTED Or #DETOUR_REG_TRANSACTED
 	CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDA = 1 : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDA,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDA = 1   : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDA = 1 : CompilerEndIf
-CompilerEndIf
-CompilerIf #DETOUR_REG_ANSI And (#DETOUR_REG_SHLWAPI Or (#PORTABLE_REGISTRY & #PORTABLE_REG_SHLWAPI))
-	CompilerIf Not Defined(DETOUR_SHDELETEKEYA,#PB_Constant)         : #DETOUR_SHDELETEKEYA = 1         : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYA,#PB_Constant)    : #DETOUR_SHDELETEEMPTYKEYA = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHDELETEVALUEA,#PB_Constant)       : #DETOUR_SHDELETEVALUEA = 1       : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHGETVALUEA,#PB_Constant)          : #DETOUR_SHGETVALUEA = 1          : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_SHQUERYVALUEEXA,#PB_Constant)      : #DETOUR_SHQUERYVALUEEXA = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHREGGETVALUEA,#PB_Constant)       : #DETOUR_SHREGGETVALUEA = 1       : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_SHSETVALUEA,#PB_Constant)          : #DETOUR_SHSETVALUEA = 1          : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHCOPYKEYA,#PB_Constant)           : #DETOUR_SHCOPYKEYA = 1           : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYA,#PB_Constant)      : #DETOUR_SHQUERYINFOKEYA = 1      : CompilerEndIf
-CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGCREATEKEYA,#PB_Constant)           : #DETOUR_REGCREATEKEYA = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGCREATEKEYEXA,#PB_Constant)         : #DETOUR_REGCREATEKEYEXA = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGOPENKEYA,#PB_Constant)             : #DETOUR_REGOPENKEYA = 0             : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGOPENKEYEXA,#PB_Constant)           : #DETOUR_REGOPENKEYEXA = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYA,#PB_Constant)           : #DETOUR_REGDELETEKEYA = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYEXA,#PB_Constant)         : #DETOUR_REGDELETEKEYEXA = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETETREEA,#PB_Constant)          : #DETOUR_REGDELETETREEA = 0          : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGDELETEVALUEA,#PB_Constant)         : #DETOUR_REGDELETEVALUEA = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYVALUEA,#PB_Constant)      : #DETOUR_REGDELETEKEYVALUEA = 0      : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGENUMKEYA,#PB_Constant)             : #DETOUR_REGENUMKEYA = 0             : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGENUMKEYEXA,#PB_Constant)           : #DETOUR_REGENUMKEYEXA = 0           : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGENUMVALUEA,#PB_Constant)           : #DETOUR_REGENUMVALUEA = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGQUERYVALUEA,#PB_Constant)          : #DETOUR_REGQUERYVALUEA = 0          : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGQUERYVALUEEXA,#PB_Constant)        : #DETOUR_REGQUERYVALUEEXA = 0        : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGGETVALUEA,#PB_Constant)            : #DETOUR_REGGETVALUEA = 0            : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGQUERYINFOKEYA,#PB_Constant)        : #DETOUR_REGQUERYINFOKEYA = 0        : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGSETVALUEA,#PB_Constant)            : #DETOUR_REGSETVALUEA = 0            : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGSETVALUEEXA,#PB_Constant)          : #DETOUR_REGSETVALUEEXA = 0          : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGSETKEYVALUEA,#PB_Constant)         : #DETOUR_REGSETKEYVALUEW = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDA = 0 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDA = 0 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDA,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDA = 0   : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHDELETEKEYA,#PB_Constant)            : #DETOUR_SHDELETEKEYA = 0            : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYA,#PB_Constant)       : #DETOUR_SHDELETEEMPTYKEYA = 0       : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHDELETEVALUEA,#PB_Constant)          : #DETOUR_SHDELETEVALUEA = 0          : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETVALUEA,#PB_Constant)             : #DETOUR_SHGETVALUEA = 0             : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_SHQUERYVALUEEXA,#PB_Constant)         : #DETOUR_SHQUERYVALUEEXA = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHREGGETVALUEA,#PB_Constant)          : #DETOUR_SHREGGETVALUEA = 0          : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_SHSETVALUEA,#PB_Constant)             : #DETOUR_SHSETVALUEA = 0             : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHCOPYKEYA,#PB_Constant)              : #DETOUR_SHCOPYKEYA = 0              : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYA,#PB_Constant)         : #DETOUR_SHQUERYINFOKEYA = 0         : CompilerEndIf
-;}
-;{ Дополнительное управление функциями UNICODE (для возможного сокращения размера dll)
-CompilerIf #DETOUR_REG_UNICODE
-	CompilerIf Not Defined(DETOUR_REGCREATEKEYW,#PB_Constant)      : #DETOUR_REGCREATEKEYW = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGCREATEKEYEXW,#PB_Constant)    : #DETOUR_REGCREATEKEYEXW = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGOPENKEYW,#PB_Constant)        : #DETOUR_REGOPENKEYW = 1        : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGOPENKEYEXW,#PB_Constant)      : #DETOUR_REGOPENKEYEXW = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYW,#PB_Constant)      : #DETOUR_REGDELETEKEYW = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYEXW,#PB_Constant)    : #DETOUR_REGDELETEKEYEXW = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETETREEW,#PB_Constant)     : #DETOUR_REGDELETETREEW = 1     : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGDELETEVALUEW,#P_Constant)    : #DETOUR_REGDELETEVALUEW = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGDELETEKEYVALUEW,#PB_Constant) : #DETOUR_REGDELETEKEYVALUEW = 1 : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGENUMKEYW,#PB_Constant)        : #DETOUR_REGENUMKEYW = 1        : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGENUMKEYEXW,#PB_Constant)      : #DETOUR_REGENUMKEYEXW = 1      : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGENUMVALUEW,#PB_Constant)      : #DETOUR_REGENUMVALUEW = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGQUERYVALUEW,#PB_Constant)     : #DETOUR_REGQUERYVALUEW = 1     : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGQUERYVALUEEXW,#PB_Constant)   : #DETOUR_REGQUERYVALUEEXW = 1   : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGGETVALUEW,#PB_Constant)       : #DETOUR_REGGETVALUEW = 1       : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGQUERYINFOKEYW,#PB_Constant)   : #DETOUR_REGQUERYINFOKEYW = 1   : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGSETVALUEW,#PB_Constant)       : #DETOUR_REGSETVALUEW = 1       : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_REGSETVALUEEXW,#PB_Constant)     : #DETOUR_REGSETVALUEEXW = 1     : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGSETKEYVALUEW,#PB_Constant)    : #DETOUR_REGSETKEYVALUEW = 1    : CompilerEndIf
-CompilerEndIf
-CompilerIf #DETOUR_REG_UNICODE And (#DETOUR_REG_TRANSACTED Or (#PORTABLE_REGISTRY & #PORTABLE_REG_TRANSACTED))
 	CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDW = 1 : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDW,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDW = 1   : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDA = 1 : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDW = 1 : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDA,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDA = 1   : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDW,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDW = 1   : CompilerEndIf
 CompilerEndIf
-CompilerIf #DETOUR_REG_UNICODE And (#DETOUR_REG_SHLWAPI Or (#PORTABLE_REGISTRY & #PORTABLE_REG_SHLWAPI))
-	CompilerIf Not Defined(DETOUR_SHDELETEKEYW,#PB_Constant)         : #DETOUR_SHDELETEKEYW = 1         : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYW,#PB_Constant)    : #DETOUR_SHDELETEEMPTYKEYW = 1    : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHDELETEVALUEW,#PB_Constant)       : #DETOUR_SHDELETEVALUEW = 1       : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHGETVALUEW,#PB_Constant)          : #DETOUR_SHGETVALUEW = 1          : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_SHQUERYVALUEEXW,#PB_Constant)      : #DETOUR_SHQUERYVALUEEXW = 1      : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHREGGETVALUEW,#PB_Constant)       : #DETOUR_SHREGGETVALUEW = 1       : CompilerEndIf
-	;CompilerIf Not Defined(DETOUR_SHSETVALUEW,#PB_Constant)          : #DETOUR_SHSETVALUEW = 1          : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHCOPYKEYW,#PB_Constant)           : #DETOUR_SHCOPYKEYW = 1           : CompilerEndIf
-	CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYW,#PB_Constant)      : #DETOUR_SHQUERYINFOKEYW = 1      : CompilerEndIf
-CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGCREATEKEYW,#PB_Constant)           : #DETOUR_REGCREATEKEYW = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGCREATEKEYEXW,#PB_Constant)         : #DETOUR_REGCREATEKEYEXW = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGOPENKEYW,#PB_Constant)             : #DETOUR_REGOPENKEYW = 0             : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGOPENKEYEXW,#PB_Constant)           : #DETOUR_REGOPENKEYEXW = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYW,#PB_Constant)           : #DETOUR_REGDELETEKEYW = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYEXW,#PB_Constant)         : #DETOUR_REGDELETEKEYEXW = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETETREEW,#PB_Constant)          : #DETOUR_REGDELETETREEW = 0          : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGDELETEVALUEW,#PB_Constant)         : #DETOUR_REGDELETEVALUEW = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGDELETEKEYVALUEW,#PB_Constant)      : #DETOUR_REGDELETEKEYVALUEW = 0      : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGENUMKEYW,#PB_Constant)             : #DETOUR_REGENUMKEYW = 0             : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGENUMKEYEXW,#PB_Constant)           : #DETOUR_REGENUMKEYEXW = 0           : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGENUMVALUEW,#PB_Constant)           : #DETOUR_REGENUMVALUEW = 0           : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGQUERYVALUEW,#PB_Constant)          : #DETOUR_REGQUERYVALUEW = 0          : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGQUERYVALUEEXW,#PB_Constant)        : #DETOUR_REGQUERYVALUEEXW = 0        : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGGETVALUEW,#PB_Constant)            : #DETOUR_REGGETVALUEW = 0            : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGQUERYINFOKEYW,#PB_Constant)        : #DETOUR_REGQUERYINFOKEYW = 0        : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGSETVALUEW,#PB_Constant)            : #DETOUR_REGSETVALUEW = 0            : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_REGSETVALUEEXW,#PB_Constant)          : #DETOUR_REGSETVALUEEXW = 0          : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGSETKEYVALUEW,#PB_Constant)         : #DETOUR_REGSETKEYVALUEW = 0         : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDA = 0 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDW = 0 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDW,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDW = 0   : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDA = 0 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDW = 0 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHDELETEKEYW,#PB_Constant)            : #DETOUR_SHDELETEKEYW = 0            : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYW,#PB_Constant)       : #DETOUR_SHDELETEEMPTYKEYW = 0       : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHDELETEVALUEW,#PB_Constant)          : #DETOUR_SHDELETEVALUEW = 0          : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETVALUEW,#PB_Constant)             : #DETOUR_SHGETVALUEW = 0             : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_SHQUERYVALUEEXW,#PB_Constant)         : #DETOUR_SHQUERYVALUEEXW = 0         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHREGGETVALUEW,#PB_Constant)          : #DETOUR_SHREGGETVALUEW = 0          : CompilerEndIf
-;CompilerIf Not Defined(DETOUR_SHSETVALUEW,#PB_Constant)             : #DETOUR_SHSETVALUEW = 0             : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHCOPYKEYW,#PB_Constant)              : #DETOUR_SHCOPYKEYW = 0              : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYW,#PB_Constant)         : #DETOUR_SHQUERYINFOKEYW = 0         : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDA,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDA = 0   : CompilerEndIf
+CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDW,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDW = 0   : CompilerEndIf
+
+CompilerIf #PORTABLE_REG_SHLWAPI Or #DETOUR_REG_SHLWAPI
+	CompilerIf Not Defined(DETOUR_SHDELETEKEYA,#PB_Constant)      : #DETOUR_SHDELETEKEYA = 1      : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHDELETEKEYW,#PB_Constant)      : #DETOUR_SHDELETEKEYW = 1      : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYA,#PB_Constant) : #DETOUR_SHDELETEEMPTYKEYA = 1 : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYW,#PB_Constant) : #DETOUR_SHDELETEEMPTYKEYW = 1 : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHDELETEVALUEA,#PB_Constant)    : #DETOUR_SHDELETEVALUEA = 1    : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHDELETEVALUEW,#PB_Constant)    : #DETOUR_SHDELETEVALUEW = 1    : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHGETVALUEA,#PB_Constant)       : #DETOUR_SHGETVALUEA = 1       : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHGETVALUEW,#PB_Constant)       : #DETOUR_SHGETVALUEW = 1       : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHREGGETVALUEA,#PB_Constant)    : #DETOUR_SHREGGETVALUEA = 1    : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHREGGETVALUEW,#PB_Constant)    : #DETOUR_SHREGGETVALUEW = 1    : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHCOPYKEYA,#PB_Constant)        : #DETOUR_SHCOPYKEYA = 1        : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHCOPYKEYW,#PB_Constant)        : #DETOUR_SHCOPYKEYW = 1        : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYA,#PB_Constant)   : #DETOUR_SHQUERYINFOKEYA = 1   : CompilerEndIf
+	CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYW,#PB_Constant)   : #DETOUR_SHQUERYINFOKEYW = 1   : CompilerEndIf
+CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHDELETEKEYA,#PB_Constant)      : #DETOUR_SHDELETEKEYA = 0      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHDELETEKEYW,#PB_Constant)      : #DETOUR_SHDELETEKEYW = 0      : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYA,#PB_Constant) : #DETOUR_SHDELETEEMPTYKEYA = 0 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYW,#PB_Constant) : #DETOUR_SHDELETEEMPTYKEYW = 0 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHDELETEVALUEA,#PB_Constant)    : #DETOUR_SHDELETEVALUEA = 0    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHDELETEVALUEW,#PB_Constant)    : #DETOUR_SHDELETEVALUEW = 0    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHGETVALUEA,#PB_Constant)       : #DETOUR_SHGETVALUEA = 0       : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHGETVALUEW,#PB_Constant)       : #DETOUR_SHGETVALUEW = 0       : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHREGGETVALUEA,#PB_Constant)    : #DETOUR_SHREGGETVALUEA = 0    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHREGGETVALUEW,#PB_Constant)    : #DETOUR_SHREGGETVALUEW = 0    : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHCOPYKEYA,#PB_Constant)        : #DETOUR_SHCOPYKEYA = 0        : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHCOPYKEYW,#PB_Constant)        : #DETOUR_SHCOPYKEYW = 0        : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYA,#PB_Constant)   : #DETOUR_SHQUERYINFOKEYA = 0   : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYW,#PB_Constant)   : #DETOUR_SHQUERYINFOKEYW = 0   : CompilerEndIf
 ;}
 
-CompilerIf Not Defined(DETOUR_REGCLOSEKEY,#PB_Constant) : #DETOUR_REGCLOSEKEY = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REGFLUSHKEY,#PB_Constant) : #DETOUR_REGFLUSHKEY = 1 : CompilerEndIf
 
 CompilerIf #DETOUR_SHDELETEKEYA Or #DETOUR_SHDELETEEMPTYKEYA Or #DETOUR_SHDELETEVALUEA
 	#DETOUR_REG_SHLWAPI_ANY = 1
 CompilerElseIf #DETOUR_SHDELETEKEYW Or #DETOUR_SHDELETEEMPTYKEYW Or #DETOUR_SHDELETEVALUEW
 	#DETOUR_REG_SHLWAPI_ANY = 1
-CompilerElseIf #DETOUR_SHGETVALUEA Or #DETOUR_SHREGGETVALUEA
+CompilerElseIf #DETOUR_SHGETVALUEA Or #DETOUR_SHGETVALUEW Or #DETOUR_SHREGGETVALUEA Or #DETOUR_SHREGGETVALUEW
 	#DETOUR_REG_SHLWAPI_ANY = 1
-CompilerElseIf #DETOUR_SHGETVALUEW Or #DETOUR_SHREGGETVALUEW
-	#DETOUR_REG_SHLWAPI_ANY = 1
-CompilerElseIf #DETOUR_SHCOPYKEYA Or #DETOUR_SHQUERYINFOKEYA
-	#DETOUR_REG_SHLWAPI_ANY = 1
-CompilerElseIf #DETOUR_SHCOPYKEYW Or #DETOUR_SHQUERYINFOKEYW
+CompilerElseIf #DETOUR_SHCOPYKEYA Or #DETOUR_SHCOPYKEYW Or #DETOUR_SHQUERYINFOKEYA Or #DETOUR_SHQUERYINFOKEYW
 	#DETOUR_REG_SHLWAPI_ANY = 1
 CompilerElse
 	#DETOUR_REG_SHLWAPI_ANY = 0
@@ -529,9 +457,9 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 394
-; FirstLine = 270
-; Folding = HHv-8
+; CursorPosition = 58
+; FirstLine = 46
+; Folding = jj4-0
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

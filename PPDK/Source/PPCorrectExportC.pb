@@ -10,7 +10,6 @@
 ;RES_DESCRIPTION PureBasic Pre/Post Processor Correct Export
 ;RES_COPYRIGHT (c) Smitis, 2020-2024
 ;RES_INTERNALNAME PPCorrectExport
-;RES_COMMENT PAM Project
 ;PP_ENABLETHREAD 0
 ;PP_OPTIMIZER 0
 
@@ -211,7 +210,7 @@ EndProcedure
 ; Folding = -
 ; Optimizer
 ; EnableThread
-; Executable = PPCorrectExportC.exe
+; Executable = ..\PPCorrectExportC.exe
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
@@ -222,5 +221,3 @@ EndProcedure
 ; VersionField6 = PureBasic Pre/Post Processor Correct Export
 ; VersionField7 = PPCorrectExport
 ; VersionField9 = (c) Smitis, 2020-2024
-; VersionField18 = Comments
-; VersionField21 = PAM Project

@@ -43,10 +43,11 @@ param (
 	[Parameter(Mandatory=$false)]
 	[Alias('CE')] [switch] $CorrectExport
 )
-$CurrentDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
+$ScriptDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
 
 $Compiler32 = "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe"
 $Compiler64 = "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe"
+$CorrectExportC = "$ScriptDir\..\PPDK\PPCorrectExportC.exe"
 
 $SrcTmp = "~tmp.pb"
 $RcTmp = "~tmp.rc"
@@ -149,7 +150,7 @@ if ($x32 -or ((-not $x32) -and (-not $x64))) {
 	}
 	& $Compiler32 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp"
 	if ($CorrectExport) {
-		.\PPCorrectExportC "$SubDir\$OutFile"
+		& $CorrectExportC "$SubDir\$OutFile"
 	}
 	Remove-Item -Lit "$SubDir\$OutName.exp" -Force -ErrorAction Ignore
 	Remove-Item -Lit "$SubDir\$OutName.lib" -Force -ErrorAction Ignore
@@ -165,7 +166,7 @@ if ($x64 -or ((-not $x32) -and (-not $x64))) {
 	}
 	& $Compiler64 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp"
 	if ($CorrectExport) {
-		.\PPCorrectExportC "$SubDir\$OutFile"
+		& $CorrectExportC "$SubDir\$OutFile"
 	}
 	Remove-Item -Lit "$SubDir\$OutName.exp" -Force -ErrorAction Ignore
 	Remove-Item -Lit "$SubDir\$OutName.lib" -Force -ErrorAction Ignore

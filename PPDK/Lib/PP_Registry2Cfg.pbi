@@ -3,10 +3,12 @@
 ;;======================================================================================================================
 
 Global ConfigFile.s
-Global PermanentFile.s ; Для совместимости с Registry1
+Global PermanentFile.s ; depricated
+Global InitialFile.s
 Global hAppKey.l
 
 CompilerIf Not Defined(CONFIG_FILEEXT,#PB_Constant) : #CONFIG_FILEEXT = ".pphiv" : CompilerEndIf
+CompilerIf Not Defined(CONFIG_ADDITIONALEXT,#PB_Constant) : #CONFIG_INITIALEXT = ".pport" : CompilerEndIf
 CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 	CompilerIf #CONFIG_FILENAME<>""
 		ConfigFile = PrgDir+#CONFIG_FILENAME
@@ -17,7 +19,123 @@ CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 		ConfigFile = PrgDir+PrgName+#CONFIG_FILEEXT
 	CompilerEndIf
 CompilerEndIf
+CompilerIf Defined(CONFIG_INITIAL,#PB_Constant)
+	CompilerIf #CONFIG_INITIAL<>""
+		InitialFile = PrgDir+#CONFIG_INITIAL
+		If GetExtensionPart(InitialFile)=""
+			InitialFile + #CONFIG_INITIALEXT
+		EndIf
+	CompilerElse
+		InitialFile = PrgDir+PrgName+"-Init"+#CONFIG_INITIALEXT
+	CompilerEndIf
+CompilerEndIf
+;;======================================================================================================================
+; Экспорт параметров из файла pport
 
+#CONFIG_SEPARATOR = $E800 ; Из набора символов для частного использования
+#CFG_CHR_NUL = $E000 ; 57344 - Из набора символов для частного использования
+#CFG_CHR_SPACE = #CFG_CHR_NUL+$20
+
+Procedure FindCtrl(s.s,start=1)
+	Protected i, c.c, l=Len(s)
+	Protected istart = @s+start*2-2
+	Protected iend = @s+l*2-2
+	For i=istart To iend
+		c = PeekC(i)
+		If c=#CONFIG_SEPARATOR Or (c<32 And c>13) Or c=#TAB
+			ProcedureReturn (i-@s)/2+1
+		EndIf
+	Next
+	ProcedureReturn 0
+EndProcedure
+
+Procedure ExportCfg(Config.s)
+	Protected s.s, hKey, sKey.s, sData.s, bData.s, dData, pData, cbData, sType.s, bType, sName.s
+	Protected x1, x2, x3, i
+	Protected *pb.Byte, *pc.Character, *end
+	Protected CodePage
+	Protected hCfg = ReadFile(#PB_Any,Config,#PB_File_SharedRead|#PB_File_SharedWrite)
+	If hCfg
+		CodePage = ReadStringFormat(hCfg)
+		While Not Eof(hCfg)
+			s = ReadString(hCfg,CodePage)
+			x1 = FindCtrl(s)
+			If x1
+				x2 = FindCtrl(s,x1+1)
+				x3 = FindCtrl(s,x2+1)
+				If x2 And x3
+					sKey = LCase(Left(s,x1-1))
+					sName = LCase(Mid(s,x1+1,x2-x1-1))
+					sType = Mid(s,x2+1,x3-x2-1)
+					sData = Mid(s,x3+1)
+					If RegCreateKey_(hAppKey,@sKey,@hKey) = #NO_ERROR
+						Select sType
+							Case "s"
+								bType = #REG_SZ
+							Case "m"
+								bType = #REG_MULTI_SZ
+							Case "x"
+								bType = #REG_EXPAND_SZ
+							Case "b"
+								bType = #REG_BINARY
+							Case "d"
+								bType = #REG_DWORD
+							Default
+								bType = Val("$"+sType)
+						EndSelect
+						Select sType
+							Case "s","m","x"
+								cbData = StringByteLength(sData)+2
+							Case "d"
+								cbData = SizeOf(Long)
+							Default
+								cbData = Len(sData)/2 ; два символа кодируют один байт
+						EndSelect
+						; Тип проверяем в строковом виде, так как могут встретиться стандартные типы нестандартной длины.
+						; Такие данные сохраняются с типом в HEX виде.
+						If sType="s" Or sType="m" Or sType="x"
+							pData = @bData
+							*pc = pData
+							*end = *pc + cbData
+							While *pc < *end ; декодирование управляющих символов 0-31
+								If *pc\c>=#CFG_CHR_NUL And *pc\c<#CFG_CHR_SPACE
+									*pc\c - #CFG_CHR_NUL
+								EndIf
+								*pc + 2
+							Wend
+						ElseIf sType="d" ;And cbData=4
+							dData = Val("$"+sData)
+							pData = @dData
+						Else ; данные закодированны в бинарном виде, в том числе и для нестандартной длины REG_DWORD
+							;cbData = Len(sData)/2 ; два символа кодируют один байт
+							pData = @sData
+							*pc = pData
+							If bType=#REG_DWORD Or bType=#REG_BINARY ; ???
+								bData = SpaceB(8)
+							Else
+								bData = SpaceB(cbData)
+							EndIf
+							*pb = @bData
+							*end = *pb+cbData
+							While *pb < *end
+								*pb\b = Val("$"+PeekS(*pc,2))
+								*pb + 1
+								*pc + 4 ; hex представление байта - два символа в юникоде
+							Wend
+						EndIf
+						SHSetValue_(hAppKey,@sKey,@sName,bType,pData,cbData)
+						RegCloseKey_(hKey)
+					EndIf
+				EndIf
+			Else ; ключ без значения
+				If RegCreateKey_(hAppKey,@sKey,@hKey) = #NO_ERROR
+					RegCloseKey_(hKey)
+				EndIf
+			EndIf
+		Wend
+		CloseFile(hCfg)
+	EndIf
+EndProcedure
 ;;======================================================================================================================
 ; https://docs.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regloadappkeya
 ; https://docs.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regloadkeya
@@ -36,6 +154,9 @@ CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			EndIf
+			If FileExist(InitialFile)
+				ExportCfg(InitialFile)
+			EndIf
 		EndProcedure
 	CompilerCase 3
 		Global AppRootKey.s = "PurePortable"
@@ -47,6 +168,9 @@ CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 				PPErrorMessage("RegLoadKey"+#CR$+"Error load hive ",err)
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
+			EndIf
+			If FileExist(InitialFile)
+				ExportCfg(InitialFile)
 			EndIf
 		EndProcedure
 CompilerEndSelect
@@ -111,9 +235,9 @@ CompilerIf #PROC_CORRECTCFGPATH
 CompilerEndIf 
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 36
-; FirstLine = 15
-; Folding = DA-
+; CursorPosition = 174
+; FirstLine = 139
+; Folding = PE9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

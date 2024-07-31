@@ -12,13 +12,12 @@
 ;RES_INTERNALNAME 400.dll
 ;RES_PRODUCTNAME Pure Portable
 ;RES_PRODUCTVERSION 4.10.0.0
-;RES_COMMENT PAM Project
 ;PP_X32_COPYAS "Temp\Proxy32.dll"
 ;PP_X64_COPYAS "Temp\Proxy64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\lib"
+IncludePath "..\PPDK\Lib"
 ;XIncludeFile "PurePortableCustom.pbi"
 
 #PROXY_DLL = "pureport"
@@ -36,10 +35,10 @@ ProcedureDLL.l AttachProcess(Instance)
 	CompilerEndIf
 	If FileExist(PrgDir+dll)
 		dll = PrgDir+dll
-	ElseIf FileExist(PrgDir+"PurePort1.dll")
-		dll = PrgDir+"PurePort1.dll"
-	ElseIf FileExist(PrgDir+"PurePort2.dll")
-		dll = PrgDir+"PurePort2.dll"
+	ElseIf FileExist(PrgDir+"PurePort-1.dll")
+		dll = PrgDir+"PurePort-1.dll"
+	ElseIf FileExist(PrgDir+"PurePort-2.dll")
+		dll = PrgDir+"PurePort-2.dll"
 	ElseIf FileExist(PrgDir+"PurePort.dll")
 		dll = PrgDir+"PurePort.dll"
 	EndIf
@@ -48,16 +47,16 @@ ProcedureDLL.l AttachProcess(Instance)
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
-; ProcedureDLL.l DetachProcess(Instance)
-; 	
-; 	PPFinish
-; EndProcedure
-
+;ProcedureDLL.l DetachProcess(Instance)
+;
+;	PPFinish
+;EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 8
+; CursorPosition = 53
+; FirstLine = 19
 ; Folding = -
 ; Optimizer
 ; EnableThread
@@ -73,5 +72,3 @@ EndProcedure
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
-; VersionField18 = Comments
-; VersionField21 = PAM Project

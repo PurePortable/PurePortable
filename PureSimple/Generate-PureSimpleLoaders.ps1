@@ -1,15 +1,15 @@
 ﻿
-$CurrentDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
-Set-Location -Lit $CurrentDir
-[System.IO.Directory]::SetCurrentDirectory($CurrentDir)
+$ScriptDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
+#Set-Location -Lit $ScriptDir
+#[System.IO.Directory]::SetCurrentDirectory($ScriptDir)
 
-$Dir32 = "bin\x32\loaders"
-$Dir64 = "bin\x64\loaders"
+$Dir32 = "$ScriptDir\bin\x32\loaders"
+$Dir64 = "$ScriptDir\bin\x64\loaders"
 
 #New-Item $Dir32 -Type Dir
 #New-Item $Dir64 -Type Dir
 
-# Proxy-dlls - Загрузчики PureSimple
+# Proxy-dlls - загрузчики PureSimple
 @(
 	"winmm", "version", "version+"
 	"avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "glu32", "iphlpapi"
@@ -28,4 +28,4 @@ $Dir64 = "bin\x64\loaders"
 ) | foreach {.\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
 
 # Загрузчики с нестандартным расширением
-.\Compile-ProxyDll "PureSimpleLoader" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"
+"$ScriptDir\Compile-ProxyDll.ps1" "PureSimpleLoader" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"
