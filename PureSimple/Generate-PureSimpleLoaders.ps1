@@ -28,4 +28,4 @@ $Dir64 = "$ScriptDir\bin\x64\loaders"
 ) | foreach {.\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
 
 # Загрузчики с нестандартным расширением
-"$ScriptDir\Compile-ProxyDll.ps1" "PureSimpleLoader" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"
+.\Compile-ProxyDll "PureSimpleLoader" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"

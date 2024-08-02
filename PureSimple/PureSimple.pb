@@ -1,12 +1,12 @@
 ﻿;;======================================================================================================================
-; Portable WINAPI wrapper for PureApps
+; Portable WINAPI wrapper for PurePortableSimple
 ;;======================================================================================================================
 
 ;PP_SILENT
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.24
+;RES_VERSION 4.10.0.25
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -359,7 +359,6 @@ Procedure RunFrom(k.s,p.s)
 				ExecuteFlags | #EXECUTE_HIDE
 		EndSelect
 	Next
-	;dbg("Execute: "+p)
 	Execute("",p,ExecuteFlags)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -381,6 +380,11 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf
 	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
 		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
+		TerminateProcess_(GetCurrentProcess_(),0)
+		Goto EndAttach
+	EndIf
+	If PreferenceGroup("Portable") = 0
+		MessageBox_(0,"Section [Portable] not found!","PurePortable",#MB_ICONERROR)
 		TerminateProcess_(GetCurrentProcess_(),0)
 		Goto EndAttach
 	EndIf
@@ -718,7 +722,6 @@ ProcedureDLL.l AttachProcess(Instance)
 	If FirstProcess And PreferenceGroup("RunFromAttachProcess")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			;dbg("RunFromAttachProcess: "+PreferenceKeyName()+" :: "+PreferenceKeyValue())
 			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 		Wend
 	EndIf		
@@ -838,20 +841,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 39
-; FirstLine = 15
-; Folding = PIbAAwIA9-
+; Folding = PJbAAwBAA-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.24
+; VersionField0 = 4.10.0.25
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.24
+; VersionField5 = 4.10.0.25
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

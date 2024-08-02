@@ -23,8 +23,6 @@
 
 CompilerIf Not Defined(DETOUR_REG_SHLWAPI,#PB_Constant) : #DETOUR_REG_SHLWAPI = 0 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REG_TRANSACTED,#PB_Constant) : #DETOUR_REG_TRANSACTED = 0 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REG_ANSI,#PB_Constant) : #DETOUR_REG_ANSI = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_REG_UNICODE,#PB_Constant) : #DETOUR_REG_UNICODE = 1 : CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
@@ -56,7 +54,7 @@ CompilerIf Not Defined(DETOUR_REGSETVALUEW,#PB_Constant)       : #DETOUR_REGSETV
 CompilerIf Not Defined(DETOUR_REGSETKEYVALUEA,#PB_Constant)    : #DETOUR_REGSETKEYVALUEA = 1    : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REGSETKEYVALUEW,#PB_Constant)    : #DETOUR_REGSETKEYVALUEW = 1    : CompilerEndIf
 
-CompilerIf #PORTABLE_REG_TRANSACTED Or #DETOUR_REG_TRANSACTED
+CompilerIf #DETOUR_REG_TRANSACTED Or #PORTABLE_REG_TRANSACTED
 	CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDA = 1 : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDW = 1 : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDA = 1 : CompilerEndIf
@@ -71,7 +69,7 @@ CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_RE
 CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDA,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDA = 0   : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDW,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDW = 0   : CompilerEndIf
 
-CompilerIf #PORTABLE_REG_SHLWAPI Or #DETOUR_REG_SHLWAPI
+CompilerIf #DETOUR_REG_SHLWAPI Or #PORTABLE_REG_SHLWAPI
 	CompilerIf Not Defined(DETOUR_SHDELETEKEYA,#PB_Constant)      : #DETOUR_SHDELETEKEYA = 1      : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_SHDELETEKEYW,#PB_Constant)      : #DETOUR_SHDELETEKEYW = 1      : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYA,#PB_Constant) : #DETOUR_SHDELETEEMPTYKEYA = 1 : CompilerEndIf
@@ -102,7 +100,6 @@ CompilerIf Not Defined(DETOUR_SHCOPYKEYW,#PB_Constant)        : #DETOUR_SHCOPYKE
 CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYA,#PB_Constant)   : #DETOUR_SHQUERYINFOKEYA = 0   : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHQUERYINFOKEYW,#PB_Constant)   : #DETOUR_SHQUERYINFOKEYW = 0   : CompilerEndIf
 ;}
-
 
 CompilerIf #DETOUR_SHDELETEKEYA Or #DETOUR_SHDELETEEMPTYKEYA Or #DETOUR_SHDELETEVALUEA
 	#DETOUR_REG_SHLWAPI_ANY = 1
@@ -457,8 +454,8 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 58
-; FirstLine = 46
+; CursorPosition = 102
+; FirstLine = 87
 ; Folding = jj4-0
 ; EnableAsm
 ; DisableDebugger

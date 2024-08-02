@@ -76,7 +76,7 @@ CompilerIf Not Defined(DETOUR_REGSETVALUEEXW,#PB_Constant)     : #DETOUR_REGSETV
 CompilerIf Not Defined(DETOUR_REGSETKEYVALUEA,#PB_Constant)    : #DETOUR_REGSETKEYVALUEA = 1    : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REGSETKEYVALUEW,#PB_Constant)    : #DETOUR_REGSETKEYVALUEW = 1    : CompilerEndIf
 
-CompilerIf #PORTABLE_REG_TRANSACTED Or #DETOUR_REG_TRANSACTED
+CompilerIf #DETOUR_REG_TRANSACTED Or #PORTABLE_REG_TRANSACTED
 	CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDA = 1 : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGCREATEKEYTRANSACTEDW = 1 : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTEDA,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTEDA = 1   : CompilerEndIf
@@ -84,7 +84,7 @@ CompilerIf #PORTABLE_REG_TRANSACTED Or #DETOUR_REG_TRANSACTED
 	CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDA,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDA = 1 : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTEDW,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTEDW = 1 : CompilerEndIf
 CompilerEndIf
-CompilerIf #PORTABLE_REG_SHLWAPI Or #DETOUR_REG_SHLWAPI
+CompilerIf #DETOUR_REG_SHLWAPI Or #PORTABLE_REG_SHLWAPI
 	CompilerIf Not Defined(DETOUR_SHDELETEKEYA,#PB_Constant)         : #DETOUR_SHDELETEKEYA = 1         : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_SHDELETEKEYW,#PB_Constant)         : #DETOUR_SHDELETEKEYW = 1         : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEYA,#PB_Constant)    : #DETOUR_SHDELETEEMPTYKEYA = 1    : CompilerEndIf
@@ -533,8 +533,8 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 130
-; FirstLine = 106
+; CursorPosition = 86
+; FirstLine = 66
 ; Folding = hjj--4P-
 ; DisableDebugger
 ; EnableExeConstant
