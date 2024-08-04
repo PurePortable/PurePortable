@@ -214,23 +214,6 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-;{ Раскрытие переменных среды
-CompilerIf Not Defined(_ExpandEnvironmentStrings,#PB_Procedure)
-	; Подобная процедура определена в модуле EnvironmentStrings
-; 	Procedure.s _ExpandEnvironmentStrings(String.s)
-; 		Protected Result.s, Length, *Buffer
-; 		Length = ExpandEnvironmentStrings_(@String,*Buffer,0)
-; 		If Length
-; 			*Buffer = AllocateMemory(Length*2+2,#PB_Memory_NoClear)
-; 			ExpandEnvironmentStrings_(@String,*Buffer,Length)
-; 			Result = PeekS(*Buffer)
-; 			FreeMemory(*Buffer)
-; 		EndIf
-; 		ProcedureReturn Result
-; 	EndProcedure
-CompilerEndIf
-;}
-;;======================================================================================================================
 ;{ Преобразование относительных путей
 Procedure.s PreferencePath(Path.s="",Dir.s="")
 	Protected Result.s
@@ -349,7 +332,7 @@ Procedure RunFrom(k.s,p.s)
 				ExecuteFlags | #EXECUTE_HIDE
 		EndSelect
 	Next
-	Execute("",p,ExecuteFlags)
+	Execute("",ExpandEnvironment(p),ExecuteFlags)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL.l AttachProcess(Instance)
@@ -831,7 +814,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PAbAAwBAA-
+; CursorPosition = 334
+; FirstLine = 71
+; Folding = PAbAA5AAg
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
