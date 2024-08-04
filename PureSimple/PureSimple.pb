@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.25
+;RES_VERSION 4.10.0.26
 ;RES_DESCRIPTION Proxy dll
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -97,18 +97,8 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 ;{ Некоторые дополнительные процедуры
 #PROC_GETVERSIONINFO = 1 ; Получение информации о файле
-#PROC_FINDMEMORYSTRING = 0 ; Поиск в памяти
-#PROC_FINDMEMORYBINARY = 0 ; Поиск в памяти
-#PROC_REPLACEMEMORYSTRING = 0 ; Поиск и замена в памяти
-#PROC_REPLACEMEMORYBINARY = 0 ; Поиск и замена в памяти
-#PROC_GETBITNESS = 0 ; Определение разрядность исполняемого файла
-#PROC_GETFILEBITNESS = 0 ; Определение разрядность исполняемого файла
 #PROC_CORRECTPATH = 1 ; Процедуры коррекции локальных путей. 1: если не найдено, возвращает пустую строку, 2: если не найдено, возвращает прежнее значение.
 #PROC_CORRECTCFGPATH = 1 ; Если используется, должна быть установлена #PROC_CORRECTPATH
-;#PROC_GUID2S = 0 ; Преобразование GUID/CLSID в строку вида {4AABE186-2666-4663-9E3E-5DFD6EAAAB60}
-#PROC_CORRECTCHECKSUM = 0
-#PROC_CORRECTCHECKSUMADR = 0
-#PROC_REMOVECERTIFICATES = 0
 ;}
 #INCLUDE_MIN_HOOK = 1 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
@@ -841,18 +831,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PJbAAwBAA-
+; Folding = PAbAAwBAA-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.25
+; VersionField0 = 4.10.0.26
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = Pure Portable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.25
+; VersionField5 = 4.10.0.26
 ; VersionField6 = Proxy dll
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
