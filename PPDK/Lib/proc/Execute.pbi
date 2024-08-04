@@ -1,4 +1,6 @@
-﻿; https://learn.microsoft.com/ru-ru/windows/win32/procthread/creating-processes
+﻿; https://vsokovikov.narod.ru/New_MSDN_API/Process_thread/fn_createprocess.htm
+; https://vsokovikov.narod.ru/New_MSDN_API/Process_thread/str_startupinfo.htm
+; https://learn.microsoft.com/ru-ru/windows/win32/procthread/creating-processes
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/synchapi/nf-synchapi-waitforsingleobjectex
@@ -11,10 +13,10 @@
 #EXECUTE_WAIT = 1
 #EXECUTE_HIDE = 2
 
-Procedure Execute(Prg.s,Prm.s,Flags=0,Dir.s="") ; TODO: Dir
+Procedure Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 	Protected StartupInfo.STARTUPINFO
 	Protected ProcessInfo.PROCESS_INFORMATION
-	Protected Error
+	Protected CreationFlags = #CREATE_DEFAULT_ERROR_MODE | #CREATE_NEW_PROCESS_GROUP
 	StartupInfo\cb = SizeOf(STARTUPINFO)
 	;StartupInfo\wShowWindow = #SW_SHOWMAXIMIZED
 	Protected CmdLine.s
@@ -26,16 +28,19 @@ Procedure Execute(Prg.s,Prm.s,Flags=0,Dir.s="") ; TODO: Dir
 	Else
 		CmdLine = Prm
 	EndIf
-	If flags & #EXECUTE_HIDE
-		StartupInfo\dwFlags | #STARTF_USESHOWWINDOW
+	If ExecuteFlags & #EXECUTE_HIDE
+		StartupInfo\dwFlags = #STARTF_USESHOWWINDOW
 		StartupInfo\wShowWindow = #SW_HIDE
 	;Else
-	;	StartupInfo\dwFlags | #STARTF_USESHOWWINDOW
+	;	StartupInfo\dwFlags = #STARTF_USESHOWWINDOW
 	;	StartupInfo\wShowWindow = #SW_SHOW
 	EndIf
 	;https://translated.turbopages.org/proxy_u/en-ru.ru.ba073929-6686a092-110882e6-74722d776562/https/stackoverflow.com/questions/17336227/how-can-i-wait-until-an-external-process-has-completed
-	If CreateProcess_(#Null,@CmdLine,#Null,#Null,#False,flags,#Null,#Null,@StartupInfo,@ProcessInfo)
-		If flags & #EXECUTE_WAIT ; Ждём завершения процесса
+	;dbg("CreateProcess: "+CmdLine)
+	If CreateProcess_(#Null,@CmdLine,#Null,#Null,0,CreationFlags,#Null,#Null,@StartupInfo,@ProcessInfo)
+		;dbg("CreateProcess: OK")
+		If ExecuteFlags & #EXECUTE_WAIT ; Ждём завершения процесса
+			;dbg("WaitForSingleObject")
 			WaitForSingleObject_(ProcessInfo\hProcess,#INFINITE)
 			;WaitForSingleObjectEx_(ProcessInfo\hProcess,#INFINITE,#True)
 			;GetExitCodeProcess_(ProcessInfo\hProcess,@ExitCode)
@@ -43,4 +48,13 @@ Procedure Execute(Prg.s,Prm.s,Flags=0,Dir.s="") ; TODO: Dir
 		CloseHandle_(ProcessInfo\hProcess)
 		CloseHandle_(ProcessInfo\hThread)
 	EndIf
+	;dbg("CreateProcess: END")
 EndProcedure
+
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 50
+; FirstLine = 18
+; Folding = -
+; EnableThread
+; DisableDebugger
+; EnableExeConstant
