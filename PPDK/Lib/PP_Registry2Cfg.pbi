@@ -49,8 +49,8 @@ Procedure FindCtrl(s.s,start=1)
 	ProcedureReturn 0
 EndProcedure
 
-Procedure ExportCfg(Config.s)
-	Protected s.s, hKey, sKey.s, sData.s, bData.s, dData, pData, cbData, sType.s, bType, sName.s
+Procedure ImportCfg(Config.s)
+	Protected s.s, hKey, sKey.s, sData.s, bData.s, dData.q, pData, cbData, sType.s, bType, sName.s
 	Protected x1, x2, x3, i
 	Protected *pb.Byte, *pc.Character, *end
 	Protected CodePage
@@ -94,7 +94,7 @@ Procedure ExportCfg(Config.s)
 						; Тип проверяем в строковом виде, так как могут встретиться стандартные типы нестандартной длины.
 						; Такие данные сохраняются с типом в HEX виде.
 						If sType="s" Or sType="m" Or sType="x"
-							pData = @bData
+							pData = @sData
 							*pc = pData
 							*end = *pc + cbData
 							While *pc < *end ; декодирование управляющих символов 0-31
@@ -108,14 +108,15 @@ Procedure ExportCfg(Config.s)
 							pData = @dData
 						Else ; данные закодированны в бинарном виде, в том числе и для нестандартной длины REG_DWORD
 							;cbData = Len(sData)/2 ; два символа кодируют один байт
-							pData = @sData
-							*pc = pData
-							If bType=#REG_DWORD Or bType=#REG_BINARY ; ???
-								bData = SpaceB(8)
-							Else
+							If bType=#REG_BINARY
 								bData = SpaceB(cbData)
+								pData = @bData
+							Else ; bType=#REG_DWORD
+								dData = 0
+								pData = @dData
 							EndIf
-							*pb = @bData
+							*pc = @sData
+							*pb = pData
 							*end = *pb+cbData
 							While *pb < *end
 								*pb\b = Val("$"+PeekS(*pc,2))
@@ -123,7 +124,7 @@ Procedure ExportCfg(Config.s)
 								*pc + 4 ; hex представление байта - два символа в юникоде
 							Wend
 						EndIf
-						SHSetValue_(hAppKey,@sKey,@sName,bType,pData,cbData)
+						RegSetValueEx_(hKey,@sName,0,bType,pData,cbData)
 						RegCloseKey_(hKey)
 					EndIf
 				EndIf
@@ -155,7 +156,7 @@ CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 				TerminateProcess_(GetCurrentProcess_(),0)
 			EndIf
 			If FileExist(InitialFile)
-				ExportCfg(InitialFile)
+				ImportCfg(InitialFile)
 			EndIf
 		EndProcedure
 	CompilerCase 3
@@ -170,7 +171,7 @@ CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 				TerminateProcess_(GetCurrentProcess_(),0)
 			EndIf
 			If FileExist(InitialFile)
-				ExportCfg(InitialFile)
+				ImportCfg(InitialFile)
 			EndIf
 		EndProcedure
 CompilerEndSelect
@@ -234,9 +235,9 @@ CompilerIf #PROC_CORRECTCFGPATH
 	EndProcedure
 CompilerEndIf 
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 174
-; FirstLine = 139
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 70
+; FirstLine = 99
 ; Folding = PE9
 ; EnableThread
 ; DisableDebugger
