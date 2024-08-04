@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; Portable WINAPI wrapper for PureApps
+; PurePortable for PureApps
 ;;======================================================================================================================
 
 ;PP_SILENT
@@ -7,10 +7,10 @@
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.10.0.0
-;RES_DESCRIPTION Proxy dll
+;RES_DESCRIPTION PurePortableSimple Loader
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
-;RES_PRODUCTNAME Pure Portable
+;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.10.0.0
 ;PP_X32_COPYAS "Temp\Proxy32.dll"
 ;PP_X64_COPYAS "Temp\Proxy64.dll"
@@ -66,9 +66,9 @@ EndProcedure
 ; IncludeVersionInfo
 ; VersionField0 = 4.10.0.0
 ; VersionField1 = 4.10.0.0
-; VersionField3 = Pure Portable
+; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
 ; VersionField5 = 4.10.0.0
-; VersionField6 = Proxy dll
+; VersionField6 = PurePortableSimple Loader
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
