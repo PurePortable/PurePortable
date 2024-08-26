@@ -12,11 +12,11 @@ $Dir64 = "$ScriptDir\bin\x64\loaders"
 # Proxy-dlls - загрузчики PureSimple
 @(
 	"winmm", "version", "version+"
-	"avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "glu32", "iphlpapi"
+	"avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "glu32", "iphlpapi", "ktmw32.pbi"
 	"mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "secur32"
 	"urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wintrust", "wtsapi32"
 	"shfolder"
-) | foreach { .\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 }
+) | foreach { ..\PPDK\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 }
 
 # Загрузчики, требующие коррекцию экспорта
 @(
@@ -25,7 +25,7 @@ $Dir64 = "$ScriptDir\bin\x64\loaders"
 	"user32"
 	"advapi32"
 	#"comctl32"
-) | foreach {.\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
+) | foreach {..\PPDK\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
 
 # Загрузчики с нестандартным расширением
-.\Compile-ProxyDll "PureSimpleLoader" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"
+..\PPDK\Compile-ProxyDll "PureSimpleLoader" "winspool" -Dir32 $Dir32 -Dir64 $Dir64 -Out "winspool.drv"

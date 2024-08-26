@@ -174,7 +174,7 @@ EndProcedure
 
 Procedure.l SetDataW(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l)
 	Protected sData.s, sType.s, sBuf.s
-	Protected i, iempty
+	Protected i, iempty, cbPrev
 	If hKey And *lpData
 		ConfigChanged = #True
 		;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ*
@@ -200,6 +200,7 @@ Procedure.l SetDataW(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l)
 		Cfg(i)\h = hKey
 		Cfg(i)\n = sName
 		Cfg(i)\t = dwType
+		cbPrev = Cfg(i)\c ; предыдущее значение для сравнения
 		Cfg(i)\c = cbData
 		If (dwType=#REG_DWORD Or dwType=#REG_BINARY) And cbData<=4
 			; Двоичные данные до 4-х байтов помещаем в поле DWORD
@@ -223,13 +224,11 @@ Procedure.l SetDataW(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l)
 			; У строк может отсутствовать завершающий нулевой символ!
 			cfg(i)\a = PeekS(*lpData,cbData/2)
 			cfg(i)\c = Len(cfg(i)\a)*2+2
-			cfg(i)\m = cfg(i)\c
 			DbgRegVirt("SetDataW (SZ): "+Cfg(i)\a)
 		Else
 			; Все остальные данные пересылаем "как есть"
-			If Cfg(i)\m <> cbData
+			If cbPrev <> cbData ; выделяем память только если изменился размер
 				Cfg(i)\a = SpaceB(cbData)
-				Cfg(i)\m = cbData
 			EndIf
 			CopyMemory(*lpData,@Cfg(i)\a,cbData)
 		EndIf
@@ -238,7 +237,7 @@ Procedure.l SetDataW(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l)
 EndProcedure
 Procedure.l SetDataA(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l) ; Противоположная кодировка
 	Protected sData.s, sType.s, sBuf.s
-	Protected i, iempty
+	Protected i, iempty, cbPrev
 	Protected *pb.Byte, *pw.Word, *End
 	If hKey And *lpData
 		ConfigChanged = #True
@@ -265,6 +264,7 @@ Procedure.l SetDataA(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l) ; Про�
 		Cfg(i)\h = hKey
 		Cfg(i)\n = sName
 		Cfg(i)\t = dwType
+		cbPrev = Cfg(i)\c ; предыдущее значение для сравнения
 		Cfg(i)\c = cbData
 		If (dwType=#REG_DWORD Or dwType=#REG_BINARY) And cbData<=4
 			; Двоичные данные до 4-х байтов помещаем в поле DWORD
@@ -286,7 +286,7 @@ Procedure.l SetDataA(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l) ; Про�
 			; У строк может отсутствовать завершающий нулевой символ!
 			Cfg(i)\a = PeekSZ(*lpData,cbData,#PB_Ascii)
 			Cfg(i)\c = Len(Cfg(i)\a)*2+2
-			Cfg(i)\m = Cfg(i)\c
+			;Cfg(i)\m = Cfg(i)\c
 			DbgRegVirt("SetDataA (SZ): "+Cfg(i)\a)
 		ElseIf dwType=#REG_MULTI_SZ
 			; Переносим в промежуточный буфер
@@ -305,7 +305,7 @@ Procedure.l SetDataA(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l) ; Про�
 			; Конечный нулевой символ добавится автоматически
 			Cfg(i)\a = PeekS(@sBuf,-1,#PB_Ascii)
 			Cfg(i)\c = Len(Cfg(i)\a)*2+2
-			Cfg(i)\m = Cfg(i)\c
+			;Cfg(i)\m = Cfg(i)\c
 			; Заменяем Chr(1) на ноль
 			*pw = @Cfg(i)\a
 			*end = *pw+Cfg(i)\c
@@ -317,9 +317,8 @@ Procedure.l SetDataA(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l) ; Про�
 			Wend
 		Else
 			; Все остальные данные пересылаем "как есть"
-			If Cfg(i)\m <> cbData
+			If cbPrev <> cbData ; выделяем память только если изменился размер
 				Cfg(i)\a = SpaceB(cbData)
-				Cfg(i)\m = cbData
 			EndIf
 			CopyMemory(*lpData,@Cfg(i)\a,cbData)
 		EndIf
@@ -845,7 +844,7 @@ Procedure.l DelKey(hKey.l,SubKey.s,*Result.Long)
 							DbgRegVirt("DelKey: Val: "+Cfg(ic)\n)
 							Cfg(ic)\h = 0
 							Cfg(ic)\c = 0
-							Cfg(ic)\m = 0
+							;Cfg(ic)\m = 0
 							Cfg(ic)\l = 0
 							Cfg(ic)\n = ""
 							Cfg(ic)\a = ""
@@ -872,7 +871,7 @@ Procedure.l DelData(hKey.l,sName.s,*Result.Long)
 				ConfigChanged = #True
 				Cfg(i)\h = 0
 				Cfg(i)\c = 0
-				Cfg(i)\m = 0
+				;Cfg(i)\m = 0
 				Cfg(i)\l = 0
 				Cfg(i)\n = ""
 				Cfg(i)\a = ""
@@ -885,7 +884,7 @@ Procedure.l DelData(hKey.l,sName.s,*Result.Long)
 	ProcedureReturn #False
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-CompilerIf #DETOUR_SHDELETEEMPTYKEYA Or #DETOUR_SHDELETEEMPTYKEYW
+CompilerIf #DETOUR_SHDELETEEMPTYKEY
 	Procedure IsEmptyKey(sKey.s)
 		Protected i
 		sKey + "\"

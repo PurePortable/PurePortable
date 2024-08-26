@@ -166,12 +166,14 @@ Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.I
 	Else
 		ErrorText.s = _MH_Error(MH_Status)
 		;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
-		DbgMinHook("MINHOOK CREATE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
-		If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-			PPErrorMessage("Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText)
-			If MinHookErrorMode = 2
-				;RaiseError(#ERROR_DLL_INIT_FAILED)
-				TerminateProcess_(GetCurrentProcess_(),0)
+		DbgMinHookError("MINHOOK CREATE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
+		If (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
+			If MinHookErrorMode
+				PPErrorMessage("Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText)
+				If MinHookErrorMode = 2
+					;RaiseError(#ERROR_DLL_INIT_FAILED)
+					TerminateProcess_(GetCurrentProcess_(),0)
+				EndIf
 			EndIf
 		EndIf
 	EndIf
@@ -182,9 +184,9 @@ EndProcedure
 MH_Initialize()
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 27
-; FirstLine = 9
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 168
+; FirstLine = 107
 ; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant

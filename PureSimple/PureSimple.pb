@@ -1,12 +1,12 @@
 ﻿;;======================================================================================================================
-; PurePortable for PurePortableSimple
+; PurePortableSimple
 ;;======================================================================================================================
 
 ;PP_SILENT
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.26
+;RES_VERSION 4.10.0.27
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -363,7 +363,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf
 	;}
 	
-	Protected k.s, v.s, p.s, n.s, o.s ; для обработки preferences
+	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
 	Protected f
 	Protected retcode
 
@@ -421,10 +421,22 @@ ProcedureDLL.l AttachProcess(Instance)
 	;{ Установка переменных среды
 	SetEnvironmentVariable("PP_PrgPath",PrgPath)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
-	;SetEnvironmentVariable("PP_PrgName",PrgName)
+	SetEnvironmentVariable("PP_PrgName",PrgName)
 	;SetEnvironmentVariable("PP_PrgPath",DllPath)
 	;SetEnvironmentVariable("PP_DllDir",DllDirN)
 	If PreferenceGroup("EnvironmentVariables")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			p = PreferenceKeyValue()
+			If p
+				SetEnvironmentVariable(k,p)
+			Else
+				RemoveEnvironmentVariable(k)
+			EndIf
+		Wend
+	EndIf
+	If PreferenceGroup("EnvironmentVariables.SetPath")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
@@ -432,8 +444,6 @@ ProcedureDLL.l AttachProcess(Instance)
 			p = PreferencePath()
 			If p
 				SetEnvironmentVariable(k,p)
-			Else
-				RemoveEnvironmentVariable(k)
 			EndIf
 		Wend
 	EndIf
@@ -474,6 +484,9 @@ ProcedureDLL.l AttachProcess(Instance)
 		If p <> ""
 			SetCurrentDirectory(PreferencePath(p))
 		EndIf
+		If ReadPreferenceInteger("RegistryDll",0)=1
+			RegistryDll = "kernelbase"
+		EndIf
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -511,7 +524,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		EndIf
 	CompilerEndIf
 	;}
-	;{ Перенаправляемые специальные папки
+	;{ Перенаправление специальных папок
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
 		p = PreferencePath(ReadPreferenceString("AllDirs",""))
 		If p
@@ -611,44 +624,70 @@ ProcedureDLL.l AttachProcess(Instance)
 		ReadCfg()
 	CompilerEndIf
 	;}
-	;{ Пути в реестре
+	;{ Реестр
 	CompilerIf #PORTABLE_REGISTRY
-		; Установка путей
-		If RegistryPermit And PreferenceGroup("Registry.SetPaths")
-			ExaminePreferenceKeys()
-			While NextPreferenceKey()
-				k = PreferenceKeyName()
-				p = PreferencePath()
-				i = FindString(k,"|")
-				If i
-					v = Mid(k,i+1)
-					k = Left(k,i-1)
-					SetCfgS(k,v,p)
-				Else ; значение по умолчанию?
-				EndIf
-			Wend
-		EndIf
-		; Коррекция путей
-		If RegistryPermit And PreferenceGroup("Registry.CorrectPaths")
-			ExaminePreferenceKeys()
-			While NextPreferenceKey()
-				k = PreferenceKeyName()
-				p = PreferencePath()
-				i = FindString(k,"|")
-				If i
-					v = Mid(k,i+1)
-					k = Left(k,i-1)
-					o = GetCfgS(k,v)
-					If p=""
-						p = PrgDirN
+		If RegistryPermit
+			; Установка данных
+			If PreferenceGroup("Registry.SetData")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					k = PreferenceKeyName()
+					p = PreferenceKeyValue()
+					i = FindString(k,"|")
+					If i
+						v = Mid(k,i+1)
+						k = Left(k,i-1)
+						i = FindString(p,":")
+						t = LCase(Left(p,i-1))
+						p = Mid(p,i+1)
+						Select t
+							Case "s"
+								SetCfgS(k,v,p)
+							Case "d"
+								SetCfgD(k,v,Val(p))
+							Case "b"
+								SetCfgB(k,v,p)
+						EndSelect
 					EndIf
-					n = CorrectPath(o,p)
-					If n And n<>o
-						SetCfgS(k,v,n)
+				Wend
+			EndIf
+			; Установка путей
+			If PreferenceGroup("Registry.SetPaths")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					k = PreferenceKeyName()
+					p = PreferencePath()
+					i = FindString(k,"|")
+					If i
+						v = Mid(k,i+1)
+						k = Left(k,i-1)
+						SetCfgS(k,v,p)
+					Else ; значение по умолчанию?
 					EndIf
-				Else ; дефолтное значение?
-				EndIf
-			Wend
+				Wend
+			EndIf
+			; Коррекция путей
+			If PreferenceGroup("Registry.CorrectPaths")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					k = PreferenceKeyName()
+					p = PreferencePath()
+					i = FindString(k,"|")
+					If i
+						v = Mid(k,i+1)
+						k = Left(k,i-1)
+						o = GetCfgS(k,v)
+						If p=""
+							p = PrgDirN
+						EndIf
+						n = CorrectPath(o,p)
+						If n And n<>o
+							SetCfgS(k,v,n)
+						EndIf
+					Else ; дефолтное значение?
+					EndIf
+				Wend
+			EndIf
 		EndIf
 	CompilerEndIf
 	;}
@@ -814,20 +853,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 334
-; FirstLine = 71
-; Folding = PAbAA5AAg
+; Folding = PAbABQAAg
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.26
+; VersionField0 = 4.10.0.27
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.26
+; VersionField5 = 4.10.0.27
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

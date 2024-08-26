@@ -589,18 +589,7 @@ EndProcedure
 ;CompilerEndIf
 ;}
 ;=======================================================================================================================
-Procedure.s bin2hex(*pb.Byte,cb)
-	Protected *end = *pb + cb
-	Protected Result.s = Space(cb*2) ; по два символа на каждый байт
-	Protected *pc = @Result
-	While *pb < *end
-		PokeS(*pc,RSet(Hex(*pb\b,#PB_Byte),2,"0")) ; пишем по два символа + 0; последний 0 ляжет на 0 в конце строки
-		*pb + 1
-		*pc + 2 + 2
-	Wend
-	ProcedureReturn Result
-EndProcedure
-;=======================================================================================================================
+; https://learn.microsoft.com/en-us/windows/win32/shell/shlwapi-string
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpw
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpnw
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpiw
@@ -639,8 +628,8 @@ EndProcedure
 ;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 632
-; FirstLine = 235
+; CursorPosition = 590
+; FirstLine = 216
 ; Folding = ---ADMQ9-
 ; EnableAsm
 ; EnableThread

@@ -19,8 +19,6 @@ CompilerIf Not Defined(DETOUR_ENVIRONMENTVARIABLE,#PB_Constant)      : #DETOUR_E
 CompilerIf Not Defined(DETOUR_ENVIRONMENTSTRINGS,#PB_Constant)       : #DETOUR_ENVIRONMENTSTRINGS = 0       : CompilerEndIf
 CompilerIf Not Defined(DETOUR_EXPANDENVIRONMENTSTRINGS,#PB_Constant) : #DETOUR_EXPANDENVIRONMENTSTRINGS = 0 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_ENVIRONMENT_CRT,#PB_Constant)          : #DETOUR_ENVIRONMENT_CRT = ""         : CompilerEndIf
-CompilerIf Not Defined(DETOUR_ENVIRONMENT_ASCII,#PB_Constant)        : #DETOUR_ENVIRONMENT_ASCII = 1        : CompilerEndIf ; ???
-CompilerIf Not Defined(DETOUR_ENVIRONMENT_UNICODE,#PB_Constant)      : #DETOUR_ENVIRONMENT_UNICODE = 1      : CompilerEndIf ; ???
 
 CompilerIf #DBG_ENVIRONMENT_VARIABLES And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
@@ -593,11 +591,13 @@ Procedure _InitEnvironmentVariablesHooks()
 			MH_HookApi(kernel32,ExpandEnvironmentStringsW)
 		CompilerEndIf
 		CompilerIf #DETOUR_ENVIRONMENTSTRINGS
-			MH_HookApi(kernel32,GetEnvironmentStrings)
-			MH_HookApi(kernel32,GetEnvironmentStringsA)
-			MH_HookApi(kernel32,GetEnvironmentStringsW)
-			MH_HookApi(kernel32,FreeEnvironmentStringsA)
-			MH_HookApi(kernel32,FreeEnvironmentStringsW)
+			If EnvironmentVariablesPermit>=2
+				MH_HookApi(kernel32,GetEnvironmentStrings)
+				MH_HookApi(kernel32,GetEnvironmentStringsA)
+				MH_HookApi(kernel32,GetEnvironmentStringsW)
+				MH_HookApi(kernel32,FreeEnvironmentStringsA)
+				MH_HookApi(kernel32,FreeEnvironmentStringsW)
+			EndIf
 		CompilerEndIf
 		CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 			If ProfileRedir
@@ -631,7 +631,9 @@ EndProcedure
 AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = OIAA-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 596
+; FirstLine = 380
+; Folding = Poeg-
 ; DisableDebugger
 ; EnableExeConstant

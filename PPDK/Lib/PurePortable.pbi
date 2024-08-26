@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.10.0.24
+; PurePortable main lib 4.10.0.27
 #PP_MAINVERSION = 4.10
 ;;======================================================================================================================
 
@@ -17,11 +17,22 @@ CompilerEndIf
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
 ;#PROXY_DLL_COMPATIBILITY_DEFAULT = 7 ; Это совместимость по умолчанию для #PROXY_DLL_COMPATIBILITY=0 ???
 
+;{ Символы для кодирования данных
+#XNUL = $E000 ; 57344 - Из набора символов для частного использования
+#XUS = $E01F
+#XSP = $E020
+#SP = $0020
+#XNUL$ = Chr(#XNUL)
+#XUS$ = Chr(#XUS)
+#XSP$ = Chr(#XSP)
+#SP$ = Chr(#SP)
+;}
 #MAX_PATH_EXTEND = 32767
 XIncludeFile "PurePortableCustom.pbi"
 XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Logging.pbi"
 XIncludeFile "PP_Subroutines.pbi"
+XIncludeFile "PP_Subroutines2.pbi"
 XIncludeFile "PP_Initialization.pbi"
 XIncludeFile "PP_Proxy.pbi"
 
@@ -74,7 +85,7 @@ CompilerIf #BLOCK_WININET Or #BLOCK_WINHTTP Or #BLOCK_WINSOCKS Or #BLOCK_WINSOCK
 CompilerEndIf
 
 ;;======================================================================================================================
-; Блокирорвка консоли (для нормального вызова некоторых программ из консоли)
+; Блокировка консоли (для нормального вызова некоторых программ из консоли)
 CompilerIf Not Defined(BLOCK_CONSOLE,#PB_Constant) : #BLOCK_CONSOLE = 0 : CompilerEndIf
 CompilerIf #BLOCK_CONSOLE
 	XIncludeFile "PP_BlockConsole.pbi"
@@ -261,11 +272,10 @@ CompilerEndIf
 Macro PPPreparation
 EndMacro
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 23
-; FirstLine = 4
-; Folding = --
+; CursorPosition = 34
+; Folding = +-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

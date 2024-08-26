@@ -72,7 +72,8 @@ AddInitProcedure(_InitCBTHook)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 3
+; CursorPosition = 67
+; FirstLine = 37
 ; Folding = -
 ; EnableAsm
 ; DisableDebugger

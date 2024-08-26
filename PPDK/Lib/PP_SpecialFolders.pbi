@@ -28,15 +28,13 @@ CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHGETKNOWNFOLDERPATH,#PB_Constant) : #DETOUR_SHGETKNOWNFOLDERPATH = 1 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHGETFOLDERPATHEX,#PB_Constant) : #DETOUR_SHGETFOLDERPATHEX = 1 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHGETKNOWNFOLDERIDLIST,#PB_Constant) : #DETOUR_SHGETKNOWNFOLDERIDLIST = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETFOLDERPATHA,#PB_Constant) : #DETOUR_SHGETFOLDERPATHA = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETFOLDERPATHW,#PB_Constant) : #DETOUR_SHGETFOLDERPATHW = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETFOLDERPATHANDSUBDIRA,#PB_Constant) : #DETOUR_SHGETFOLDERPATHANDSUBDIRA = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETFOLDERPATHANDSUBDIRW,#PB_Constant) : #DETOUR_SHGETFOLDERPATHANDSUBDIRW = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETSPECIALFOLDERPATHA,#PB_Constant) : #DETOUR_SHGETSPECIALFOLDERPATHA = 1 : CompilerEndIf
-CompilerIf Not Defined(DETOUR_SHGETSPECIALFOLDERPATHW,#PB_Constant) : #DETOUR_SHGETSPECIALFOLDERPATHW = 1 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHGETFOLDERPATH,#PB_Constant) : #DETOUR_SHGETFOLDERPATH = 1 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHGETFOLDERPATHANDSUBDIR,#PB_Constant) : #DETOUR_SHGETFOLDERPATHANDSUBDIR = 1 : CompilerEndIf
+CompilerIf Not Defined(DETOUR_SHGETSPECIALFOLDERPATH,#PB_Constant) : #DETOUR_SHGETSPECIALFOLDERPATH = 1 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHGETFOLDERLOCATION,#PB_Constant) : #DETOUR_SHGETFOLDERLOCATION = 1 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHGETSPECIALFOLDERLOCATION,#PB_Constant) : #DETOUR_SHGETSPECIALFOLDERLOCATION = 1 : CompilerEndIf
-CompilerIf #DETOUR_SHGETFOLDERPATHA Or #DETOUR_SHGETFOLDERPATHW Or #DETOUR_SHGETFOLDERPATHANDSUBDIRA Or #DETOUR_SHGETFOLDERPATHANDSUBDIRW Or #DETOUR_SHGETSPECIALFOLDERPATHA Or #DETOUR_SHGETSPECIALFOLDERPATHW
+
+CompilerIf #DETOUR_SHGETFOLDERPATH Or #DETOUR_SHGETFOLDERPATHANDSUBDIR Or #DETOUR_SHGETSPECIALFOLDERPATH
 	#CSIDL2PATH = 1
 CompilerElse
 	#CSIDL2PATH = 0
@@ -345,7 +343,7 @@ Prototype.l SHGetFolderPath(hwnd,csidl,hToken,dwFlags.l,*pszPath)
 ; S_FALSE = 1 : CSIDL специальной папки существует. Папка является виртуальной
 ; E_INVALIDARG = $80070057 : CSIDL не доступен
 ; TODO: CSIDL_FLAG_CREATE
-CompilerIf #DETOUR_SHGETFOLDERPATHA
+CompilerIf #DETOUR_SHGETFOLDERPATH
 	Global Original_SHGetFolderPathA.SHGetFolderPath
 	Procedure.l Detour_SHGetFolderPathA(hwnd,csidl,hToken,dwFlags.l,*pszPath)
 		Protected Result
@@ -370,8 +368,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHGETFOLDERPATHW
 	Global Original_SHGetFolderPathW.SHGetFolderPath
 	Procedure.l Detour_SHGetFolderPathW(hwnd,csidl,hToken,dwFlags.l,*pszPath)
 		Protected Result
@@ -400,7 +396,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetfolderpathandsubdira
 Prototype.l SHGetFolderPathAndSubDir(hwnd,csidl,hToken,dwFlags.l,pszSubDir,*pszPath)
-CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRA
+CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR
 	Global Original_SHGetFolderPathAndSubDirA.SHGetFolderPathAndSubDir
 	Procedure.l Detour_SHGetFolderPathAndSubDirA(hwnd,csidl,hToken,dwFlags.l,pszSubDir,*pszPath)
 		Protected Result
@@ -431,8 +427,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRW
 	Global Original_SHGetFolderPathAndSubDirW.SHGetFolderPathAndSubDir
 	Procedure.l Detour_SHGetFolderPathAndSubDirW(hwnd,csidl,hToken,dwFlags.l,pszSubDir,*pszPath)
 		Protected Result
@@ -474,7 +468,7 @@ CompilerEndIf
 ; Procedure.l Detour_SHGetSpecialFolderPath(hwnd,*pszPath,csidl,fCreate)
 ; EndProcedure
 Prototype.l SHGetSpecialFolderPath(hwnd,*pszPath,csidl,fCreate)
-CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA
+CompilerIf #DETOUR_SHGETSPECIALFOLDERPATH
 	Global Original_SHGetSpecialFolderPathA.SHGetSpecialFolderPath
 	Procedure.l Detour_SHGetSpecialFolderPathA(hwnd,*pszPath,csidl,fCreate)
 		Protected Result
@@ -499,8 +493,6 @@ CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHW
 	Global Original_SHGetSpecialFolderPathW.SHGetSpecialFolderPath
 	Procedure.l Detour_SHGetSpecialFolderPathW(hwnd,*pszPath,csidl,fCreate)
 		Protected Result
@@ -682,12 +674,12 @@ Procedure _InitSpecialFoldersHooks()
 		CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH : MH_HookApi(shell32,SHGetKnownFolderPath,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_SHGETFOLDERPATHEX : MH_HookApi(shell32,SHGetFolderPathEx,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST : MH_HookApi(shell32,SHGetKnownFolderIDList,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
-		CompilerIf #DETOUR_SHGETFOLDERPATHA : MH_HookApi(shell32,SHGetFolderPathA) : CompilerEndIf
-		CompilerIf #DETOUR_SHGETFOLDERPATHW : MH_HookApi(shell32,SHGetFolderPathW) : CompilerEndIf
-		CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHA : MH_HookApi(shell32,SHGetSpecialFolderPathA) : CompilerEndIf
-		CompilerIf #DETOUR_SHGETSPECIALFOLDERPATHW : MH_HookApi(shell32,SHGetSpecialFolderPathW) : CompilerEndIf
-		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRA : MH_HookApi(shell32,SHGetFolderPathAndSubDirA) : CompilerEndIf
-		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIRW : MH_HookApi(shell32,SHGetFolderPathAndSubDirW) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATH : MH_HookApi(shell32,SHGetFolderPathA) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATH : MH_HookApi(shell32,SHGetFolderPathW) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETSPECIALFOLDERPATH : MH_HookApi(shell32,SHGetSpecialFolderPathA) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETSPECIALFOLDERPATH : MH_HookApi(shell32,SHGetSpecialFolderPathW) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR : MH_HookApi(shell32,SHGetFolderPathAndSubDirA) : CompilerEndIf
+		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR : MH_HookApi(shell32,SHGetFolderPathAndSubDirW) : CompilerEndIf
 		CompilerIf #DETOUR_SHGETFOLDERLOCATION : MH_HookApi(shell32,SHGetFolderLocation) : CompilerEndIf
 		CompilerIf #DETOUR_SHGETSPECIALFOLDERLOCATION : MH_HookApi(shell32,SHGetSpecialFolderLocation) : CompilerEndIf
 	EndIf
@@ -696,7 +688,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = uAAA-
+; Folding = qAAg-
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

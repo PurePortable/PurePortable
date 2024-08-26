@@ -12,9 +12,9 @@
 ;RES_VERSION 4.10.0.0
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
-;RES_INTERNALNAME 400.dll
+;RES_INTERNALNAME 410.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.10.0.0
+;RES_PRODUCTVERSION 4.10.0.27
 ;PP_X32_COPYAS "P:\PurePortable\Apps\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\Apps\proxy64.dll"
 ;PP_CLEAN 2
@@ -63,7 +63,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_ENTRYPOINT = 0
 
 ;;----------------------------------------------------------------------------------------------------------------------
-;{ Диагностика
+;{ Мониторинг
 #DBG_REGISTRY = 0
 #DBG_SPECIAL_FOLDERS = 0
 #DBG_ENVIRONMENT_VARIABLES = 0 ; 1 - только переопределяемые, 2 - все
@@ -74,7 +74,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_PROXY_DLL = 0
 #DBG_ANY = 0
 ;}
-;{ Дополнительная диагностика
+;{ Мониторинг некоторых вызовов WinApi
 #DBGX_EXECUTE = 0 ; 1 - ShellExecute/CreateProcess, 2 - CreateProcess
 #DBGX_LOAD_LIBRARY = 0 ; 1 - всё, 2 - без GetProcAddress
 #DBGX_FILE_OPERATIONS = 0
@@ -202,6 +202,7 @@ CompilerEndIf
 ProcedureDLL.l AttachProcess(Instance)
 	PPPreparation
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
+	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
 	;ValidateProgramName(1,"program",1) ; Проверка, та ли программа запущена
 	;Protected FileInfo.s = LCase(GetFileVersionInfo(PrgPath,"InternalName"))
 	;Protected FileInfo.s = LCase(GetFilePart(GetFileVersionInfo(PrgPath,"OriginalFilename"),#PB_FileSystem_NoExtension))
@@ -247,13 +248,13 @@ ProcedureDLL.l AttachProcess(Instance)
 		ReadCfg()
 
 		; Коррекция путей
-		;Protected settingskey.s = "programs\settings"
-		;Protected path.s
-		;path = GetCfgS(settingskey,"lastpath")
-		;If path
-		;	CorrectPath(path,PrgDirN,#CORRECTPATH_FROM_DEEP|#CORRECTPATH_FORWARD_SLASH)
+		;Protected SettingsKey.s = "programs\settings"
+		;Protected NewPath.s
+		;NewPath = GetCfgS(SettingsKey,"lastpath")
+		;If NewPath
+		;	CorrectPath(NewPath,PrgDirN,#CORRECTPATH_FROM_DEEP|#CORRECTPATH_FORWARD_SLASH)
 		;EndIf
-		;CorrectCfgPath(settingskey,"lastdatabasepath",PrgDirN,#CORRECTPATH_FORWARD_SLASH)
+		;CorrectCfgPath(SettingsKey,"lastdatabasepath",PrgDirN,#CORRECTPATH_FORWARD_SLASH)
 	CompilerEndIf
 	;}
 
@@ -289,22 +290,20 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 38
-; FirstLine = 27
-; Folding = Y1rG0
+; Folding = I1rG0
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.00.0.0
-; VersionField1 = 4.0.9.0
+; VersionField0 = 4.10.0.0
+; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
-; VersionField4 = 4.0.9.0
-; VersionField5 = 4.00.0.0
+; VersionField4 = 4.10.0.0
+; VersionField5 = 4.10.0.0
 ; VersionField6 = PurePortableExpert
-; VersionField7 = PurePort.dll
+; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

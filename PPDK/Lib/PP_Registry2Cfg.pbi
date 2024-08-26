@@ -30,7 +30,85 @@ CompilerIf Defined(CONFIG_INITIAL,#PB_Constant)
 	CompilerEndIf
 CompilerEndIf
 ;;======================================================================================================================
-; Экспорт параметров из файла pport
+; Прцедуры для работы с данными из куста реестра.
+;;======================================================================================================================
+;https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-reggetvaluea
+;https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetkeyvaluea
+;https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluea
+;https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletetreea
+#RRF_RT_REG_BINARY=$00000008
+#RRF_RT_REG_DWORD=$00000010
+#RRF_RT_DWORD=$00000018 ; #RRF_RT_REG_BINARY|#RRF_RT_REG_DWORD
+#RRF_RT_REG_SZ=$00000002
+#RRF_RT_ANY=$0000FFFF
+DeclareImport(kernel32,_RegGetValueW@28,RegGetValueW,RegGetValue_(hKey,*SubKey,*ValueName,dwFlags.l,*dwType,*Data,*cbData))
+DeclareImport(kernel32,_RegSetKeyValueW@24,RegSetKeyValueW,RegSetKeyValue_(hKey,*SubKey,*ValueName,dwType.l,*Data,*cbData))
+DeclareImport(kernel32,_RegDeleteKeyValueW@12,RegDeleteKeyValueW,RegDeleteKeyValue_(hKey,*SubKey,*ValueName))
+DeclareImport(kernel32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey,*SubKey))
+
+Procedure.s GetCfgS(sKey.s,sName.s)
+	Protected dwType, cbData, Result.s
+	Protected ret = RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,#Null,@cbData)
+	If cbData And (dwType=#REG_SZ Or dwType=#REG_EXPAND_SZ)
+		Result = Space((cbData+1)/2)
+		If RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,@Result,@cbData)=#NO_ERROR
+			ProcedureReturn Result
+		EndIf
+	EndIf
+	;ProcedureReturn ""
+EndProcedure
+Procedure.l GetCfgD(sKey.s,sName.s,DefVal.l=0)
+	Protected dwType, cbData
+	Protected ret = RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,#Null,@cbData)
+	If RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,@DefVal,@cbData)=#NO_ERROR
+		ProcedureReturn DefVal
+	EndIf
+	ProcedureReturn 0
+EndProcedure
+Procedure CfgExist(sKey.s,sName.s)
+	;ProcedureReturn Bool(SHGetValue_(hAppKey,@sKey,@sName,#Null,#Null,#Null)=#NO_ERROR)
+	ProcedureReturn Bool(RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_ANY,#Null,#Null,#Null)=#NO_ERROR)
+EndProcedure
+Procedure SetCfgS(sKey.s,sName.s,sData.s)
+	;ProcedureReturn Bool(SHSetValue_(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
+	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
+EndProcedure
+Procedure SetCfgD(sKey.s,sName.s,dData.l)
+	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_DWORD,@dData,SizeOf(Long))=#NO_ERROR)
+EndProcedure
+Procedure SetCfgB(sKey.s,sName.s,sHex.s)
+	sHex = ReplaceString(sHex," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
+	Protected cbData
+	Protected *Bin = Hex2Bin(sHex,#Null,@cbData) 
+	Protected Result = Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_BINARY,*Bin,cbData)=#NO_ERROR)
+	FreeMemory(*Bin)
+	ProcedureReturn Result
+EndProcedure
+Procedure DelCfg(sKey.s,sName.s)
+	ProcedureReturn Bool(RegDeleteKeyValue_(hAppKey,@sKey,@sName)=#NO_ERROR)
+EndProcedure
+Procedure DelTree(sKey.s)
+	ProcedureReturn Bool(RegDeleteTree_(hAppKey,@sKey)=#NO_ERROR)
+EndProcedure
+
+;;----------------------------------------------------------------------------------------------------------------------
+CompilerIf Not Defined(PROC_CORRECTCFGPATH,#PB_Constant) : #PROC_CORRECTCFGPATH = 0 : CompilerEndIf
+CompilerIf #PROC_CORRECTCFGPATH
+	Procedure CorrectCfgPath(Key.s,Value.s,Base.s,Flags=0)
+		Protected Path.s = CorrectPath(GetCfgS(Key,Value),Base,Flags)
+		If Flags & #CORRECTPATH_REAL_PATH
+			If Path
+				SetCfgS(Key,Value,Path)
+			EndIf
+		Else
+			SetCfgS(Key,Value,Path)
+		EndIf
+	EndProcedure
+CompilerEndIf 
+
+;;======================================================================================================================
+; Экспорт из файла конфигурации.
+;;======================================================================================================================
 
 #CONFIG_SEPARATOR = $E800 ; Из набора символов для частного использования
 #CFG_CHR_NUL = $E000 ; 57344 - Из набора символов для частного использования
@@ -50,9 +128,10 @@ Procedure FindCtrl(s.s,start=1)
 EndProcedure
 
 Procedure ImportCfg(Config.s)
-	Protected s.s, hKey, sKey.s, sData.s, bData.s, dData.q, pData, cbData, sType.s, bType, sName.s
+	Protected s.s, hKey, sKey.s, sData.s, bData.s, dData.q, sType.s, dwType.l, sName.s
+	Protected cbData.i ; Должен быть i для правильной работы Hex2Bin
 	Protected x1, x2, x3, i
-	Protected *pb.Byte, *pc.Character, *end
+	Protected *ptr
 	Protected CodePage
 	Protected hCfg = ReadFile(#PB_Any,Config,#PB_File_SharedRead|#PB_File_SharedWrite)
 	If hCfg
@@ -71,60 +150,39 @@ Procedure ImportCfg(Config.s)
 					If RegCreateKey_(hAppKey,@sKey,@hKey) = #NO_ERROR
 						Select sType
 							Case "s"
-								bType = #REG_SZ
+								dwType = #REG_SZ
 							Case "m"
-								bType = #REG_MULTI_SZ
+								dwType = #REG_MULTI_SZ
 							Case "x"
-								bType = #REG_EXPAND_SZ
+								dwType = #REG_EXPAND_SZ
 							Case "b"
-								bType = #REG_BINARY
+								dwType = #REG_BINARY
 							Case "d"
-								bType = #REG_DWORD
+								dwType = #REG_DWORD
 							Default
-								bType = Val("$"+sType)
+								dwType = Val("$"+sType)
 						EndSelect
 						Select sType
 							Case "s","m","x"
 								cbData = StringByteLength(sData)+2
 							Case "d"
 								cbData = SizeOf(Long)
-							Default
+							Default ; всё остальное хранится в виде hex-строки
 								cbData = Len(sData)/2 ; два символа кодируют один байт
 						EndSelect
 						; Тип проверяем в строковом виде, так как могут встретиться стандартные типы нестандартной длины.
-						; Такие данные сохраняются с типом в HEX виде.
+						; Такие данные сохраняются с типом в hex виде и сами данные в виде hex-строки.
 						If sType="s" Or sType="m" Or sType="x"
-							pData = @sData
-							*pc = pData
-							*end = *pc + cbData
-							While *pc < *end ; декодирование управляющих символов 0-31
-								If *pc\c>=#CFG_CHR_NUL And *pc\c<#CFG_CHR_SPACE
-									*pc\c - #CFG_CHR_NUL
-								EndIf
-								*pc + 2
-							Wend
+							DecodeCtrl(@sData)
+							RegSetValueEx_(hKey,@sName,0,dwType,@sData,cbData)
 						ElseIf sType="d" ;And cbData=4
 							dData = Val("$"+sData)
-							pData = @dData
-						Else ; данные закодированны в бинарном виде, в том числе и для нестандартной длины REG_DWORD
-							;cbData = Len(sData)/2 ; два символа кодируют один байт
-							If bType=#REG_BINARY
-								bData = SpaceB(cbData)
-								pData = @bData
-							Else ; bType=#REG_DWORD
-								dData = 0
-								pData = @dData
-							EndIf
-							*pc = @sData
-							*pb = pData
-							*end = *pb+cbData
-							While *pb < *end
-								*pb\b = Val("$"+PeekS(*pc,2))
-								*pb + 1
-								*pc + 4 ; hex представление байта - два символа в юникоде
-							Wend
+							RegSetValueEx_(hKey,@sName,0,dwType,@dData,cbData)
+						Else ; данные закодированны в бинарном виде, в том числе и для REG_DWORD нестандартной длины
+							*ptr = Hex2Bin(sData,#Null,@cbData)
+							RegSetValueEx_(hKey,@sName,0,dwType,*ptr,cbData)
+							FreeMemory(*ptr)
 						EndIf
-						RegSetValueEx_(hKey,@sName,0,bType,pData,cbData)
 						RegCloseKey_(hKey)
 					EndIf
 				EndIf
@@ -180,65 +238,8 @@ Procedure WriteCfg()
 	; Ничего не делаем
 EndProcedure
 ;;======================================================================================================================
-Procedure.s GetCfgS(sKey.s,sName.s)
-	Protected dwType, cbData, Result.s
-	Protected ret = SHGetValue_(hAppKey,@sKey,@sName,@dwType,#Null,@cbData)
-	If cbData And (dwType=#REG_SZ Or dwType=#REG_EXPAND_SZ)
-		Result = Space((cbData+1)/2)
-		If SHGetValue_(hAppKey,@sKey,@sName,@dwType,@Result,@cbData)=#NO_ERROR
-			ProcedureReturn Result
-		EndIf
-	EndIf
-	;ProcedureReturn ""
-EndProcedure
-Procedure.l GetCfgD(sKey.s,sName.s,Result.l=0)
-	Protected dwType, cbData
-	Protected ret = SHGetValue_(hAppKey,@sKey,@sName,@dwType,#Null,@cbData)
-	If cbData And dwType=#REG_DWORD
-		If SHGetValue_(hAppKey,@sKey,@sName,@dwType,@Result,@cbData)=#NO_ERROR
-			ProcedureReturn Result
-		EndIf
-	EndIf
-	;ProcedureReturn 0
-EndProcedure
-Procedure CfgExist(sKey.s,sName.s)
-	ProcedureReturn Bool(SHGetValue_(hAppKey,@sKey,@sName,#Null,#Null,#Null)=#NO_ERROR)
-EndProcedure
-Procedure SetCfgS(sKey.s,sName.s,sData.s)
-	ProcedureReturn Bool(SHSetValue_(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
-EndProcedure
-Procedure SetCfgD(sKey.s,sName.s,dData.l)
-	ProcedureReturn Bool(SHSetValue_(hAppKey,@sKey,@sName,#REG_SZ,@dData,SizeOf(Long))=#NO_ERROR)
-EndProcedure
-Procedure SetCfgB(sKey.s,sName.s,dData.l,cbData=1)
-	ProcedureReturn Bool(SHSetValue_(hAppKey,@sKey,@sName,#REG_SZ,@dData,cbData)=#NO_ERROR)
-EndProcedure
-Procedure DelCfg(sKey.s,sName.s)
-	ProcedureReturn Bool(SHDeleteValue_(hAppKey,@sKey,@sName)=#NO_ERROR)
-EndProcedure
-Procedure DelTree(sKey.s)
-	ProcedureReturn Bool(SHDeleteKey_(hAppKey,@sKey)=#NO_ERROR)
-EndProcedure
-
-;;----------------------------------------------------------------------------------------------------------------------
-CompilerIf Not Defined(PROC_CORRECTCFGPATH,#PB_Constant) : #PROC_CORRECTCFGPATH = 0 : CompilerEndIf
-CompilerIf #PROC_CORRECTCFGPATH
-	Procedure CorrectCfgPath(Key.s,Value.s,Base.s,Flags=0)
-		Protected Path.s = CorrectPath(GetCfgS(Key,Value),Base,Flags)
-		If Flags & #CORRECTPATH_REAL_PATH
-			If Path
-				SetCfgS(Key,Value,Path)
-			EndIf
-		Else
-			SetCfgS(Key,Value,Path)
-		EndIf
-	EndProcedure
-CompilerEndIf 
-;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 70
-; FirstLine = 99
-; Folding = PE9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = MA9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -49,7 +49,7 @@ CompilerEndIf
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regcreatekeya
 ; TODO: lpSubKey = Null
 Prototype.l RegCreateKey(hKey.l,*lpSubKey,*phkResult.Long)
-CompilerIf #DETOUR_REGCREATEKEYA
+CompilerIf #DETOUR_REGCREATEKEY
 	Global Original_RegCreateKeyA.RegCreateKey
 	Procedure.l Detour_RegCreateKeyA(hKey.l,*lpSubKey,*phkResult.Long)
 		Protected Result.l
@@ -66,8 +66,6 @@ CompilerIf #DETOUR_REGCREATEKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGCREATEKEYW
 	Global Original_RegCreateKeyW.RegCreateKey
 	Procedure.l Detour_RegCreateKeyW(hKey.l,*lpSubKey,*phkResult.Long)
 		Protected Result.l
@@ -88,7 +86,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regcreatekeyexa
 Prototype.l RegCreateKeyEx(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long)
-CompilerIf #DETOUR_REGCREATEKEYEXA
+CompilerIf #DETOUR_REGCREATEKEYEX
 	Global Original_RegCreateKeyExA.RegCreateKeyEx
 	Procedure.l Detour_RegCreateKeyExA(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long)
 		Protected Result.l
@@ -113,8 +111,6 @@ CompilerIf #DETOUR_REGCREATEKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGCREATEKEYEXW
 	Global Original_RegCreateKeyExW.RegCreateKeyEx
 	Procedure.l Detour_RegCreateKeyExW(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long)
 		Protected Result.l
@@ -142,7 +138,7 @@ CompilerIf #DETOUR_REGCREATEKEYEXW
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegCreateKeyTransacted(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long,hTransaction,*pExtendedParameter)
-CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDA
+CompilerIf #DETOUR_REGCREATEKEYTRANSACTED
 	Global Original_RegCreateKeyTransactedA.RegCreateKeyTransacted
 	Procedure.l Detour_RegCreateKeyTransactedA(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long,hTransaction,*pExtendedParameter)
 		Protected Result.l
@@ -162,8 +158,6 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGCREATEKEYTRANSACTEDW
 	Global Original_RegCreateKeyTransactedW.RegCreateKeyTransacted
 	Procedure.l Detour_RegCreateKeyTransactedW(hKey.l,*lpSubKey,Reserved.l,*lpClass,dwOptions.l,samDesired.l,*lpSecurityAttributes.SECURITY_ATTRIBUTES,*phkResult.Long,*lpdwDisposition.Long,hTransaction,*pExtendedParameter)
 		Protected Result.l
@@ -187,7 +181,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regopenkeya
 Prototype.l RegOpenKey(hKey.l,*lpSubKey,*phkResult.Long)
-CompilerIf #DETOUR_REGOPENKEYA
+CompilerIf #DETOUR_REGOPENKEY
 	Global Original_RegOpenKeyA.RegOpenKey
 	Procedure.l Detour_RegOpenKeyA(hKey.l,*lpSubKey,*phkResult.Long)
 		Protected Result.l
@@ -204,8 +198,6 @@ CompilerIf #DETOUR_REGOPENKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGOPENKEYW
 	Global Original_RegOpenKeyW.RegOpenKey
 	Procedure.l Detour_RegOpenKeyW(hKey.l,*lpSubKey,*phkResult.Long)
 		Protected Result.l
@@ -226,7 +218,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regopenkeyexa
 Prototype.l RegOpenKeyEx(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long)
-CompilerIf #DETOUR_REGOPENKEYEXA
+CompilerIf #DETOUR_REGOPENKEYEX
 	Global Original_RegOpenKeyExA.RegOpenKeyEx
 	Procedure.l Detour_RegOpenKeyExA(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long)
 		Protected Result.l
@@ -243,8 +235,6 @@ CompilerIf #DETOUR_REGOPENKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGOPENKEYEXW
 	Global Original_RegOpenKeyExW.RegOpenKeyEx
 	Procedure.l Detour_RegOpenKeyExW(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long)
 		Protected Result.l
@@ -264,7 +254,7 @@ CompilerIf #DETOUR_REGOPENKEYEXW
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegOpenKeyTransacted(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long,hTransaction,*pExtendedParameter)
-CompilerIf #DETOUR_REGOPENKEYTRANSACTEDA
+CompilerIf #DETOUR_REGOPENKEYTRANSACTED
 	Global Original_RegOpenKeyTransactedA.RegOpenKeyTransacted
 	Procedure.l Detour_RegOpenKeyTransactedA(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long,hTransaction,*pExtendedParameter)
 		Protected Result.l
@@ -281,8 +271,6 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTEDA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGOPENKEYTRANSACTEDW
 	Global Original_RegOpenKeyTransactedW.RegOpenKeyTransacted
 	Procedure.l Detour_RegOpenKeyTransactedW(hKey.l,*lpSubKey,ulOptions.l,samDesired.l,*phkResult.Long,hTransaction,*pExtendedParameter)
 		Protected Result.l
@@ -303,7 +291,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeya
 Prototype.l RegDeleteKey(hKey.l,*lpSubKey)
-CompilerIf #DETOUR_REGDELETEKEYA
+CompilerIf #DETOUR_REGDELETEKEY
 	Global Original_RegDeleteKeyA.RegDeleteKey
 	Procedure.l Detour_RegDeleteKeyA(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -320,8 +308,6 @@ CompilerIf #DETOUR_REGDELETEKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGDELETEKEYW
 	Global Original_RegDeleteKeyW.RegDeleteKey
 	Procedure.l Detour_RegDeleteKeyW(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -342,7 +328,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeyexa
 Prototype.l RegDeleteKeyEx(hKey.l,*lpSubKey,samDesired.l,Reserved.l)
-CompilerIf #DETOUR_REGDELETEKEYEXA
+CompilerIf #DETOUR_REGDELETEKEYEX
 	Global Original_RegDeleteKeyExA.RegDeleteKeyEx
 	Procedure.l Detour_RegDeleteKeyExA(hKey.l,*lpSubKey,samDesired.l,Reserved.l)
 		Protected Result.l
@@ -359,8 +345,6 @@ CompilerIf #DETOUR_REGDELETEKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGDELETEKEYEXW
 	Global Original_RegDeleteKeyExW.RegDeleteKeyEx
 	Procedure.l Detour_RegDeleteKeyExW(hKey.l,*lpSubKey,samDesired.l,Reserved.l)
 		Protected Result.l
@@ -380,7 +364,7 @@ CompilerIf #DETOUR_REGDELETEKEYEXW
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype.l RegDeleteKeyTransacted(hKey.l,*lpSubKey,samDesired.l,Reserved.l,hTransaction,*pExtendedParameter)
-CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDA
+CompilerIf #DETOUR_REGDELETEKEYTRANSACTED
 	Global Original_RegDeleteKeyTransactedA.RegDeleteKeyTransacted
 	Procedure.l Detour_RegDeleteKeyTransactedA(hKey.l,*lpSubKey,samDesired.l,Reserved.l,hTransaction,*pExtendedParameter)
 		Protected Result.l
@@ -397,8 +381,6 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGDELETEKEYTRANSACTEDW
 	Global Original_RegDeleteKeyTransactedW.RegDeleteKeyTransacted
 	Procedure.l Detour_RegDeleteKeyTransactedW(hKey.l,*lpSubKey,samDesired.l,Reserved.l,hTransaction,*pExtendedParameter)
 		Protected Result.l
@@ -419,7 +401,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletetreea
 Prototype.l RegDeleteTree(hKey.l,*lpSubKey)
-CompilerIf #DETOUR_REGDELETETREEA
+CompilerIf #DETOUR_REGDELETETREE
 	Global Original_RegDeleteTreeA.RegDeleteTree
 	Procedure.l Detour_RegDeleteTreeA(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -436,8 +418,6 @@ CompilerIf #DETOUR_REGDELETETREEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGDELETETREEW
 	Global Original_RegDeleteTreeW.RegDeleteTree
 	Procedure.l Detour_RegDeleteTreeW(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -458,7 +438,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeletekeya
 Prototype.l SHDeleteKey(hKey.l,*lpSubKey)
-CompilerIf #DETOUR_SHDELETEKEYA
+CompilerIf #DETOUR_SHDELETEKEY
 	Global Original_SHDeleteKeyA.SHDeleteKey
 	Procedure.l Detour_SHDeleteKeyA(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -475,8 +455,6 @@ CompilerIf #DETOUR_SHDELETEKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHDELETEKEYW
 	Global Original_SHDeleteKeyW.SHDeleteKey
 	Procedure.l Detour_SHDeleteKeyW(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -497,7 +475,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeleteemptykeya
 Prototype.l SHDeleteEmptyKey(hKey.l,*lpSubKey)
-CompilerIf #DETOUR_SHDELETEEMPTYKEYA
+CompilerIf #DETOUR_SHDELETEEMPTYKEY
 	Global Original_SHDeleteEmptyKeyA.SHDeleteEmptyKey
 	Procedure.l Detour_SHDeleteEmptyKeyA(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -522,8 +500,6 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHDELETEEMPTYKEYW
 	Global Original_SHDeleteEmptyKeyW.SHDeleteEmptyKey
 	Procedure.l Detour_SHDeleteEmptyKeyW(hKey.l,*lpSubKey)
 		Protected Result.l
@@ -552,7 +528,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletevaluea
 Prototype.l RegDeleteValue(hKey.l,*lpValueName)
-CompilerIf #DETOUR_REGDELETEVALUEA
+CompilerIf #DETOUR_REGDELETEVALUE
 	Global Original_RegDeleteValueA.RegDeleteValue
 	Procedure.l Detour_RegDeleteValueA(hKey.l,*lpValueName)
 		Protected Result.l
@@ -569,8 +545,6 @@ CompilerIf #DETOUR_REGDELETEVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGDELETEVALUEW
 	Global Original_RegDeleteValueW.RegDeleteValue
 	Procedure.l Detour_RegDeleteValueW(hKey.l,*lpValueName)
 		Protected Result.l
@@ -591,7 +565,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regdeletekeyvaluea
 Prototype.l RegDeleteKeyValue(hkey.l,*lpSubKey,*lpValueName)
-CompilerIf #DETOUR_REGDELETEKEYVALUEA
+CompilerIf #DETOUR_REGDELETEKEYVALUE
 	Global Original_RegDeleteKeyValueA.RegDeleteKeyValue
 	Procedure.l Detour_RegDeleteKeyValueA(hkey.l,*lpSubKey,*lpValueName)
 		Protected Result.l
@@ -611,8 +585,6 @@ CompilerIf #DETOUR_REGDELETEKEYVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGDELETEKEYVALUEW
 	Global Original_RegDeleteKeyValueW.RegDeleteKeyValue
 	Procedure.l Detour_RegDeleteKeyValueW(hkey.l,*lpSubKey,*lpValueName)
 		Protected Result.l
@@ -636,7 +608,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shdeletevaluea
 Prototype.l SHDeleteValue(hKey.l,*lpSubKey,*lpValueName)
-CompilerIf #DETOUR_SHDELETEVALUEA
+CompilerIf #DETOUR_SHDELETEVALUE
 	Global Original_SHDeleteValueA.SHDeleteValue
 	Procedure.l Detour_SHDeleteValueA(hKey.l,*lpSubKey,*lpValueName)
 		Protected Result.l
@@ -655,8 +627,6 @@ CompilerIf #DETOUR_SHDELETEVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHDELETEVALUEW
 	Global Original_SHDeleteValueW.SHDeleteValue
 	Procedure.l Detour_SHDeleteValueW(hKey.l,*lpSubKey,*lpValueName)
 		Protected Result.l
@@ -679,7 +649,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regenumkeyw
 Prototype.l RegEnumKey(hKey.l,dwIndex.l,*lpName,cbName.l)
-CompilerIf #DETOUR_REGENUMKEYA
+CompilerIf #DETOUR_REGENUMKEY
 	Global Original_RegEnumKeyA.RegEnumKey
 	Procedure.l Detour_RegEnumKeyA(hKey.l,dwIndex.l,*lpName,cbName.l)
 		Protected Result.l
@@ -703,8 +673,6 @@ CompilerIf #DETOUR_REGENUMKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGENUMKEYW
 	Global Original_RegEnumKeyW.RegEnumKey
 	Procedure.l Detour_RegEnumKeyW(hKey.l,dwIndex.l,*lpName,cbName.l)
 		Protected Result.l
@@ -732,7 +700,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regenumkeyexwa
 Prototype.l RegEnumKeyEx(hKey.l,dwIndex.l,*lpName,*lpcbName.Long,*lpReserved.Long,*lpClass,*lpcbClass.Long,*lpftLastWriteTime.FILETIME)
-CompilerIf #DETOUR_REGENUMKEYEXA
+CompilerIf #DETOUR_REGENUMKEYEX
 	Global Original_RegEnumKeyExA.RegEnumKeyEx
 	Procedure.l Detour_RegEnumKeyExA(hKey.l,dwIndex.l,*lpName,*lpcbName.Long,*lpReserved.Long,*lpClass,*lpcbClass.Long,*lpftLastWriteTime.FILETIME)
 		Protected Result.l
@@ -756,8 +724,6 @@ CompilerIf #DETOUR_REGENUMKEYEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGENUMKEYEXW
 	Global Original_RegEnumKeyExW.RegEnumKeyEx
 	Procedure.l Detour_RegEnumKeyExW(hKey.l,dwIndex.l,*lpName,*lpcbName.Long,*lpReserved.Long,*lpClass,*lpcbClass.Long,*lpftLastWriteTime.FILETIME)
 		Protected Result.l
@@ -785,7 +751,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regenumvaluea
 Prototype.l RegEnumValue(hKey.l,dwIndex.l,*lpValueName,*lpcbValueName.Long,*lpReserved,*lpType.Long,*lpData,*lpcbData.Long)
-CompilerIf #DETOUR_REGENUMVALUEA
+CompilerIf #DETOUR_REGENUMVALUE
 	Global Original_RegEnumValueA.RegEnumValue
 	Procedure.l Detour_RegEnumValueA(hKey.l,dwIndex.l,*lpValueName,*lpcbValueName.Long,*lpReserved,*lpType.Long,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -804,8 +770,6 @@ CompilerIf #DETOUR_REGENUMVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGENUMVALUEW
 	Global Original_RegEnumValueW.RegEnumValue
 	Procedure.l Detour_RegEnumValueW(hKey.l,dwIndex.l,*lpValueName,*lpcbValueName.Long,*lpReserved,*lpType.Long,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -828,7 +792,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regqueryvaluea
 Prototype.l RegQueryValue(hKey.l,*lpSubKey,*lpData,*lpcbData.Long)
-CompilerIf #DETOUR_REGQUERYVALUEA
+CompilerIf #DETOUR_REGQUERYVALUE
 	Global Original_RegQueryValueA.RegQueryValue
 	Procedure.l Detour_RegQueryValueA(hKey.l,*lpSubKey,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -848,8 +812,6 @@ CompilerIf #DETOUR_REGQUERYVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGQUERYVALUEW
 	Global Original_RegQueryValueW.RegQueryValue
 	Procedure.l Detour_RegQueryValueW(hKey.l,*lpSubKey,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -873,7 +835,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regqueryvalueexa
 Prototype.l RegQueryValueEx(hKey.l,*lpValueName,*lpReserved.Long,*lpType.Long,*lpData,*lpcbData.Long)
-CompilerIf #DETOUR_REGQUERYVALUEEXA
+CompilerIf #DETOUR_REGQUERYVALUEEX
 	Global Original_RegQueryValueExA.RegQueryValueEx
 	Procedure.l Detour_RegQueryValueExA(hKey.l,*lpValueName,*lpReserved.Long,*lpType.Long,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -892,8 +854,6 @@ CompilerIf #DETOUR_REGQUERYVALUEEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGQUERYVALUEEXW
 	Global Original_RegQueryValueExW.RegQueryValueEx
 	Procedure.l Detour_RegQueryValueExW(hKey.l,*lpValueName,*lpReserved.Long,*lpType.Long,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -916,7 +876,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-reggetvaluea
 Prototype.l RegGetValue(hKey.l,*lpSubKey,*lpValueName,rrfFlags.l,*lpType.Long,*lpData,*lpcbData.Long)
-CompilerIf #DETOUR_REGGETVALUEA
+CompilerIf #DETOUR_REGGETVALUE
 	Global Original_RegGetValueA.RegGetValue
 	Procedure.l Detour_RegGetValueA(hKey.l,*lpSubKey,*lpValueName,rrfFlags.l,*lpType.Long,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -936,8 +896,6 @@ CompilerIf #DETOUR_REGGETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGGETVALUEW
 	Global Original_RegGetValueW.RegGetValue
 	Procedure.l Detour_RegGetValueW(hKey.l,*lpSubKey,*lpValueName,rrfFlags.l,*lpType.Long,*lpData,*lpcbData.Long)
 		Protected Result.l
@@ -961,7 +919,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shgetvaluea
 Prototype.l SHGetValue(hKey.l,*lpSubKey,*lpValueName,*pdwType,*pvData,*pcbData)
-CompilerIf #DETOUR_SHGETVALUEA
+CompilerIf #DETOUR_SHGETVALUE
 	Global Original_SHGetValueA.SHGetValue
 	Procedure.l Detour_SHGetValueA(hKey.l,*lpSubKey,*lpValueName,*pdwType.Long,*pvData,*pcbData.Long)
 		Protected Result.l
@@ -981,8 +939,6 @@ CompilerIf #DETOUR_SHGETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHGETVALUEW
 	Global Original_SHGetValueW.SHGetValue
 	Procedure.l Detour_SHGetValueW(hKey.l,*lpSubKey,*lpValueName,*pdwType.Long,*pvData,*pcbData.Long)
 		Protected Result.l
@@ -1015,7 +971,7 @@ Prototype.l SHQueryValueEx(hKey.l,*lpValueName,*pdwReserved.Long,*pdwType.Long,*
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shreggetvaluea
 ; TODO: srrfFlags https://learn.microsoft.com/ru-ru/windows/win32/shell/srrf
 Prototype.l SHRegGetValue(hKey.l,*lpSubKey,*lpValueName,srrfFlags,*pdwType,*pvData,*pcbData)
-CompilerIf #DETOUR_SHREGGETVALUEA
+CompilerIf #DETOUR_SHREGGETVALUE
 	Global Original_SHRegGetValueA.SHRegGetValue
 	Procedure.l Detour_SHRegGetValueA(hKey,*lpSubKey,*lpValueName,srrfFlags,*pdwType.Long,*pvData,*pcbData.Long)
 		Protected Result.l
@@ -1035,8 +991,6 @@ CompilerIf #DETOUR_SHREGGETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHREGGETVALUEW
 	Global Original_SHRegGetValueW.SHRegGetValue
 	Procedure.l Detour_SHRegGetValueW(hKey.l,*lpSubKey,*lpValueName,srrfFlags,*pdwType.Long,*pvData,*pcbData.Long)
 		Protected Result.l
@@ -1057,6 +1011,57 @@ CompilerIf #DETOUR_SHREGGETVALUEW
 	EndProcedure
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shreggetboolusvaluea
+Prototype SHRegGetBoolUSValue(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+CompilerIf #DETOUR_SHREGGETBOOLUSVALUE
+	Global Original_SHRegGetBoolUSValueA.SHRegGetBoolUSValue
+	Procedure Detour_SHRegGetBoolUSValueA(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+		Protected Result
+		RegCriticalEnter
+		DbgReg("SHRegGetBoolUSValueA: "+LPeekSZA(*lpSubKey)+" "+LPeekSZA(*lpValueName))
+		CompilerIf Not #PORTABLE
+			Result = Original_SHRegGetBoolUSValueA(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+		CompilerElse
+			Protected SubKey.s = CheckKey(0,LPeekSZA(*lpSubKey))
+			If SubKey
+				Protected iCfg = CfgExist(SubKey,LPeekSZA(*lpValueName))
+				If iCfg
+					Result = Cfg(iCfg)\l
+				Else
+					Result = fDefault
+				EndIf
+			Else
+				Result = Original_SHRegGetBoolUSValueA(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+			EndIf
+		CompilerEndIf
+		RegCriticalLeave
+		ProcedureReturn Result
+	EndProcedure
+	Global Original_SHRegGetBoolUSValueW.SHRegGetBoolUSValue
+	Procedure Detour_SHRegGetBoolUSValueW(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+		Protected Result
+		RegCriticalEnter
+		DbgReg("SHRegGetBoolUSValueW: "+LPeekSZU(*lpSubKey)+" "+LPeekSZU(*lpValueName))
+		CompilerIf Not #PORTABLE
+			Result = Original_SHRegGetBoolUSValueW(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+		CompilerElse
+			Protected SubKey.s = CheckKey(0,LPeekSZU(*lpSubKey))
+			If SubKey
+				Protected iCfg = CfgExist(SubKey,LPeekSZU(*lpValueName))
+				If iCfg
+					Result = Cfg(iCfg)\l
+				Else
+					Result = fDefault
+				EndIf
+			Else
+				Result = Original_SHRegGetBoolUSValueW(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
+			EndIf
+		CompilerEndIf
+		RegCriticalLeave
+		ProcedureReturn Result
+	EndProcedure
+CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shreggetintw
 ;Prototype.l SHRegGetInt(hKey.l,*pwzKey,iDefault) ; только unicode
 
@@ -1067,7 +1072,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetvaluea
 Prototype.l RegSetValue(hKey.l,*lpSubKey,dwType.l,*lpData,cbData.l)
-CompilerIf #DETOUR_REGSETVALUEA
+CompilerIf #DETOUR_REGSETVALUE
 	Global Original_RegSetValueA.RegSetValue
 	Procedure.l Detour_RegSetValueA(hKey.l,*lpSubKey,dwType.l,*lpData,cbData.l)
 		Protected Result.l
@@ -1087,8 +1092,6 @@ CompilerIf #DETOUR_REGSETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGSETVALUEW
 	Global Original_RegSetValueW.RegSetValue
 	Procedure.l Detour_RegSetValueW(hKey.l,*lpSubKey,dwType.l,*lpData,cbData.l)
 		Protected Result.l
@@ -1112,7 +1115,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetvalueexa
 Prototype.l RegSetValueEx(hKey.l,*lpValueName,dwReserved.l,dwType.l,*lpData,cbData.l)
-CompilerIf #DETOUR_REGSETVALUEEXA
+CompilerIf #DETOUR_REGSETVALUEEX
 	Global Original_RegSetValueExA.RegSetValueEx
 	Procedure.l Detour_RegSetValueExA(hKey.l,*lpValueName,dwReserved.l,dwType.l,*lpData,cbData.l)
 		Protected Result.l
@@ -1131,8 +1134,6 @@ CompilerIf #DETOUR_REGSETVALUEEXA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGSETVALUEEXW
 	Global Original_RegSetValueExW.RegSetValueEx
 	Procedure.l Detour_RegSetValueExW(hKey.l,*lpValueName,dwReserved.l,dwType.l,*lpData,cbData.l)
 		Protected Result.l
@@ -1155,7 +1156,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regsetkeyvaluea
 Prototype.l RegSetKeyValue(hKey.l,*lpSubKey,*lpValueName,dwType.l,*lpData,cbData.l)
-CompilerIf #DETOUR_REGSETKEYVALUEA
+CompilerIf #DETOUR_REGSETKEYVALUE
 	Global Original_RegSetKeyValueA.RegSetKeyValue
 	Procedure.l Detour_RegSetKeyValueA(hKey.l,*lpSubKey,*lpValueName,dwType.l,*lpData,cbData.l)
 		Protected Result.l
@@ -1175,8 +1176,6 @@ CompilerIf #DETOUR_REGSETKEYVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGSETKEYVALUEW
 	Global Original_RegSetKeyValueW.RegSetKeyValue
 	Procedure.l Detour_RegSetKeyValueW(hKey.l,*lpSubKey,*lpValueName,dwType.l,*lpData,cbData.l)
 		Protected Result.l
@@ -1200,7 +1199,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shsetvaluea
 Prototype.l SHSetValue(hKey.l,*lpSubKey,*lpValueName,dwType.l,*pvData,cbData.l)
-CompilerIf #DETOUR_SHSETVALUEA
+CompilerIf #DETOUR_SHSETVALUE
 	Global Original_SHSetValueA.SHSetValue
 	Procedure.l Detour_SHSetValueA(hKey.l,*lpSubKey,*lpValueName,dwType.l,*pvData,cbData.l)
 		Protected Result.l
@@ -1220,8 +1219,6 @@ CompilerIf #DETOUR_SHSETVALUEA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHSETVALUEW
 	Global Original_SHSetValueW.SHSetValue
 	Procedure.l Detour_SHSetValueW(hKey.l,*lpSubKey,*lpValueName,dwType.l,*pvData,cbData.l)
 		Protected Result.l
@@ -1274,7 +1271,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regqueryinfokeya
 Prototype.l RegQueryInfoKey(hKey.l,*lpClass,*lpcbClass,*lpReserved,*lpcSubKeys.Long,*lpcMaxSubKeyLen.Long,*lpcMaxClassLen.Long,*lpcValues.Long,*lpcMaxValueNameLen.Long,*lpcMaxValueLen.Long,*lpcbSecurityDescriptor.Long,*lpftLastWriteTime)
-CompilerIf #DETOUR_REGQUERYINFOKEYA
+CompilerIf #DETOUR_REGQUERYINFOKEY
 	Global Original_RegQueryInfoKeyA.RegQueryInfoKey
 	Procedure.l Detour_RegQueryInfoKeyA(hKey.l,*lpClass,*lpcbClass.Long,*lpReserved,*lpcSubKeys.Long,*lpcMaxSubKeyLen.Long,*lpcMaxClassLen.Long,*lpcValues.Long,*lpcMaxValueNameLen.Long,*lpcMaxValueLen.Long,*lpcbSecurityDescriptor.Long,*lpftLastWriteTime)
 		Protected Result.l
@@ -1324,8 +1321,6 @@ CompilerIf #DETOUR_REGQUERYINFOKEYA
 		RegCriticalLeave
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_REGQUERYINFOKEYW
 	Global Original_RegQueryInfoKeyW.RegQueryInfoKey
 	Procedure.l Detour_RegQueryInfoKeyW(hKey.l,*lpClass,*lpcbClass.Long,*lpReserved,*lpcSubKeys.Long,*lpcMaxSubKeyLen.Long,*lpcMaxClassLen.Long,*lpcValues.Long,*lpcMaxValueNameLen.Long,*lpcMaxValueLen.Long,*lpcbSecurityDescriptor.Long,*lpftLastWriteTime)
 		Protected Result.l
@@ -1379,7 +1374,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-shqueryinfokeya
 Prototype.l SHQueryInfoKey(hKey.l,*lpSubKey,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
-CompilerIf #DETOUR_SHQUERYINFOKEYA
+CompilerIf #DETOUR_SHQUERYINFOKEY
 	Global Original_SHQueryInfoKeyA.SHQueryInfoKey
 	Procedure Detour_SHQueryInfoKeyA(hKey.l,*lpSubKey,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
 		Protected Result.l
@@ -1398,8 +1393,6 @@ CompilerIf #DETOUR_SHQUERYINFOKEYA
 		DbgRegExt("SHQueryInfoKeyA: "+Result2Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-CompilerEndIf
-CompilerIf #DETOUR_SHQUERYINFOKEYW
 	Global Original_SHQueryInfoKeyW.SHQueryInfoKey
 	Procedure Detour_SHQueryInfoKeyW(hKey.l,*lpSubKey,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
 		Protected Result.l
@@ -1443,8 +1436,8 @@ CompilerIf #DETOUR_REGFLUSHKEY
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AAAAAAAAAA-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = AAAAAAAAAA9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

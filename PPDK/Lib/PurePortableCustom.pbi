@@ -27,6 +27,10 @@
 #PORTABLE_REG_IAT = $20000 ; TODO
 #PORTABLE_REG_CS = $40000  ; TODO: регистрозависимое хранение ключей
 
+; Выбор через #DETOUR_REG_DLL dll для установки хуков реестра
+#DETOUR_REG_DLL_ADVAPI32 = 0
+#DETOUR_REG_DLL_KERNELBASE = 1
+
 ; Для вывода диагностики
 #DBG_REG_MODE_MASK = $0F ; пока используем значения 0-15
 #DBG_REG_MODE_ALIENS = 1 ; только не прошедшие фильтр ключи
@@ -65,8 +69,8 @@
 
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 51
-; FirstLine = 24
+; CursorPosition = 31
+; FirstLine = 15
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
