@@ -48,46 +48,80 @@ DeclareImport(kernel32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey,*Sub
 
 Procedure.s GetCfgS(sKey.s,sName.s)
 	Protected dwType, cbData, Result.s
-	Protected ret = RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,#Null,@cbData)
+	Protected ret
+	If Original_RegGetValueW ; если хук установлен, через оригинальную функцию
+		ret = Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,#Null,@cbData)
+	Else ; иначе напрямую
+		ret = RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,#Null,@cbData)
+	EndIf
 	If cbData And (dwType=#REG_SZ Or dwType=#REG_EXPAND_SZ)
 		Result = Space((cbData+1)/2)
-		If RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,@Result,@cbData)=#NO_ERROR
-			ProcedureReturn Result
+		If Original_RegGetValueW ; если хук установлен, через оригинальную функцию
+			If Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,@Result,@cbData)=#NO_ERROR
+				ProcedureReturn Result
+			EndIf
+		Else ; иначе напрямую
+			If RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,@Result,@cbData)=#NO_ERROR
+				ProcedureReturn Result
+			EndIf
 		EndIf
 	EndIf
 	;ProcedureReturn ""
 EndProcedure
 Procedure.l GetCfgD(sKey.s,sName.s,DefVal.l=0)
-	Protected dwType, cbData
-	Protected ret = RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,#Null,@cbData)
-	If RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,@DefVal,@cbData)=#NO_ERROR
-		ProcedureReturn DefVal
+	Protected dwType, dwData.l, cbData=SizeOf(Long)
+	Protected ret
+	If Original_RegGetValueW ; если хук установлен, через оригинальную функцию
+		If Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,@dwData,@cbData)=#NO_ERROR
+			ProcedureReturn dwData
+		EndIf
+	Else ; иначе напрямую
+		If RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,@dwData,@cbData)=#NO_ERROR
+			ProcedureReturn dwData
+		EndIf
 	EndIf
-	ProcedureReturn 0
+	ProcedureReturn DefVal
 EndProcedure
 Procedure CfgExist(sKey.s,sName.s)
-	;ProcedureReturn Bool(SHGetValue_(hAppKey,@sKey,@sName,#Null,#Null,#Null)=#NO_ERROR)
+	If Original_RegGetValueW
+		ProcedureReturn Bool(Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_ANY,#Null,#Null,#Null)=#NO_ERROR)
+	EndIf
 	ProcedureReturn Bool(RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_ANY,#Null,#Null,#Null)=#NO_ERROR)
 EndProcedure
 Procedure SetCfgS(sKey.s,sName.s,sData.s)
-	;ProcedureReturn Bool(SHSetValue_(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
+	If Original_RegSetKeyValueW
+		ProcedureReturn Bool(Original_RegSetKeyValueW(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
+	EndIf
 	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
 EndProcedure
 Procedure SetCfgD(sKey.s,sName.s,dData.l)
+	If Original_RegSetKeyValueW
+		ProcedureReturn Bool(Original_RegSetKeyValueW(hAppKey,@sKey,@sName,#REG_DWORD,@dData,SizeOf(Long))=#NO_ERROR)
+	EndIf
 	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_DWORD,@dData,SizeOf(Long))=#NO_ERROR)
 EndProcedure
 Procedure SetCfgB(sKey.s,sName.s,sHex.s)
 	sHex = ReplaceString(sHex," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
-	Protected cbData
-	Protected *Bin = Hex2Bin(sHex,#Null,@cbData) 
-	Protected Result = Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_BINARY,*Bin,cbData)=#NO_ERROR)
+	Protected Result, cbData
+	Protected *Bin = Hex2Bin(sHex,#Null,@cbData)
+	If Original_RegSetKeyValueW
+		Result = Bool(Original_RegSetKeyValueW(hAppKey,@sKey,@sName,#REG_BINARY,*Bin,cbData)=#NO_ERROR)
+	Else
+		Result = Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_BINARY,*Bin,cbData)=#NO_ERROR)
+	EndIf
 	FreeMemory(*Bin)
 	ProcedureReturn Result
 EndProcedure
 Procedure DelCfg(sKey.s,sName.s)
+	If Original_RegDeleteKeyValueW
+		ProcedureReturn Bool(Original_RegDeleteKeyValueW(hAppKey,@sKey,@sName)=#NO_ERROR)
+	EndIf
 	ProcedureReturn Bool(RegDeleteKeyValue_(hAppKey,@sKey,@sName)=#NO_ERROR)
 EndProcedure
 Procedure DelTree(sKey.s)
+	If Original_RegDeleteTreeW
+		ProcedureReturn Bool(Original_RegDeleteTreeW(hAppKey,@sKey)=#NO_ERROR)
+	EndIf
 	ProcedureReturn Bool(RegDeleteTree_(hAppKey,@sKey)=#NO_ERROR)
 EndProcedure
 
@@ -238,8 +272,10 @@ Procedure WriteCfg()
 	; Ничего не делаем
 EndProcedure
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = MA9
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 122
+; FirstLine = 98
+; Folding = -D9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

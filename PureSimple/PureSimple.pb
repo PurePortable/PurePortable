@@ -470,6 +470,9 @@ ProcedureDLL.l AttachProcess(Instance)
 			If GetExtensionPart(InitialFile)=""
 				InitialFile + #CONFIG_INITIALEXT
 			EndIf
+			If ReadPreferenceInteger("RegistryDll",0)=1
+				RegistryDll = "kernelbase"
+			EndIf
 		CompilerEndIf
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
@@ -483,9 +486,6 @@ ProcedureDLL.l AttachProcess(Instance)
 		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
 			SetCurrentDirectory(PreferencePath(p))
-		EndIf
-		If ReadPreferenceInteger("RegistryDll",0)=1
-			RegistryDll = "kernelbase"
 		EndIf
 	EndIf
 	;}

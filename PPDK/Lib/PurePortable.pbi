@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.10.0.27
+; PurePortable main lib 4.10.0.28
 #PP_MAINVERSION = 4.10
 ;;======================================================================================================================
 
@@ -272,9 +272,8 @@ CompilerEndIf
 Macro PPPreparation
 EndMacro
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 34
 ; Folding = +-
 ; EnableThread
 ; DisableDebugger

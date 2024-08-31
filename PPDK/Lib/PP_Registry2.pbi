@@ -362,7 +362,9 @@ EndProcedure
 AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 279
+; FirstLine = 81
 ; Folding = ijz-0
 ; EnableAsm
 ; DisableDebugger

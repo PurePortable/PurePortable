@@ -276,8 +276,10 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 			!PUSH RDX
 			!PUSH R8
 			!PUSH R9
-			!MOV RCX, hDll_#DllName
 			!MOV RDX, FuncAsciiName_#FuncName
+			!PUSH RDX
+			!MOV RCX, hDll_#DllName
+			!PUSH RCX
 			!CALL [v__InitProxyFunc]
 			!MOV QWORD [v_Trampoline_#FuncName], RAX
 			!POP R9
@@ -319,9 +321,10 @@ EndProcedure
 Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассемблера
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 1
-; Folding = -AE5
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 281
+; FirstLine = 119
+; Folding = -AE9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
