@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.27
+;RES_VERSION 4.10.0.28
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -436,7 +436,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			EndIf
 		Wend
 	EndIf
-	If PreferenceGroup("EnvironmentVariables.SetPath")
+	If PreferenceGroup("EnvironmentVariables.SetPaths")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
