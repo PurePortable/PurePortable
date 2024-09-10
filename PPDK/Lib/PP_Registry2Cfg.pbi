@@ -101,7 +101,7 @@ Procedure SetCfgD(sKey.s,sName.s,dData.l)
 	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_DWORD,@dData,SizeOf(Long))=#NO_ERROR)
 EndProcedure
 Procedure SetCfgB(sKey.s,sName.s,sHex.s)
-	sHex = ReplaceString(sHex," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
+	sHex = ReplaceString(ReplaceString(sHex,",","")," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
 	Protected Result, cbData
 	Protected *Bin = Hex2Bin(sHex,#Null,@cbData)
 	If Original_RegSetKeyValueW

@@ -113,7 +113,7 @@ Procedure SetCfgD(sKey.s,sName.s,dwData.l)
 EndProcedure
 Procedure SetCfgB(sKey.s,sName.s,sHex.s)
 	Protected i = _AddCfg(sKey,sName,#REG_BINARY)
-	sHex = ReplaceString(sHex," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
+	sHex = ReplaceString(ReplaceString(sHex,",","")," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
 	Protected Size = Len(sHex)/2
 	Cfg(i)\c = Size
 	;Cfg(i)\m = Size

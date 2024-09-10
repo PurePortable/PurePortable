@@ -19,7 +19,7 @@ CompilerEndIf
 CompilerIf Not Defined(Hex2Bin,#PB_Procedure)
 	Procedure.i Hex2Bin(sHex.s,*Buf=#Null,*cb.Integer=#Null)
 		;RemoveSpaces(@Hex)
-		sHex = ReplaceString(sHex," ","")
+		sHex = ReplaceString(ReplaceString(sHex,",","")," ","")
 		Protected Size = Len(sHex)/2 ; на каждый байт два символа
 		If *cb
 			*cb\i = Size
@@ -75,8 +75,8 @@ CompilerIf Not Defined(DecodeCtrl,#PB_Procedure)
 CompilerEndIf
 ;=======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 15
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 22
 ; FirstLine = 3
 ; Folding = -
 ; EnableThread
