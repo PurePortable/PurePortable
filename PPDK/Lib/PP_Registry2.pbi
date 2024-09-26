@@ -53,7 +53,7 @@ CompilerIf Not Defined(DETOUR_REGCREATEKEYTRANSACTED,#PB_Constant) : #DETOUR_REG
 CompilerIf Not Defined(DETOUR_REGDELETEKEYTRANSACTED,#PB_Constant) : #DETOUR_REGDELETEKEYTRANSACTED = 0 : CompilerEndIf
 CompilerIf Not Defined(DETOUR_REGOPENKEYTRANSACTED,#PB_Constant)   : #DETOUR_REGOPENKEYTRANSACTED = 0   : CompilerEndIf
 
-CompilerIf #DETOUR_REG_SHLWAPI Or #PORTABLE_REG_SHLWAPI
+CompilerIf #DETOUR_REG_SHLWAPI Or #PORTABLE_REG_SHLWAPI Or (#PORTABLE_REGISTRY & #PORTABLE_REG_SHLWAPI)
 	CompilerIf Not Defined(DETOUR_SHDELETEKEY,#PB_Constant)         : #DETOUR_SHDELETEKEY = 1         : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_SHDELETEEMPTYKEY,#PB_Constant)    : #DETOUR_SHDELETEEMPTYKEY = 1    : CompilerEndIf
 	CompilerIf Not Defined(DETOUR_SHDELETEVALUE,#PB_Constant)       : #DETOUR_SHDELETEVALUE = 1       : CompilerEndIf
@@ -302,12 +302,16 @@ CompilerEndIf
 ;;======================================================================================================================
 XIncludeFile "PP_MinHook.pbi"
 ;;======================================================================================================================
-Global RegistryPermit = 1
-Global RegistryShlwapiPermit = 1
-CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_KERNELBASE) = 0 Or #DETOUR_REG_DLL = 0
-	Global RegistryDll.s = "advapi32"
+Global RegistryPermit = #DETOUR_REG_SHLWAPI
+CompilerIf #DETOUR_REG_SHLWAPI Or (#PORTABLE_REGISTRY & #PORTABLE_REG_SHLWAPI)
+	Global RegistryShlwapiPermit = 1
 CompilerElse
+	Global RegistryShlwapiPermit = 0
+CompilerEndIf
+CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_KERNELBASE
 	Global RegistryDll.s = "kernelbase"
+CompilerElse
+	Global RegistryDll.s = "advapi32"
 CompilerEndIf
 Procedure _InitRegistryHooks()
 	If RegistryPermit
@@ -362,10 +366,10 @@ EndProcedure
 AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 279
-; FirstLine = 81
-; Folding = ijz-0
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 55
+; FirstLine = 52
+; Folding = jjz-0
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

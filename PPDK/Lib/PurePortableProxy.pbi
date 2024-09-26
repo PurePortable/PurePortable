@@ -13,6 +13,8 @@ CompilerIf Not #PB_Compiler_Thread
 CompilerEndIf
 
 ;=======================================================================================================================
+Global ProcessId
+;=======================================================================================================================
 ; https://docs.microsoft.com/ru-ru/windows/win32/debug/retrieving-the-last-error-code
 ;CompilerIf Not Defined(PROC_GETLASTERRORSTR,#PB_Constant) : #PROC_GETLASTERRORSTR = 0 : CompilerEndIf
 ;CompilerIf #PROC_GETLASTERRORSTR
@@ -33,7 +35,7 @@ Procedure PPErrorMessage(Msg.s,Error=-1)
 	If Error<>-1
 		Msg + #CR$+GetLastErrorStr(Error)
 	EndIf
-	MessageBox_(0,Msg,"PurePortable ("+StrU(GetCurrentProcessID_())+")",#MB_ICONERROR)
+	MessageBox_(0,Msg,"PurePortable ("+StrU(ProcessID)+")",#MB_ICONERROR)
 EndProcedure
 ;;======================================================================================================================
 
@@ -131,8 +133,7 @@ CompilerEndIf
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 37
-; FirstLine = 13
+; CursorPosition = 15
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

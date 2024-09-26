@@ -15,7 +15,7 @@ $Dir64 = "$ScriptDir\bin\x64\loaders"
 	"avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "glu32", "iphlpapi", "ktmw32.pbi"
 	"mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "secur32"
 	"urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wintrust", "wtsapi32"
-	"shfolder"
+	"shfolder", "vcruntime140"
 ) | foreach { ..\PPDK\Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 }
 
 # Загрузчики, требующие коррекцию экспорта

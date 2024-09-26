@@ -367,7 +367,7 @@ Procedure PPErrorMessage(Msg.s,Error=-1)
 	If Error<>-1
 		Msg + #CR$+GetLastErrorStr(Error)
 	EndIf
-	MessageBox_(0,Msg,"PurePortable ("+StrU(GetCurrentProcessID_())+")",#MB_ICONERROR)
+	MessageBox_(0,Msg,"PurePortable ("+StrU(ProcessID)+")",#MB_ICONERROR)
 EndProcedure
 ;=======================================================================================================================
 CompilerIf Not Defined(PROC_NORMALIZEPATH,#PB_Constant) : #PROC_NORMALIZEPATH = 0 : CompilerEndIf
@@ -628,8 +628,8 @@ EndProcedure
 ;=======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 590
-; FirstLine = 216
+; CursorPosition = 369
+; FirstLine = 178
 ; Folding = ---ADMQ9-
 ; EnableAsm
 ; EnableThread

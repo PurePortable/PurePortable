@@ -5,7 +5,6 @@
 CompilerIf Not Defined(dbg,#PB_Procedure)
 	CompilerIf Not Defined(DBG_PROCESS_ID,#PB_Constant) : #DBG_PROCESS_ID = 0 : CompilerEndIf
 	CompilerIf #DBG_PROCESS_ID
-		Global ProcessId = GetCurrentProcessId_()
 		Global DbgProcessId.s = "PORT: ["+Str(ProcessId)+"] "
 		Procedure dbg(txt.s="") : OutputDebugString_(DbgProcessId+txt) : EndProcedure
 	CompilerElse
@@ -91,7 +90,7 @@ Macro LoggingEnd(s) : EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 22
+; CursorPosition = 7
 ; FirstLine = 3
 ; Folding = --
 ; EnableThread

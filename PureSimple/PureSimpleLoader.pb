@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.0
+;RES_VERSION 4.10.0.6
 ;RES_DESCRIPTION PurePortableSimple Loader
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -35,10 +35,6 @@ ProcedureDLL.l AttachProcess(Instance)
 	CompilerEndIf
 	If FileExist(PrgDir+dll)
 		dll = PrgDir+dll
-	ElseIf FileExist(PrgDir+"PurePort-1.dll")
-		dll = PrgDir+"PurePort-1.dll"
-	ElseIf FileExist(PrgDir+"PurePort-2.dll")
-		dll = PrgDir+"PurePort-2.dll"
 	ElseIf FileExist(PrgDir+"PurePort.dll")
 		dll = PrgDir+"PurePort.dll"
 	EndIf
@@ -55,8 +51,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 53
-; FirstLine = 19
+; CursorPosition = 8
 ; Folding = -
 ; Optimizer
 ; EnableThread

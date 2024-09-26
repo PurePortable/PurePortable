@@ -46,7 +46,8 @@ Procedure _GlobalInitialization()
 		!@@:
 		!INC DWORD [AttachProcessCnt]
 	CompilerEndIf
-	DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
+	ProcessId = GetCurrentProcessId_()
+	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
 	;dbg("AttachProcessCnt: "+StrU(PeekL(?AttachProcessCnt)))
 	;ProcessID = GetCurrentProcessId_()
 	
@@ -105,8 +106,8 @@ _GlobalInitialization()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 48
-; FirstLine = 18
+; CursorPosition = 30
+; FirstLine = 7
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

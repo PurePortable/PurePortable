@@ -13,6 +13,8 @@ CompilerIf Not #PB_Compiler_Thread
 CompilerEndIf
 
 ;;======================================================================================================================
+Global ProcessId
+;;======================================================================================================================
 
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
 ;#PROXY_DLL_COMPATIBILITY_DEFAULT = 7 ; Это совместимость по умолчанию для #PROXY_DLL_COMPATIBILITY=0 ???
@@ -129,7 +131,7 @@ CompilerEndIf
 ;;======================================================================================================================
 ; Список KnownDLLs
 ; HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs
-; Эти dll могут быть использованны только не под своим именем с соответствующей правкой исполняемого файла.
+; Эти dll могут быть использованны только не под своим именем с соответствующей правкой таблицы импорта.
 ;;======================================================================================================================
 ; Windows 11 x64
 ; advapi32.dll clbcatq.dll combase.dll comdlg32.dll coml2.dll difxapi.dll gdi32.dll gdiplus.dll imagehlp.dll imm32.dll kernel32.dll
@@ -274,6 +276,7 @@ EndMacro
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 15
 ; Folding = +-
 ; EnableThread
 ; DisableDebugger

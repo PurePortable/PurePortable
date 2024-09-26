@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.28
+;RES_VERSION 4.10.0.29
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -30,7 +30,7 @@ XIncludeFile "PurePortableCustom.pbi"
 
 ;;----------------------------------------------------------------------------------------------------------------------
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
-#PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
+#PORTABLE_REGISTRY = 0 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
@@ -214,8 +214,7 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-;{ Преобразование относительных путей
-Procedure.s PreferencePath(Path.s="",Dir.s="")
+Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
 	Protected Result.s
 	If Path=""
 		Path = PreferenceKeyValue()
@@ -236,7 +235,19 @@ Procedure.s PreferencePath(Path.s="",Dir.s="")
 	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
-;}
+Procedure _OpenPreference(Prefs.s)
+	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
+		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
+		TerminateProcess_(GetCurrentProcess_(),0)
+		ProcedureReturn 0
+	EndIf
+	If PreferenceGroup("Portable") = 0
+		MessageBox_(0,"Section [Portable] not found!","PurePortable",#MB_ICONERROR)
+		TerminateProcess_(GetCurrentProcess_(),0)
+		ProcedureReturn 0
+	EndIf
+	ProcedureReturn 1
+EndProcedure
 ;;======================================================================================================================
 XIncludeFile "proc\s2guid.pbi"
 ;;======================================================================================================================
@@ -315,7 +326,8 @@ Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
 EndProcedure
 ;}
 ;;======================================================================================================================
-Global PureAppsPrefs.s
+Global PureSimplePrefs.s
+Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
 XIncludeFile "proc\Execute.pbi"
 Procedure RunFrom(k.s,p.s)
 	Protected i
@@ -338,84 +350,112 @@ EndProcedure
 ProcedureDLL.l AttachProcess(Instance)
 	PPPreparation
 	Protected i, j
-
-	;{ Файл конфигурации
-	PureAppsPrefs = PrgDir+DllName
+	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
+	Protected RetCode
 	
-	If FileExist(PureAppsPrefs+".prefs")
-		PureAppsPrefs+".prefs"
-	ElseIf FileExist(PureAppsPrefs+".ini")
-		PureAppsPrefs+".ini"
+	If LCase(PrgName) = "rundll32"
+		; TODO: дополнительно проверить ресурсы
+		ProcedureReturn
+	EndIf
+	
+	;{ Файл конфигурации
+	PureSimplePrefs = PrgDir+DllName
+	Protected MultiConfigPrefs.s 
+	If FileExist(PureSimplePrefs+".prefs")
+		PureSimplePrefs+".prefs"
+	ElseIf FileExist(PureSimplePrefs+".ini")
+		PureSimplePrefs+".ini"
 	ElseIf FileExist(PrgDir+"PurePort.prefs")
-		PureAppsPrefs = PrgDir+"PurePort.prefs"
+		PureSimplePrefs = PrgDir+"PurePort.prefs"
 	ElseIf FileExist(PrgDir+"PurePort.ini")
-		PureAppsPrefs = PrgDir+"PurePort.ini"
+		PureSimplePrefs = PrgDir+"PurePort.ini"
 	EndIf
-	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
-		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
-		TerminateProcess_(GetCurrentProcess_(),0)
-		Goto EndAttach
-	EndIf
-	If PreferenceGroup("Portable") = 0
-		MessageBox_(0,"Section [Portable] not found!","PurePortable",#MB_ICONERROR)
-		TerminateProcess_(GetCurrentProcess_(),0)
-		Goto EndAttach
+	_OpenPreference(PureSimplePrefs)
+	;}
+	;{ Мультиконфиг
+	; После _OpenPreference текущая группа Portable
+	If ReadPreferenceInteger("MultiConfig",0)
+		ExaminePreferenceGroups()
+		Protected Group.s
+		While NextPreferenceGroup()
+			Group = PreferenceGroupName()
+			If LCase(Left(Group,7))="config:"
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					k = PreferenceKeyName()
+					v= PreferenceKeyValue()
+					Select LCase(k)
+						Case "reaction" ; пропускаем
+						Case "programname","programfilename"
+							If _ValidateProgramL(PrgName,v,1)
+								MultiConfigPrefs = Mid(Group,8)
+								Break 2
+							EndIf
+						Default
+							If _ValidateProgramL(GetFileVersionInfo(PrgPath,k),v,1)
+								MultiConfigPrefs = Mid(Group,8)
+								Break 2
+							EndIf
+					EndSelect
+				Wend
+			EndIf
+		Wend
+		If MultiConfigPrefs ; была обнаружена секция
+			MultiConfigPrefs = PreferencePath(MultiConfigPrefs)
+			ClosePreferences()
+			PureSimplePrefs = MultiConfigPrefs ; другая конфигурация
+			_OpenPreference(PureSimplePrefs)
+		EndIf
 	EndIf
 	;}
-	
-	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
-	Protected f
-	Protected retcode
-
 	;{ Проверка, та ли программа запущена
-	Protected ValidateProgram
-	Protected InvalidProgram
+	Protected InvalidProgram = 1
 	Protected InvalidReaction = 1
-	If LCase(PrgName) = "rundll32"
-		InvalidProgram = 2
-	ElseIf PreferenceGroup("Portable")
-		ValidateProgram = ReadPreferenceInteger("ValidateProgram",1)
-	EndIf
-	If ValidateProgram And PreferenceGroup("ValidateProgram")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			v = PreferenceKeyValue()
-			Select LCase(k)
-				Case "programname","programfilename"
-					If _ValidateProgramL(PrgName,v,1)
-						InvalidProgram = 0
-						Break
-					EndIf
-					InvalidProgram = 1
-				Case "reaction"
-					InvalidReaction = Val(v)
-				Default
-					If _ValidateProgramL(GetFileVersionInfo(PrgPath,k),v,1)
-						InvalidProgram = 0
-						Break
-					EndIf
-					InvalidProgram = 1
-			EndSelect
-		Wend
-	EndIf
-	If ValidateProgram And InvalidProgram = 1
-		If InvalidReaction=3 ; Выдать предупреждение
-			MessageBox_(0,"Invalid program "+PrgName+"!","PurePortable",#MB_ICONERROR)
-		ElseIf InvalidReaction=1 Or InvalidReaction=2 ; Выдать запрос на продолжение
-			Protected MessageBoxType = #MB_ICONERROR+#MB_YESNO
-			If InvalidReaction=2
-				MessageBoxType + #MB_DEFBUTTON2
+	If PreferenceGroup("Portable")
+		If ReadPreferenceInteger("ValidateProgram",1)
+			If PreferenceGroup("ValidateProgram") = 0
+				MessageBox_(0,"Section [ValidateProgram] not found!","PurePortable",#MB_ICONERROR)
+				TerminateProcess_(GetCurrentProcess_(),0)
+				Goto EndAttach
 			EndIf
-			retcode = MessageBox_(0,"Invalid program "+PrgName+"!"+#CR$+"Continue the program execution?","PurePortable",MessageBoxType)
-			If retcode<>#IDYES
-				InvalidReaction=4
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = PreferenceKeyName()
+				v = PreferenceKeyValue()
+				Select LCase(k)
+					Case "programname","programfilename"
+						If _ValidateProgramL(PrgName,v,1)
+							InvalidProgram = 0
+							Break
+						EndIf
+					Case "reaction"
+						InvalidReaction = Val(v)
+					Default ; остальные это ресурсы VersionInfo
+						If _ValidateProgramL(GetFileVersionInfo(PrgPath,k),v,1)
+							InvalidProgram = 0
+							Break
+						EndIf
+				EndSelect
+			Wend
+			If InvalidProgram ; если не выполнилось ни одного условия
+				If InvalidReaction=3 ; Выдать предупреждение
+					MessageBox_(0,"Invalid program "+PrgName+"!","PurePortable",#MB_ICONERROR)
+				ElseIf InvalidReaction=1 Or InvalidReaction=2 ; Выдать запрос на продолжение
+					Protected MessageBoxType = #MB_ICONERROR+#MB_YESNO
+					If InvalidReaction=2
+						MessageBoxType+#MB_DEFBUTTON2
+					EndIf
+					RetCode = MessageBox_(0,"Invalid program "+PrgName+"!"+#CR$+"Continue the program execution?","PurePortable",MessageBoxType)
+					If RetCode<>#IDYES
+						InvalidReaction = 4 ; далее это завершит работу
+					EndIf
+				EndIf
+				If InvalidReaction=3 Or InvalidReaction=4 ; завершить работу
+					TerminateProcess_(GetCurrentProcess_(),0)
+				EndIf
+				Goto EndAttach
 			EndIf
 		EndIf
-		If InvalidReaction=3 Or InvalidReaction=4 ; завершить работу
-			TerminateProcess_(GetCurrentProcess_(),0)
-		EndIf
-		Goto EndAttach
 	EndIf
 	;}
 	;{ Установка переменных среды
@@ -766,13 +806,13 @@ ProcedureDLL.l DetachProcess(Instance)
 		EndIf
 	CompilerEndIf
 	
-	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
+	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
 		Goto EndDetach
 	EndIf
 	
 	If PreferenceGroup("Portable")
 		If ReadPreferenceInteger("Cleanup",0)
-			Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup")
+			Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+PureSimplePrefs+Chr(34))
 		EndIf
 	EndIf
 	
@@ -788,7 +828,10 @@ ProcedureDLL.l DetachProcess(Instance)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
-	If OpenPreferences(PureAppsPrefs,#PB_Preference_NoSpace) = 0
+	; *lpszCmdLine в кодировке ASCII !
+	Protected ProcId = Val(ProgramParameter(2))
+	Protected PrefsFile.s = ProgramParameter(3)
+	If OpenPreferences(PrefsFile,#PB_Preference_NoSpace) = 0
 		ProcedureReturn
 	EndIf
 	
@@ -853,18 +896,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PAbABQAAg
+; Folding = PAbABQAAA-
 ; Optimizer
 ; EnableThread
 ; Executable = ..\PureBasic\400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.27
+; VersionField0 = 4.10.0.29
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.27
+; VersionField5 = 4.10.0.29
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
