@@ -6,31 +6,34 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.29
+;RES_VERSION 4.10.0.30
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.10.0.0
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
+;PP_X32_COPYAS "P:\PurePortable\Test\CD Bank Cataloguer\2.7.7\PurePort.dll"
+;PP_X32_COPYAS "P:\PurePortable\Test\CD Bank Cataloguer\2.7.8\PurePort.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
 IncludePath "..\PPDK\Lib"
 XIncludeFile "PurePortableCustom.pbi"
+XIncludeFile "PP_Extension.pbi"
 
 #PROXY_DLL = "pureport"
 #PROXY_DLL_COMPATIBILITY = 0 ; Совместимость: 0 - по умолчанию, 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
 
-#CONFIG_FILENAME = "registry"
+#CONFIG_FILENAME = ""
 #CONFIG_PERMANENT = #CONFIG_FILENAME+"-init"
 ;#CONFIG_INITIAL = #CONFIG_FILENAME+"-Init"
 ;#PREFERENCES_FILENAME = #CONFIG_FILENAME ; Имя файла конфигурации PurePortable
 
 ;;----------------------------------------------------------------------------------------------------------------------
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
-#PORTABLE_REGISTRY = 0 ; Перехват функций для работы с реестром
+#PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
@@ -59,13 +62,13 @@ XIncludeFile "PurePortableCustom.pbi"
 ;{ Диагностика
 #DBG_REGISTRY = #DBG_REG_MODE_MAX
 #DBG_SPECIAL_FOLDERS = #DBG_SF_MODE_MAX
-#DBG_ENVIRONMENT_VARIABLES = 1
+#DBG_ENVIRONMENT_VARIABLES = 0
 #DBG_PROFILE_STRINGS = 0
 #DBG_CBT_HOOK = 0
 #DBG_MIN_HOOK = 0
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
-#DBG_ANY = 0
+#DBG_ANY = 1
 ;}
 ;{ Более подробная трассировка
 #LOGGING = 0 ; Сохранять в log-файл
@@ -328,6 +331,13 @@ EndProcedure
 ;;======================================================================================================================
 Global PureSimplePrefs.s
 Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
+Global PPData.PPData
+Global DbgRegMode
+Global DbgSpecMode
+Global DbgEnvMode
+Global DbgAnyMode
+Global DbgDetach
+
 XIncludeFile "proc\Execute.pbi"
 Procedure RunFrom(k.s,p.s)
 	Protected i
@@ -348,15 +358,14 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL.l AttachProcess(Instance)
-	PPPreparation
-	Protected i, j
-	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
-	Protected RetCode
-	
+	PPAttachProcess
 	If LCase(PrgName) = "rundll32"
 		; TODO: дополнительно проверить ресурсы
 		ProcedureReturn
 	EndIf
+	Protected i, j
+	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
+	Protected RetCode
 	
 	;{ Файл конфигурации
 	PureSimplePrefs = PrgDir+DllName
@@ -400,10 +409,10 @@ ProcedureDLL.l AttachProcess(Instance)
 				Wend
 			EndIf
 		Wend
-		If MultiConfigPrefs ; была обнаружена секция
+		If MultiConfigPrefs ; была обнаружена подходящая группа "Config:"
 			MultiConfigPrefs = PreferencePath(MultiConfigPrefs)
 			ClosePreferences()
-			PureSimplePrefs = MultiConfigPrefs ; другая конфигурация
+			PureSimplePrefs = MultiConfigPrefs ; другой файл конфигурации
 			_OpenPreference(PureSimplePrefs)
 		EndIf
 	EndIf
@@ -483,6 +492,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			;v = PreferenceKeyValue()
 			p = PreferencePath()
 			If p
+				CreatePath(p)
 				SetEnvironmentVariable(k,p)
 			EndIf
 		Wend
@@ -496,19 +506,19 @@ ProcedureDLL.l AttachProcess(Instance)
 			If RegistryPermit
 				RegistryShlwapiPermit = ReadPreferenceInteger("RegistryShlwapi",1)
 			EndIf
-			p = ReadPreferenceString("DataFile","")
-			If p
+			ConfigFile = ReadPreferenceString("DataFile","")
+			If ConfigFile
+				If GetExtensionPart(ConfigFile)=""
+					ConfigFile + #CONFIG_FILEEXT
+				EndIf
 				ConfigFile = PreferencePath(p)
 			EndIf
-			If GetExtensionPart(ConfigFile)=""
-				ConfigFile + #CONFIG_FILEEXT
-			EndIf
-			p = ReadPreferenceString("InitFile","")
-			If p
+			InitialFile = ReadPreferenceString("InitFile","")
+			If InitialFile
+				If GetExtensionPart(InitialFile)=""
+					InitialFile + #CONFIG_INITIALEXT
+				EndIf
 				InitialFile = PreferencePath(p)
-			EndIf
-			If GetExtensionPart(InitialFile)=""
-				InitialFile + #CONFIG_INITIALEXT
 			EndIf
 			If ReadPreferenceInteger("RegistryDll",0)=1
 				RegistryDll = "kernelbase"
@@ -530,20 +540,17 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf
 	;}
 	;{ Вывод отладочной информации
-	Global DbgRegMode = 0
-	Global DbgSpecMode = 0
-	Global DbgEnvMode = 0
-	Global DbgAnyMode = 0
+	DbgRegMode = 0
+	DbgSpecMode = 0
+	DbgEnvMode = 0
+	DbgAnyMode = 0
+	DbgDetach = 1
 	If PreferenceGroup("Debug")
 		DbgRegMode = ReadPreferenceInteger("Registry",0)
 		DbgSpecMode = ReadPreferenceInteger("SpecialFolders",0)
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
-		DbgAnyMode = ReadPreferenceInteger("Attach",0)
-	EndIf
-	;}
-	;{ Закончить, если был запуск через rundll32
-	If InvalidProgram = 2
-		Goto EndAttach
+		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
+		DbgDetach = ReadPreferenceInteger("Detach",1)
 	EndIf
 	;}
 	;{ Обрабатываемые ключи реестра
@@ -602,6 +609,9 @@ ProcedureDLL.l AttachProcess(Instance)
 				Case "commondocuments"
 					CommonDocumentsRedir = p
 					CreatePath(p)
+				Case "temp"
+					TempRedir = p
+					CreatePath(p)
 				Default
 					Protected id.s = k
 					Protected rfid.GUID
@@ -641,15 +651,17 @@ ProcedureDLL.l AttachProcess(Instance)
 			k = PreferenceKeyName()
 			v = PreferenceKeyValue()
 			p = PreferencePath()
-			Select LCase(k)
+			Select LCase(k) ; если значение не задано, для некоторых устанавливаем то же, что и для SpecialFolders.
 				Case "userprofile"
-					If p="" : p = ProfileRedir : EndIf
+					If p="" And ProfileRedir<>p : p = ProfileRedir : EndIf
 				Case "allusersprofile","programdata"
-					If p="" : p = CommonAppDataRedir : EndIf
+					If p="" And CommonAppDataRedir<>p : p = CommonAppDataRedir : EndIf
 				Case "appdata"
-					If p="" : p = AppDataRedir : EndIf
+					If p="" And AppDataRedir<>p : p = AppDataRedir : EndIf
 				Case "localappdata"
-					If p="" : p = AppDataRedir : EndIf
+					If p="" And AppDataRedir<>p : p = AppDataRedir : EndIf
+				Case "temp","tmp"
+					If p="" And TempRedir<>p : p = TempRedir : EndIf
 				Default
 					p = v
 			EndSelect
@@ -702,6 +714,7 @@ ProcedureDLL.l AttachProcess(Instance)
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
 						SetCfgS(k,v,p)
+						CreatePath(p)
 					Else ; значение по умолчанию?
 					EndIf
 				Wend
@@ -763,12 +776,45 @@ ProcedureDLL.l AttachProcess(Instance)
 	If PreferenceGroup("LoadLibrary")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
+			LoadableLibrary = PreferencePath(PreferenceKeyName())
+			dbg("ATTACHPROCESS: DLL: "+LoadableLibrary)
+			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
+			If hLoadableLibrary
+				dbg("ATTACHPROCESS: DLL: OK")
+			EndIf
+		Wend
+	EndIf
+	;}
+	;{ Загрузка расширений
+	Protected PurePortableExtension.PurePortableExtension
+	Protected *PurePortableExtensionNameA = Ascii("PurePortableExtension")
+	If PreferenceGroup("Extensions")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
 			;k = PreferenceKeyName()
 			;v = PreferenceKeyValue()
 			LoadableLibrary = PreferencePath(PreferenceKeyName())
+			dbg("ATTACHPROCESS: EXT: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
+			If hLoadableLibrary
+				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
+				If PurePortableExtension
+					If PPData\Version = 0 ; надо инициализировать структуру
+						PPData\Version = 1
+						PPData\Prefs = PureSimplePrefs
+					EndIf
+					; Код возврата:
+					; 1 - Выгрузить dll после завершения
+					i = PurePortableExtension(@PPData)
+					If i = 1
+						FreeLibrary_(hLoadableLibrary)
+					EndIf
+				EndIf
+				dbg("ATTACHPROCESS: EXT: OK")
+			EndIf
 		Wend
 	EndIf
+	FreeMemory(*PurePortableExtensionNameA)
 	;}
 	;{ Запуск приложений
 	If FirstProcess And PreferenceGroup("RunFromAttachProcess")
@@ -794,6 +840,7 @@ Procedure DbgCln(txt.s)
 	EndIf
 EndProcedure
 ProcedureDLL.l DetachProcess(Instance)
+	PPDetachProcess
 	If LCase(PrgName) = "rundll32"
 		ProcedureReturn
 	EndIf
@@ -810,25 +857,28 @@ ProcedureDLL.l DetachProcess(Instance)
 		Goto EndDetach
 	EndIf
 	
-	If PreferenceGroup("Portable")
-		If ReadPreferenceInteger("Cleanup",0)
-			Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+PureSimplePrefs+Chr(34))
+	If LastProcess
+		If PreferenceGroup("Portable")
+			If ReadPreferenceInteger("Cleanup",0)
+				Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+PureSimplePrefs+Chr(34))
+			EndIf
+		EndIf
+		If PreferenceGroup("RunFromDetachProcess")
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				RunFrom(PreferenceKeyName(),PreferenceKeyValue())
+			Wend
 		EndIf
 	EndIf
 	
-	If PreferenceGroup("RunFromDetachProcess")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
-		Wend
-	EndIf
-	
 	EndDetach:
-	PPFinish
+	PPDetachProcessEnd
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	; *lpszCmdLine в кодировке ASCII !
+	; Командная строка: rundll32 путь_к_dll,PurePortableCleanup process_id "путь_к_файлу_конфигурации"
+	Protected Dim ClnDirs.s(0), iClnDir, nClnDir
 	Protected ProcId = Val(ProgramParameter(2))
 	Protected PrefsFile.s = ProgramParameter(3)
 	If OpenPreferences(PrefsFile,#PB_Preference_NoSpace) = 0
@@ -839,54 +889,67 @@ ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	Protected RetCode
 	Protected Heap = HeapCreate_(0,0,0)
 	Protected *buf = HeapAlloc_(Heap,#HEAP_ZERO_MEMORY,4)
-	Protected CleanupDirectory.s, lCleanupDirectory
+	Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
 	If PreferenceGroup("Debug")
 		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
 	EndIf
 	If PreferenceGroup("Portable")
-		;If ReadPreferenceInteger("Cleanup",0) = 0
-		;	ProcedureReturn
-		;EndIf
-		CleanupDirectory = PreferencePath(ReadPreferenceString("CleanupDirectory",""))
+		CleanupDirectory = ReadPreferenceString("CleanupDirectory","")
 	EndIf
 	If CleanupDirectory = ""
 		CleanupDirectory = PrgDirN
 	EndIf
+	nClnDir = SplitArray(ClnDirs(),CleanupDirectory)
+	If nClnDir = 0
+		nClnDir = AddArrayS(ClnDirs(),PrgDirN)
+	EndIf
+	For iClnDir=1 To nClnDir
+		ClnDirs(iClnDir) = PreferencePath(ClnDirs(iClnDir))
+	Next
+	ClnDirs(0) = TempDir ; всегда разрешено во временной папке
 	DbgCln("CleanupDirectory: "+CleanupDirectory)
-	SetCurrentDirectory(CleanupDirectory)
-	CleanupDirectory = LCase(CleanupDirectory+"\") ; обязательно "\" в конце
-	lCleanupDirectory = Len(CleanupDirectory)
 	
 	; Чистка
 	Protected SHFileOp.SHFILEOPSTRUCT
 	If PreferenceGroup("Cleanup")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			p = PreferencePath(PreferenceKeyName())
-			DbgCln("Cleanup: "+p)
-			; Для безопасности проверим путь - начало пути должно совпадать с CleanupRootDir
+			CleanupItem = PreferencePath(PreferenceKeyName())
+			DbgCln("Cleanup: "+CleanupItem)
+			; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
 			;If LCase(Left(p,lCleanupDirectory)) <> CleanupDirectory
-			If Not StartWithPath(p,CleanupDirectory) And Not StartWithPath(p,TempDir)
+			Cleanup = 0
+			For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
+				DbgCln("Cleanup: Chk: "+ClnDirs(iClnDir))
+				If StartWithPath(CleanupItem,ClnDirs(iClnDir))
+					Cleanup = 1
+					DbgCln("Cleanup: Into: "+ClnDirs(iClnDir))
+					Break
+				EndIf
+			Next
+			If Cleanup
+				;CleanupItem+"#"
+				;PokeW(@CleanupItem+Len(CleanupItem)*2-2,0) ; Эта строка должна быть завершена двойным значением NULL
+				CleanupItem+#XNUL$
+				DecodeCtrl(@CleanupItem) ; Эта строка должна быть завершена двойным значением NULL
+				;SetCurrentDirectory(CleanupDirectory)
+				; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
+				;SHFileOp\hwnd = 0 ; Окно не нужно
+				SHFileOp\wFunc = #FO_DELETE
+				; #FOF_FILESONLY Если в поле pFrom установлено *.*, то операция будет производиться только с файлами.
+				; #FOF_SILENT Не показывать диалог с индикатором прогресса.
+				; #FOF_NOCONFIRMATION Отвечать "yes to all" на все запросы в ходе опеации.
+				; #FOF_NO_CONNECTED_ELEMENTS
+				SHFileOp\fFlags = #FOF_SILENT|#FOF_NOCONFIRMATION|#FOF_NOERRORUI ;|#FOF_FILESONLY
+				SHFileOp\pFrom = @CleanupItem ; Эта строка должна быть завершена двойным значением NULL
+				;SHFileOp\fAnyOperationsAborted = 0
+				RetCode = SHFileOperation_(SHFileOp)
+				; 124 == 0x7C == The path in the source or destination or both was invalid.
+				; Путь в источнике или пункте назначения или в обоих случаях недействителен.
+				DbgCln("Cleanup: RetCode: "+Str(RetCode))
+			Else
 				DbgCln("Cleanup: Wrong path! "+p)
-				Continue
 			EndIf
-			v = p+"#"
-			PokeW(@v+Len(v)*2-2,0) ; Эта строка должна быть завершена двойным значением NULL
-			;DbgCln("Cleanup: "+v)
-			; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
-			;SHFileOp\hwnd = 0 ; Окно не нужно
-			SHFileOp\wFunc = #FO_DELETE
-			; #FOF_FILESONLY Если в поле pFrom установлено *.*, то операция будет производиться только с файлами.
-			; #FOF_SILENT Не показывать диалог с индикатором прогресса.
-			; #FOF_NOCONFIRMATION Отвечать "yes to all" на все запросы в ходе опеации.
-			; #FOF_NO_CONNECTED_ELEMENTS
-			SHFileOp\fFlags = #FOF_SILENT|#FOF_NOCONFIRMATION|#FOF_NOERRORUI ;|#FOF_FILESONLY
-			SHFileOp\pFrom = @v ; Эта строка должна быть завершена двойным значением NULL
-			;SHFileOp\fAnyOperationsAborted = 0
-			RetCode = SHFileOperation_(SHFileOp)
-			; 124 == 0x7C == The path in the source or destination or both was invalid.
-			; Путь в источнике или пункте назначения или в обоих случаях недействителен.
-			DbgCln("Cleanup: "+Str(RetCode))
 		Wend
 	EndIf
 	ClosePreferences()
@@ -896,18 +959,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = PAbABQAAA-
+; Folding = fAbACwAAA-
 ; Optimizer
 ; EnableThread
-; Executable = ..\PureBasic\400.dll
+; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.29
+; VersionField0 = 4.10.0.30
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.29
+; VersionField5 = 4.10.0.30
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

@@ -55,7 +55,7 @@ EndProcedure
 ; Folding = -
 ; Optimizer
 ; EnableThread
-; Executable = 400.dll
+; Executable = PureSimpleLoader.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
@@ -65,5 +65,5 @@ EndProcedure
 ; VersionField4 = 4.10.0.0
 ; VersionField5 = 4.10.0.0
 ; VersionField6 = PurePortableSimple Loader
-; VersionField7 = 400.dll
+; VersionField7 = PureSimpleLoader.dll
 ; VersionField9 = (c) Smitis, 2017-2024

@@ -3,8 +3,7 @@
 ;;======================================================================================================================
 CompilerIf Not Defined(DBG_MIN_HOOK,#PB_Constant) : #DBG_MIN_HOOK = 0 : CompilerEndIf
 
-;CompilerIf Not Defined(MINHOOK,#PB_Constant) : #MINHOOK = 1 : CompilerEndIf
-CompilerIf Not Defined(MIN_HOOK,#PB_Constant) : #MIN_HOOK = 1 : CompilerEndIf
+#MIN_HOOK = 1
 
 CompilerIf #DBG_MIN_HOOK
 	Macro DbgMinHook(txt) : dbg(txt) : EndMacro
@@ -185,8 +184,7 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 168
-; FirstLine = 107
+; CursorPosition = 5
 ; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant

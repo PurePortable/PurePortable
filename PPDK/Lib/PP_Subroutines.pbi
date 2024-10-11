@@ -57,15 +57,15 @@ Macro SpaceB(size) : Space((size-1)/2) : EndMacro ; для чётного буд
 ; Выделение памяти в байтах для строки ascii с учётом нулевого.
 Macro SpaceA(size) : Space(size/2) : EndMacro ; для чётного будет выделенно на один больше, для нечётного точно
 
-Procedure.s UnicodeToAscii(s.s)
-	Protected r.s = Space((Len(s)+1)/2)
-	PokeS(@r,s,-1,#PB_Ascii)
-	ProcedureReturn r
-EndProcedure
+; Procedure.s UnicodeToAscii(s.s)
+; 	Protected r.s = Space((Len(s)+1)/2)
+; 	PokeS(@r,s,-1,#PB_Ascii)
+; 	ProcedureReturn r
+; EndProcedure
 
 ;;======================================================================================================================
 ; Дополнительные процедуры.
-;=======================================================================================================================
+;;======================================================================================================================
 
 Procedure.i iif(c,a,b)
 	If c : ProcedureReturn a : EndIf
@@ -87,26 +87,6 @@ Macro HexL(n) : Hex(n,#PB_Long) : EndMacro
 Macro HexLA(n) : RSet(Hex(n,#PB_Long),8,"0") : EndMacro
 Macro HexQ(n) : Hex(n,#PB_Quad) : EndMacro
 Macro HexQA(n) : RSet(Hex(n,#PB_Quad),16,"0") : EndMacro
-
-;;----------------------------------------------------------------------------------------------------------------------
-; Поиск строки с конца
-; Попробовать https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-strrchra
-Procedure.i FindStringReverse(String.s,StringToFind.s,StartPosition=0,CaseInSensitive=#PB_String_CaseSensitive)
-	If StartPosition = 0
-		StartPosition = Len(String)
-	;ElseIf StartPosition < 0
-	;	StartPosition = Len(String)-StartPosition+1
-	EndIf
-	Protected length = Len(StringToFind)
-	Protected *position = @String+(StartPosition-length)*SizeOf(Character)
-	While *position >= @String
-		If CompareMemoryString(*position,@StringToFind,CaseInSensitive,length) = 0
-			ProcedureReturn (*position-@String)/SizeOf(Character)+1
-		EndIf
-		*position-SizeOf(Character)
-	Wend
-	ProcedureReturn 0
-EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; PeekS/PokeS с проверкой адреса.
@@ -153,115 +133,24 @@ Procedure PokeSZA(*MemoryBuffer,Text.s,cb=-1)
 	ProcedureReturn 0
 EndProcedure
 
-;=======================================================================================================================
-; Коррекция путей
-CompilerIf Not Defined(PROC_CORRECTPATH,#PB_Constant) : #PROC_CORRECTPATH = 0 : CompilerEndIf
-CompilerIf Not Defined(PROC_CORRECTCFGPATH,#PB_Constant) : #PROC_CORRECTCFGPATH = 0 : CompilerEndIf
-CompilerIf Not Defined(DBG_CORRECTPATH,#PB_Constant) : #DBG_CORRECTPATH = 0 : CompilerEndIf
-CompilerIf #DBG_CORRECTPATH
-	Macro DbgCorpath(txt) : dbg(txt) : EndMacro
-CompilerElse
-	Macro DbgCorpath(txt) : EndMacro
-CompilerEndIf
-CompilerIf #PROC_CORRECTPATH Or #PROC_CORRECTCFGPATH
-	EnumerationBinary CORRECTPATH
-		#CORRECTPATH_FROM_DEEP ; $0001
-		#CORRECTPATH_REAL_PATH ; $0002 ; возвращается только реальный результат, если пути нет, то пустая строка, иначе строка без изменений.
-		;#CORRECTPATH_CHECK_PATH = #CORRECTPATH_CHECK_PATH
-		#CORRECTPATH_FORWARD_SLASH ; $0004
-		#CORRECTPATH_DOUBLE_BACKSLASH ; $0008 ; TODO
-		#CORRECTPATH_RELATIVE ; $0010 ; TODO возвращается путь относительно Base
-		#CORRECTPATH_SAVE_BACKSLASH ; $0020 ; TODO сохранять последний слеш
-	EndEnumeration
-	; TODO:
-	; Если Path изначально не содержит "\", файл не будет найден. Имеет ли смысл специально добавлять лидирующий "\"?
-	Procedure.s CorrectPath(Path.s,Base.s,Flags=0)
-		Protected i, NewPath.s, bs.s
-		Protected LBase
-		Base = RTrim(Base,"\")+"\"
-		DbgCorpath("Base: "+Base)
-		If Right(Path,1)="\"
-			Path = RTrim(Path,"\")
-			bs = "\" ; сохраним завершающий «\» для папок
-		ElseIf Right(Path,1)="/"
-			Path = RTrim(Path,"/")
-			bs = "/" ; сохраним завершающий «/» для папок
-		EndIf
-		If Flags & #CORRECTPATH_FORWARD_SLASH
-			Path = ReplaceString(Path,"/","\")
-			;WindowsReplaceString_(@Path,"/","\",@Path)
-		EndIf
-		DbgCorpath("Path: "+Path)
-		If Path
-			If Flags & #CORRECTPATH_FROM_DEEP
-				i = FindString(Path,"\")
-				While i
-					NewPath = Base+Mid(Path,i+1)
-					DbgCorpath("   >> "+NewPath)
-					If FileSize(NewPath)<>-1
-						DbgCorpath("   == "+NewPath)
-						If Flags & #CORRECTPATH_FORWARD_SLASH
-							NewPath = ReplaceString(NewPath,"\","/")
-						EndIf
-						ProcedureReturn NewPath+bs
-					EndIf
-					i = FindString(Path,"\",i+1)
-				Wend
-			Else
-				i = FindStringReverse(Path,"\")
-				While i>0
-					NewPath = Base+Mid(Path,i+1)
-					DbgCorpath("   >> "+NewPath)
-					If FileSize(NewPath)<>-1
-						DbgCorpath("   == "+NewPath)
-						If Flags & #CORRECTPATH_FORWARD_SLASH
-							NewPath = ReplaceString(NewPath,"\","/")
-						EndIf
-						ProcedureReturn NewPath+bs
-					EndIf
-					i = FindStringReverse(Path,"\",i-1)
-				Wend
-			EndIf
-		EndIf
-		; Путь не найден
-		If Flags & #CORRECTPATH_REAL_PATH
-			ProcedureReturn ""
-		EndIf
-		If Flags & #CORRECTPATH_FORWARD_SLASH
-			Path = ReplaceString(Path,"\","/")
-		EndIf
-		ProcedureReturn Path+bs
-	EndProcedure
-CompilerEndIf
-
-;=======================================================================================================================
-CompilerIf Not Defined(PROC_ADDARRAYS,#PB_Constant) : #PROC_ADDARRAYS = 0 : CompilerEndIf
-;CompilerIf #PROC_ADDARRAYS
+;;======================================================================================================================
 Procedure AddArrayS(Array arr.s(1),v.s)
 	Protected n = ArraySize(arr())+1
 	ReDim arr(n)
 	arr(n) = v
 	ProcedureReturn n
 EndProcedure
-;CompilerEndIf
-	
-;=======================================================================================================================
-CompilerIf Not Defined(PROC_ADDARRAYI,#PB_Constant) : #PROC_ADDARRAYI = 0 : CompilerEndIf
-;CompilerIf #PROC_ADDARRAYI
 Procedure AddArrayI(Array arr.i(1),v.i)
 	Protected n = ArraySize(arr())+1
 	ReDim arr(n)
 	arr(n) = v
 EndProcedure
-;CompilerEndIf
 
-;=======================================================================================================================
-CompilerIf Not Defined(PROC_ARRAY,#PB_Constant) : #PROC_ARRAY = 0 : CompilerEndIf
-;CompilerIf #PROC_ARRAY
-	; Нулевой элемент не используется.
-	; Если строка (в том числе и пустая) не содержит разделителя, добавиться только один элемент.
-	; Если строка заканчивается разделителем, последний элемент будет пустым.
-	; Если строка состоит из одного разделителя, будет два пустых элемента и т.д.
+;;======================================================================================================================
+; Нулевой элемент не используется.
+; Если строка (в том числе и пустая) не содержит разделителя, добавиться только один элемент.
+; Если строка заканчивается разделителем, последний элемент будет пустым.
+; Если строка состоит из одного разделителя, будет два пустых элемента и т.д.
 Procedure.i SplitArray(Array a.s(1),s.s,d.s=";")
 	Protected p1, p2
 	Protected n
@@ -309,9 +198,8 @@ Procedure.s JoinArray(Array a.s(1),d.s)
 	EndIf
 	ProcedureReturn Result
 EndProcedure
-;CompilerEndIf
 
-;=======================================================================================================================
+;;======================================================================================================================
 ;{ Дополнительные процедуры. Константы оставлены только для совместимости.
 CompilerIf Not Defined(PROC_FINDMEMORYSTRING,#PB_Constant) : #PROC_FINDMEMORYSTRING = 0 : CompilerEndIf
 CompilerIf #PROC_FINDMEMORYSTRING
@@ -346,7 +234,7 @@ CompilerIf #PROC_REMOVECERTIFICATES
 	XIncludeFile "Proc\RemoveCertificates.pbi"
 CompilerEndIf
 ;}
-;=======================================================================================================================
+;;======================================================================================================================
 ; https://docs.microsoft.com/ru-ru/windows/win32/debug/retrieving-the-last-error-code
 ;CompilerIf Not Defined(PROC_GETLASTERRORSTR,#PB_Constant) : #PROC_GETLASTERRORSTR = 0 : CompilerEndIf
 ;CompilerIf #PROC_GETLASTERRORSTR
@@ -362,78 +250,22 @@ Procedure.s GetLastErrorStr(Error=0)
 		ProcedureReturn StrU(Error)+": "+Result
 	EndIf
 EndProcedure
-;=======================================================================================================================
+;;======================================================================================================================
 Procedure PPErrorMessage(Msg.s,Error=-1)
 	If Error<>-1
 		Msg + #CR$+GetLastErrorStr(Error)
 	EndIf
 	MessageBox_(0,Msg,"PurePortable ("+StrU(ProcessID)+")",#MB_ICONERROR)
 EndProcedure
-;=======================================================================================================================
-CompilerIf Not Defined(PROC_NORMALIZEPATH,#PB_Constant) : #PROC_NORMALIZEPATH = 0 : CompilerEndIf
-; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfullpathnamew
-; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathcanonicalizew
-; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathremovebackslashw
-; https://learn.microsoft.com/en-us/dotnet/standard/io/file-path-formats
-;CanonicalizePath
-;CompilerIf #PROC_NORMALIZEPATH
-Procedure.s NormalizePath(Path.s)
-	If Path ; Иначе вернём корень текущего диска
-		Protected NewPath.s = Path + "\."
-		Protected *Buf
-		Protected LenBuf = GetFullPathName_(@NewPath,0,#Null,#Null)
-		If LenBuf
-			*Buf = AllocateMemory(LenBuf*2)
-			GetFullPathName_(@NewPath,LenBuf,*Buf,#Null)
-			NewPath = PeekS(*Buf)
-			FreeMemory(*Buf)
-			ProcedureReturn NewPath
-		EndIf
-	EndIf
-	ProcedureReturn Path
-EndProcedure
-;{ Procedure.s NormalizePath2(Path.s)
-; 	If Path ; Иначе вернём корень текущего диска
-; 		Path + "\."
-; 		Protected Len = GetFullPathName_(@NewPath,0,#Null,#Null)
-; 		Protected Result.s
-; 		If Len
-; 			Result = Space(Len)
-; 			GetFullPathName_(@Path,Len,@Result,#Null)
-; 			ProcedureReturn Result
-; 		EndIf
-; 	EndIf
-; 	ProcedureReturn Path
-; EndProcedure
-;}
-;CompilerEndIf
+;;======================================================================================================================
 
-;=======================================================================================================================
-; https://www.rsdn.org/article/qna/baseserv/fileexist.xml
-; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-pathfileexistsa
-; Функции PathFileExists и PathIsDirectory работают неадекватно!
-Procedure FileExist(fn.s)
-	ProcedureReturn Bool(GetFileAttributes_(@fn)&#FILE_ATTRIBUTE_DIRECTORY=0)
-	;ProcedureReturn PathFileExists_(@fn)
-EndProcedure
-; https://learn.microsoft.com/ru-ru/windows/win32/api/shlwapi/nf-shlwapi-pathisdirectorya
-Procedure DirectoryExist(fn.s)
-	Protected attr = GetFileAttributes_(@fn)
-	ProcedureReturn Bool(attr<>#INVALID_FILE_ATTRIBUTES And (attr&#FILE_ATTRIBUTE_DIRECTORY))
-	;ProcedureReturn PathIsDirectory_(@fn)
-EndProcedure
-; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shcreatedirectoryexw
-;DeclareImport(shell32,_SHCreateDirectoryExW@12,SHCreateDirectoryExW,SHCreateDirectoryEx_(hWnd,*pszPath,*psa))
-Procedure CreatePath(Path.s)
-	;SHCreateDirectoryEx_(0,@Path,#Null) ; может неправильно работать из dllmain
-	Path = RTrim(Path,"\")+"\"
-	Protected p = FindString(Path,"\")
-	While p
-		CreateDirectory(Left(Path,p-1))
-		p = FindString(Path,"\",p+1)
-	Wend
-EndProcedure
-;=======================================================================================================================
+XIncludeFile "proc\FindStringReverse.pbi"
+XIncludeFile "proc\Exist.pbi"
+XIncludeFile "proc\CreatePath.pbi"
+XIncludeFile "proc\NormalizePath.pbi"
+XIncludeFile "proc\CorrectPath.pbi"
+
+;;======================================================================================================================
 ;{ Проверка версии/имени файла
 
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winver/nf-winver-getfileversioninfoa
@@ -588,7 +420,7 @@ Procedure _ValidateProgramL(w.s,v.s,l=0)
 EndProcedure
 ;CompilerEndIf
 ;}
-;=======================================================================================================================
+;;======================================================================================================================
 ; https://learn.microsoft.com/en-us/windows/win32/shell/shlwapi-string
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpw
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpnw
@@ -615,22 +447,17 @@ EndProcedure
 Procedure.i StartWithPath(s.s,t.s,cs=0)
 	StrTrim_(@t,"\")
 	Protected l = Len(t)
-	;dbg("StartWithPath")
-	;dbg("  "+s)
-	;dbg("  "+t)
-	;dbg("  "+Str(StrCmpNI(@s,@t,l)))
-	;dbg("  "+Chr(PeekW(@s+l<<1)))
 	If cs
 		ProcedureReturn Bool(StrCmp(@s,@t)=0 Or (StrCmpN(@s,@t,l)=0 And PeekW(@s+l<<1)=92))
 	EndIf
 	ProcedureReturn Bool(StrCmpI(@s,@t)=0 Or (StrCmpNI(@s,@t,l)=0 And PeekW(@s+l<<1)=92))
 EndProcedure
-;=======================================================================================================================
+;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 369
-; FirstLine = 178
-; Folding = ---ADMQ9-
+; CursorPosition = 60
+; FirstLine = 28
+; Folding = 59PwDw6
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

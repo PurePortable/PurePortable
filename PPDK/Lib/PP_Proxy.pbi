@@ -83,22 +83,26 @@ Macro DeclareExportFunc(FuncName,LibName,Name32,Name64)
 EndMacro
 ; Только x32
 Macro DeclareExportFunc32(FuncName,LibName,Name32)
-	Import DoubleQuote#LibName.lib#DoubleQuote
-		Import_#FuncName As DoubleQuote#Name32#DoubleQuote
-	EndImport
-	ProcedureDLL FuncName()
-		!JMP Name32
-	EndProcedure
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		Import DoubleQuote#LibName.lib#DoubleQuote
+			Import_#FuncName As DoubleQuote#Name32#DoubleQuote
+		EndImport
+		ProcedureDLL FuncName()
+			!JMP Name32
+		EndProcedure
+	CompilerEndIf
 EndMacro
 ; Только x64
 Macro DeclareExportFunc64(FuncName,LibName,Name64)
-	Import DoubleQuote#LibName.lib#DoubleQuote
-		Import_#FuncName As DoubleQuote#Name64#DoubleQuote
-	EndImport
-	ProcedureDLL FuncName()
-		!ADD RSP,40
-		!JMP Name64
-	EndProcedure
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x64
+		Import DoubleQuote#LibName.lib#DoubleQuote
+			Import_#FuncName As DoubleQuote#Name64#DoubleQuote
+		EndImport
+		ProcedureDLL FuncName()
+			!ADD RSP,40
+			!JMP Name64
+		EndProcedure
+	CompilerEndIf
 EndMacro
 ; Перехват не обязателен - в Detour-функцию попадём через JMP.
 ; Переменная Original_FuncName будет указывать на статически импортируемую функцию.
@@ -321,10 +325,10 @@ EndProcedure
 Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассемблера
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 281
-; FirstLine = 119
-; Folding = -AE9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 96
+; FirstLine = 60
+; Folding = -wF9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

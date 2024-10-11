@@ -4,6 +4,23 @@
 (-) удалено
 (?) непонятно ))
 
+[4.10.0.30] 2024-10-11
+(+) Перехват переменных Temp, Tmp
+(+) PureSimple: Параметр Temp в секции [SpecialFolders] для задания пути к временной папке.
+(+) PureSimple: Registry1: Если значение DataFile не задано, pport файл не читается и не создаётся.
+(+) PureSimple: Создание папок указываемых в [Registry.SetPaths].
+(+) PureSimple: Создание папок указываемых в [EnvironmentVariables.SetPaths].
+(*) PPFinish - depricated.
+(+) Макросы PPDetachProcess и PPDetachProcessEnd.
+(+) Счётчик процессов, загрузивших dll.
+(+) PureSimple: Запуск приложений из секции [RunFromAttachProcess] только из первого процесса.
+(+) PureSimple: Запуск очистки только из последнего процесса.
+(+) PureSimple: Расширения (v1.0).
+(+) PureSimple: Расширение PurePortIni.
+(+) NormalizePath: При нормализации путей сохраняется завершающий бэкслеш, если он есть.
+(+) Управление выводом отладочной информации при выгрузке dll (в связи с падением в некоторых программах).
+(+) PureSimple: Параметр Detach в секции Debug.
+
 [4.10.0.29] 2024-09-25
 (*) Рефакторинг
 (+) Мультиконфиг

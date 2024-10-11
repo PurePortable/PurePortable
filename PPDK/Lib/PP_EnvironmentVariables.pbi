@@ -15,6 +15,17 @@
 ; - GetEnvironmentStrings (без A и W!)
 ;;======================================================================================================================
 
+Global ProfileRedir.s
+Global AppDataRedir.s
+Global LocalAppDataRedir.s
+Global LocalLowAppDataRedir.s
+Global DocumentsRedir.s
+Global CommonAppDataRedir.s
+Global CommonDocumentsRedir.s
+Global TempRedir.s
+
+;;----------------------------------------------------------------------------------------------------------------------
+
 CompilerIf Not Defined(DETOUR_ENVIRONMENTVARIABLE,#PB_Constant)      : #DETOUR_ENVIRONMENTVARIABLE = 1      : CompilerEndIf
 CompilerIf Not Defined(DETOUR_ENVIRONMENTSTRINGS,#PB_Constant)       : #DETOUR_ENVIRONMENTSTRINGS = 0       : CompilerEndIf
 CompilerIf Not Defined(DETOUR_EXPANDENVIRONMENTSTRINGS,#PB_Constant) : #DETOUR_EXPANDENVIRONMENTSTRINGS = 0 : CompilerEndIf
@@ -26,10 +37,10 @@ CompilerEndIf
 CompilerIf #DBG_ENVIRONMENT_VARIABLES
 	;UndefineMacro DbgAny : DbgAnyDef
 	Global DbgEnvMode = #DBG_ENVIRONMENT_VARIABLES
-	Global DbgEnvList.s = "appdata|localappdata|userprofile|allusersprofile|programdata|public|home|homedrive|homepath|temp|tmp|tmpdir|programdir|commonprogramfiles|commonprogramfiles(x86)|commonprogramw6432|programfiles|programfiles(x86)|programw6432|systemroot|windir|driverdata"
+	Global DbgEnvList.s = "appdatalocalappdatauserprofileallusersprofileprogramdatapublichomehomedrivehomepathtemptmpprogramdircommonprogramfilescommonprogramfiles(x86)commonprogramw6432programfilesprogramfiles(x86)programw6432systemrootwindirdriverdata"
 	Procedure DbgEnv(txt.s,var.s="")
 		If DbgEnvMode
-			If var="" Or (DbgEnvMode=1 And FindString(DbgEnvList,LCase(var))>0) Or DbgEnvMode=2
+			If var="" Or (DbgEnvMode=1 And FindString(DbgEnvList,""+LCase(var)+"")>0) Or DbgEnvMode=2
 				dbg(txt)
 			EndIf
 		EndIf
@@ -80,6 +91,9 @@ Procedure.s env2path(Env.s)
 	ElseIf Env="public" And CommonAppDataRedir
 		DbgEnv("env2path: "+CommonAppDataRedir)
 		Result = CommonAppDataRedir
+	ElseIf (Env="temp" Or Env="tmp") And TempRedir
+		DbgEnv("env2path: "+TempRedir)
+		Result = TempRedir
 	;Else
 	;	Result = CheckEnv(Env)
 	EndIf
@@ -631,9 +645,9 @@ EndProcedure
 AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 596
-; FirstLine = 380
-; Folding = Poeg-
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 403
+; FirstLine = 165
+; Folding = HgQA-
 ; DisableDebugger
 ; EnableExeConstant

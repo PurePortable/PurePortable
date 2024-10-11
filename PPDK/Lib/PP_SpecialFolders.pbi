@@ -13,6 +13,7 @@ Global LocalLowAppDataRedir.s
 Global DocumentsRedir.s
 Global CommonAppDataRedir.s
 Global CommonDocumentsRedir.s
+Global TempRedir.s
 
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf Not Defined(DETOUR_SHFOLDER,#PB_Constant) : #DETOUR_SHFOLDER = 0 : CompilerEndIf
@@ -688,6 +689,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 11
 ; Folding = qAAg-
 ; EnableAsm
 ; DisableDebugger

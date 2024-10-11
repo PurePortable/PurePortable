@@ -20,6 +20,8 @@ CompilerIf #DBG_ANY And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 Global DbgAnyMode
+;Global DbgAttach
+Global DbgDetach
 
 ; При первом использовании выведет общую информацию
 ; Macro DbgAnyDef
@@ -90,8 +92,7 @@ Macro LoggingEnd(s) : EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 7
-; FirstLine = 3
+; CursorPosition = 22
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

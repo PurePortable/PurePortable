@@ -22,6 +22,7 @@
 	Wend
 	ProcedureReturn r+s
 EndProcedure
+
 ;{Procedure.s _ExpandEnvironmentStrings2(s.s)
 ; 	Protected r.s
 ; 	Protected p0,p1, p2
@@ -39,3 +40,11 @@ EndProcedure
 ; 	ProcedureReturn r+s
 ;EndProcedure
 ;}
+
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 25
+; FirstLine = 6
+; Folding = -
+; EnableThread
+; DisableDebugger
+; EnableExeConstant

@@ -16,7 +16,23 @@ Global PreferenceFile.s
 Global WinDir.s, SysDir.s, TempDir.s
 
 ;;======================================================================================================================
-; Иницилизация глобальных переменных
+CompilerIf Not Defined(DBG_ALWAYS,#PB_Constant)
+	#DBG_ALWAYS = 0
+CompilerEndIf
+;;======================================================================================================================
+; Общая секция для межпроцессного взаимодействия.
+DataSection
+	!section '.share' data readable writeable shareable notpageable
+	ProcessCnt:
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		!ProcessCnt: DD 0
+	CompilerElse
+		!ProcessCnt: DQ 0
+	CompilerEndIf
+	!section '.data' data readable writeable
+EndDataSection
+;;======================================================================================================================
+; Иницилизация
 ;;======================================================================================================================
 Global Dim InitProcedures(0)
 Macro AddInitProcedure(Proc)
@@ -27,29 +43,32 @@ Macro EndInitHooks : EndMacro ; заглушка
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
+Global ProcessCnt
 Global FirstProcess
+Global LastProcess
 Procedure _GlobalInitialization()
+	CompilerIf #DBG_ALWAYS
+		DbgDetach = 1
+	CompilerEndIf
+
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
 		!MOV [v_DllInstance], EAX
-		!CMP DWORD [AttachProcessCnt],0
-		!JNE @f
-		!INC [v_FirstProcess]
-		!@@:
-		!INC DWORD [AttachProcessCnt]
+		!MOV EAX, 1
+		!LOCK XADD DWORD [ProcessCnt], EAX
+		!INC EAX
+		!MOV DWORD [v_ProcessCnt], EAX
 	CompilerElse
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
-		!CMP DWORD [AttachProcessCnt],0
-		!JNE @f
-		!INC [v_FirstProcess]
-		!@@:
-		!INC DWORD [AttachProcessCnt]
+		!MOV RAX, 1
+		!LOCK XADD QWORD [ProcessCnt], RAX
+		!INC RAX
+		!MOV QWORD [v_ProcessCnt], RAX
 	CompilerEndIf
-	ProcessId = GetCurrentProcessId_()
+	FirstProcess = Bool(ProcessCnt=1)
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
-	;dbg("AttachProcessCnt: "+StrU(PeekL(?AttachProcessCnt)))
-	;ProcessID = GetCurrentProcessId_()
+	ProcessId = GetCurrentProcessId_()
 	
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
 	
@@ -94,21 +113,77 @@ Procedure _GlobalInitialization()
 			LoggingFile = PrgDir+PrgName+".log"
 		CompilerEndIf
 	CompilerEndIf
+	CompilerIf #DBG_ALWAYS
+		dbg("ATTACHPROCESS: "+PrgPath)
+		dbg("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
+	CompilerEndIf
 EndProcedure
-DataSection
-	!section '.share' data readable writeable shareable
-	AttachProcessCnt:
-	!AttachProcessCnt: DD 0
-	!section '.data' Data readable writeable
-EndDataSection
 _GlobalInitialization()
+;;======================================================================================================================
+Procedure _PPAttachProcess()
+	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
+EndProcedure
+Macro PPPreparation ; depricated
+	_PPAttachProcess()
+EndMacro
+Macro PPAttachProcess
+	_PPAttachProcess()
+EndMacro
+;;======================================================================================================================
+; Завершение
+Procedure _PPDetachProcess()
+	CompilerIf #DBG_ALWAYS
+		If DbgDetach
+			dbg("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
+		EndIf
+	CompilerEndIf
+	LastProcess = Bool(ProcessCnt=1)
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		!PUSH EAX
+		!MOV EAX, -1
+		!LOCK XADD DWORD [ProcessCnt], EAX
+		!DEC EAX
+		!MOV DWORD [v_ProcessCnt], EAX
+		!POP EAX
+	CompilerElse
+		!PUSH RAX
+		!MOV RAX, -1
+		!LOCK XADD QWORD [ProcessCnt], RAX
+		!DEC RAX
+		!MOV QWORD [v_ProcessCnt], RAX
+		!POP RAX
+	CompilerEndIf
+EndProcedure
+Procedure _PPDetachProcessEnd()
+	CompilerIf #DBG_ALWAYS
+		If DbgDetach
+			dbg("DETACHPROCESS: "+PrgPath)
+		EndIf
+	CompilerEndIf
+EndProcedure
 
+Procedure DbgAny(txt.s)
+	If Left(txt,3)="CBT" ; обеспечиваем совместимость для CBT-хуков
+		dbg(txt)
+	Else
+		_PPDetachProcessEnd()
+	EndIf
+EndProcedure
+Macro PPDetachProcess
+	_PPDetachProcess()
+EndMacro
+Macro PPFinish ; depricated
+	_PPDetachProcessEnd()
+EndMacro
+Macro PPDetachProcessEnd
+	_PPDetachProcessEnd()
+EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 30
-; FirstLine = 7
-; Folding = -
+; CursorPosition = 159
+; FirstLine = 122
+; Folding = uG+
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

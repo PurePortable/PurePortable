@@ -681,15 +681,18 @@ DeclareExportFunc(InitOnceBeginInitialize,kernel32,_InitOnceBeginInitialize@16,I
 DeclareExportFunc(InitOnceComplete,kernel32,_InitOnceComplete@12,InitOnceComplete)
 DeclareExportFunc(InitOnceExecuteOnce,kernel32,_InitOnceExecuteOnce@16,InitOnceExecuteOnce)
 DeclareExportFunc(InitOnceInitialize,kernel32,_InitOnceInitialize@4,InitOnceInitialize)
-;DeclareExportFunc(InterlockedCompareExchange,kernel32,_InterlockedCompareExchange@12,InterlockedCompareExchange)
-;DeclareExportFunc(InterlockedCompareExchange64,kernel32,_InterlockedCompareExchange64@20,InterlockedCompareExchange64)
-;DeclareExportFunc(InterlockedDecrement,kernel32,_InterlockedDecrement@4,InterlockedDecrement)
-;DeclareExportFunc(InterlockedExchange,kernel32,_InterlockedExchange@8,InterlockedExchange)
-;DeclareExportFunc(InterlockedExchangeAdd,kernel32,_InterlockedExchangeAdd@8,InterlockedExchangeAdd)
-;DeclareExportFunc(InterlockedFlushSList,kernel32,_InterlockedFlushSList@4,InterlockedFlushSList)
-;DeclareExportFunc(InterlockedIncrement,kernel32,_InterlockedIncrement@4,InterlockedIncrement)
-;DeclareExportFunc(InterlockedPopEntrySList,kernel32,_InterlockedPopEntrySList@4,InterlockedPopEntrySList)
-;DeclareExportFunc(InterlockedPushEntrySList,kernel32,_InterlockedPushEntrySList@8,InterlockedPushEntrySList)
+DeclareExportFunc32(InterlockedCompareExchange,kernel32,_InterlockedCompareExchange@12)
+DeclareExportFunc32(InterlockedCompareExchange64,kernel32,_InterlockedCompareExchange64@20)
+DeclareExportFunc32(InterlockedDecrement,kernel32,_InterlockedDecrement@4)
+DeclareExportFunc32(InterlockedExchange,kernel32,_InterlockedExchange@8)
+DeclareExportFunc32(InterlockedExchangeAdd,kernel32,_InterlockedExchangeAdd@8)
+DeclareExportFunc32(InterlockedIncrement,kernel32,_InterlockedIncrement@4)
+DeclareExportFunc(InterlockedFlushSList,kernel32,_InterlockedFlushSList@4,InterlockedFlushSList)
+DeclareExportFunc(InterlockedPopEntrySList,kernel32,_InterlockedPopEntrySList@4,InterlockedPopEntrySList)
+DeclareExportFunc(InterlockedPushEntrySList,kernel32,_InterlockedPushEntrySList@8,InterlockedPushEntrySList)
+;DeclareExportFunc(InterlockedPushListSList,kernel32,_InterlockedPushListSList@16,InterlockedPushListSList)
+DeclareExportFunc64(InterlockedPushListSList,kernel32,InterlockedPushListSList)
+DeclareExportFunc(InterlockedPushListSListEx,kernel32,_InterlockedPushListSListEx@16,InterlockedPushListSListEx)
 DeclareExportFunc(IsBadCodePtr,kernel32,_IsBadCodePtr@4,IsBadCodePtr)
 DeclareExportFunc(IsBadHugeReadPtr,kernel32,_IsBadHugeReadPtr@8,IsBadHugeReadPtr)
 DeclareExportFunc(IsBadHugeWritePtr,kernel32,_IsBadHugeWritePtr@8,IsBadHugeWritePtr)
@@ -1182,9 +1185,9 @@ DeclareExportFunc(lstrlenA,kernel32,_lstrlenA@4,lstrlenA)
 DeclareExportFunc(lstrlenW,kernel32,_lstrlenW@4,lstrlenW)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 157
-; FirstLine = 147
-; Markers = 151,313,799,868,908
+; CursorPosition = 693
+; FirstLine = 676
+; Markers = 151,313,684,802,871,911
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

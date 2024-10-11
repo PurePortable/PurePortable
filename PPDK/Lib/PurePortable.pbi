@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.10.0.28
+; PurePortable main lib 4.10.0.30
 #PP_MAINVERSION = 4.10
 ;;======================================================================================================================
 
@@ -192,46 +192,6 @@ CompilerIf #INCLUDE_IAT_HOOK
 CompilerEndIf
 
 ;;======================================================================================================================
-; Вывод общей информации при аттаче dll
-
-CompilerIf Not Defined(DBG_ALWAYS,#PB_Constant)
-	#DBG_ALWAYS = 0
-CompilerEndIf
-CompilerIf #DBG_ALWAYS
-	dbg("ATTACHPROCESS: "+PrgPath)
-	dbg("ATTACHPROCESS: "+DllPath)
-CompilerEndIf
-; CompilerIf #DBG_ANY
-; 	UndefineMacro DbgAny : DbgAnyDef
-; CompilerEndIf
-; CompilerIf Not Defined(DbgAny,#PB_Procedure)
-; 	Macro DbgAny(text) : EndMacro
-; CompilerEndIf
-
-;;======================================================================================================================
-; Завершение
-;Global Dim FinishProcedures(0)
-Procedure _Finish()
-	CompilerIf #DBG_ALWAYS
-		dbg("DETACHPROCESS: "+PrgPath)
-	CompilerEndIf
-EndProcedure
-
-Procedure DbgAny(txt.s)
-	If Left(txt,3)="CBT" ; обеспечиваем совместимость для CBT-хуков
-		dbg(txt)
-	Else
-		_Finish()
-	EndIf
-EndProcedure
-;Macro DbgAny(txt)
-;	_Finish()
-;EndMacro
-Macro PPFinish
-	_Finish()
-EndMacro
-
-;;======================================================================================================================
 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 CompilerIf Not Defined(PORTABLE_CBT_HOOK,#PB_Constant) : #PORTABLE_CBT_HOOK = 0 : CompilerEndIf
 CompilerIf Not Defined(DBG_CBT_HOOK,#PB_Constant) : #DBG_CBT_HOOK = 0 : CompilerEndIf
@@ -240,6 +200,13 @@ CompilerIf #PORTABLE_CBT_HOOK
 CompilerEndIf
 
 ;;======================================================================================================================
+CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFormat=#PB_Compiler_DLL
+	ProcedureDLL PurePortable(id.l,*param1,*param2,reserved)
+		ProcedureReturn 0
+	EndProcedure
+CompilerEndIf
+;;======================================================================================================================
+; Этот блок должен быть в самом конце, так как только здесь точно становится известно, надо ли инициализировать MinHook.
 Prototype InitProcedure()
 Global PPInitializationComplete
 Procedure _PPInitialization()
@@ -264,20 +231,11 @@ Macro PPInitialization
 	_PPInitialization()
 EndMacro
 ;;======================================================================================================================
-CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFormat=#PB_Compiler_DLL
-	ProcedureDLL PurePortable(id.l,*param1,*param2,reserved)
-		ProcedureReturn 0
-	EndProcedure
-CompilerEndIf
-;;======================================================================================================================
-; Это заглушка на случай дальнейших доработок
-Macro PPPreparation
-EndMacro
-;;======================================================================================================================
+
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 15
-; Folding = +-
+; CursorPosition = 1
+; Folding = +
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

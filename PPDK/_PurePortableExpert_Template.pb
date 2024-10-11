@@ -14,7 +14,7 @@
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 410.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.10.0.27
+;RES_PRODUCTVERSION 4.10.0.30
 ;PP_X32_COPYAS "P:\PurePortable\Apps\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\Apps\proxy64.dll"
 ;PP_CLEAN 2
@@ -200,7 +200,7 @@ CompilerEndIf
 ;}
 ;;======================================================================================================================
 ProcedureDLL.l AttachProcess(Instance)
-	PPPreparation
+	PPAttachProcess
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
 	;ValidateProgramName(1,"program",1) ; Проверка, та ли программа запущена
@@ -269,8 +269,11 @@ ProcedureDLL.l DetachProcess(Instance)
 	; Модификация параметров.
 	; Сохранение конфигурации.
 	;;------------------------------------------------------------------------------------------------------------------
-	CompilerIf Defined(MH_Initialize,#PB_Procedure)
-		MH_Uninitialize()
+	PPDetachProcess
+	CompilerIf Defined(MIN_HOOK,#PB_Constant)
+		CompilerIf #MIN_HOOK
+			MH_Uninitialize()
+		CompilerEndIf
 	CompilerEndIf
 	CompilerIf #PORTABLE_REGISTRY
 		WriteCfg()
@@ -285,13 +288,15 @@ ProcedureDLL.l DetachProcess(Instance)
 	CompilerEndIf
 	;}
 	
-	PPFinish
+	PPDetachProcessEnd
 EndProcedure
 
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 274
+; FirstLine = 119
 ; Folding = I1rG0
 ; Optimizer
 ; EnableThread

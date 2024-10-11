@@ -199,7 +199,7 @@ CompilerIf #DBG_REGISTRY_MODE
 	; !!! Так как мы не можем определить, где открывается ключ, данная процедура не имеет смысла
 	Procedure DbgRegAliens(txt.s)
 		;If DbgRegMode=#DBG_REG_MODE_ALIENS
-		;	;Global KeyExclude.s = "clsid|software\classes|"
+		;	;Global KeyExclude.s = "clsidsoftware\classes"
 		;	If txt<>"software" And Left(txt,5)<>"clsid" And Left(txt,16)<>"software\classes"
 		;		dbg("ALIEN: "+txt)
 		;	EndIf

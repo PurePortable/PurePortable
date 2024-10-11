@@ -208,7 +208,7 @@ CompilerIf #DBG_REGISTRY_MODE
 	EndProcedure
 	Procedure DbgRegAliens(txt.s)
 		If DbgRegMode=#DBG_REG_MODE_ALIENS
-			;Global KeyExclude.s = "clsid|software\classes|"
+			;Global KeyExclude.s = "clsidsoftware\classes"
 			;If txt<>"software" And Left(txt,5)<>"clsid" And Left(txt,16)<>"software\classes"
 			dbg("ALIEN: "+txt)
 			;EndIf
@@ -454,8 +454,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 60
-; FirstLine = 57
 ; Folding = hjj--4v-
 ; DisableDebugger
 ; EnableExeConstant
