@@ -381,7 +381,48 @@ CompilerEndIf
 ; Но! Переменная не раскрывается, если она существует, но не влезает в буфер. Рузультат обрезается по эту переменную.
 ; Здесь будет несовместимость.
 CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
-	XIncludeFile "proc\ExpandEnvironment.pbi"
+	Procedure.s _ExpandEnvironment(*s,cp=#PB_Unicode)
+		Protected s.s = PeekS(*s,-1,cp)
+		Protected r.s, e.s, v.s
+		Protected p1, p2
+		p1 = FindString(s,"%")
+		While p1
+			p2 = FindString(s,"%",p1+1)
+			If p2
+				v = Mid(s,p1+1,p2-p1-1)
+				e = env2path(v)
+				If e="" And v<>""
+					e = GetEnvironmentVariable(v)
+				EndIf
+				If e=""
+					e = Mid(s,p1,p2-p1+1)
+				EndIf
+				r + Left(s,p1-1)+e
+				s = Mid(s,p2+1)
+			Else ; нет парного %
+				Break
+			EndIf
+			p1 = FindString(s,"%")
+		Wend
+		ProcedureReturn r+s
+	EndProcedure
+	;{ Procedure.s _ExpandEnvironment2(s.s)
+	; 	Protected r.s
+	; 	Protected p0,p1, p2
+	; 	p1 = FindString(s,"%")
+	; 	While p1
+	; 		p2 = FindString(s,"%",p1+1)
+	; 		If p2
+	; 			r + Left(s,p1-1)+env2path(Mid(p1+1,p2-p1-1))
+	; 			s = Mid(s,p2+1)
+	; 		Else
+	; 			Break
+	; 		EndIf
+	; 		p1 = FindString(s,"%")
+	; 	Wend
+	; 	ProcedureReturn r+s
+	;EndProcedure
+	;}
 	Prototype.l ExpandEnvironmentStrings(lpSrc,lpDst,nSize)
 	Global Original_ExpandEnvironmentStringsA.ExpandEnvironmentStrings
 	Procedure.l Detour_ExpandEnvironmentStringsA(lpSrc,lpDst,nSize)
@@ -390,7 +431,7 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_ExpandEnvironmentStringsA(lpSrc,lpDst,nSize)
 		CompilerElse
-			Protected s.s = ExpandEnvironment(PeekS(lpSrc,-1,#PB_Ascii))
+			Protected s.s = _ExpandEnvironment(lpSrc,#PB_Ascii)
 			Result = Len(s)+1
 			If nSize > Result
 				PokeSZ(lpDst,s,-1,#PB_Ascii)
@@ -408,7 +449,7 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		CompilerIf Not #PORTABLE
 			Result = Original_ExpandEnvironmentStringsW(lpSrc,lpDst,nSize)
 		CompilerElse
-			Protected s.s = ExpandEnvironment(PeekS(lpSrc))
+			Protected s.s = _ExpandEnvironment(lpSrc,#PB_Unicode)
 			Result = Len(s)+1
 			If nSize > Result
 				PokeSZ(lpDst,s)
@@ -645,9 +686,7 @@ EndProcedure
 AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 403
-; FirstLine = 165
-; Folding = HgQA-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = HgAA9
 ; DisableDebugger
 ; EnableExeConstant

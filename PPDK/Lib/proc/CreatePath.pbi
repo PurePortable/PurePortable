@@ -8,13 +8,12 @@ Procedure CreatePath(Path.s)
 	Path = RTrim(Path,"\")+"\"
 	Protected p = FindString(Path,"\")
 	While p
-		CreateDirectory(Left(Path,p-1))
+		CreateDirectory(Left(Path,p))
 		p = FindString(Path,"\",p+1)
 	Wend
 EndProcedure
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 5
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

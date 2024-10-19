@@ -24,11 +24,7 @@ EnableExplicit
 IncludePath "..\PPDK\Lib"
 
 #DBG_EXTENSION = 0
-
 XIncludeFile "PurePortableExtension.pbi"
-XIncludeFile "proc\CorrectPath.pbi"
-XIncludeFile "proc\CreatePath.pbi"
-XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 
 ;;======================================================================================================================
 ;{ Работа с ini-файлами
@@ -250,7 +246,7 @@ ProcedureDLL PurePortableExtension(*data)
 							ExaminePreferenceKeys()
 							While NextPreferenceKey()
 								k = PreferenceKeyName()
-								v = PreferencePath(ExpandEnvironment(PreferenceKeyValue()))
+								v = PreferencePath(ExpandEnvironmentStrings(PreferenceKeyValue()))
 								i = FindString(k,"|")
 								If i
 									IniSet(Left(k,i-1),Mid(k,i+1),v)
@@ -269,8 +265,9 @@ ProcedureDLL PurePortableExtension(*data)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 26
 ; Folding = B+
 ; Optimizer
 ; EnableThread

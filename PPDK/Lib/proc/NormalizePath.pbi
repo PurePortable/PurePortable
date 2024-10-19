@@ -6,7 +6,7 @@
 
 ;CanonicalizePath
 
-Procedure.s NormalizePath(Path.s)
+Procedure.s NormalizePath(Path.s,Dir.s="")
 	If Path ; Если не проверить, для пустой строки вернёт корень текущего диска
 		Protected NewPath.s, Ending.s
 		If Right(Path,1) = "\" ; сохраним завершающий «\» для папок
@@ -14,6 +14,14 @@ Procedure.s NormalizePath(Path.s)
 			Ending = "\"
 		Else
 			NewPath = Path + "\."
+		EndIf
+		If Mid(Path,2) <> ":" ; относительный путь
+			If Dir=""
+				Dir = GetCurrentDirectory()
+			Else
+				Dir = RTrim(Dir,"\")+"\"
+			EndIf
+			Path = Dir+Path ; TODO: пути, начинающиеся с "\"
 		EndIf
 		Protected *Buf
 		Protected LenBuf = GetFullPathName_(@NewPath,0,#Null,#Null)
@@ -43,7 +51,8 @@ EndProcedure
 ; EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 11
+; CursorPosition = 21
+; FirstLine = 6
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

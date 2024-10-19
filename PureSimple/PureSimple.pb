@@ -13,15 +13,12 @@
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.10.0.0
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
-;PP_X32_COPYAS "P:\PurePortable\Test\CD Bank Cataloguer\2.7.7\PurePort.dll"
-;PP_X32_COPYAS "P:\PurePortable\Test\CD Bank Cataloguer\2.7.8\PurePort.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
 IncludePath "..\PPDK\Lib"
 XIncludeFile "PurePortableCustom.pbi"
-XIncludeFile "PP_Extension.pbi"
 
 #PROXY_DLL = "pureport"
 #PROXY_DLL_COMPATIBILITY = 0 ; Совместимость: 0 - по умолчанию, 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
@@ -105,7 +102,8 @@ XIncludeFile "PP_Extension.pbi"
 ;}
 #INCLUDE_MIN_HOOK = 1 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
-XIncludeFile "PurePortable.pbi"
+XIncludeFile "PurePortableSimple.pbi"
+XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure RFID_DATA
@@ -217,27 +215,6 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
-	Protected Result.s
-	If Path=""
-		Path = PreferenceKeyValue()
-	EndIf
-	If Dir=""
-		Dir = PrgDirN
-	EndIf
-	;dbg("PreferencePath: <"+Path)
-	Path = ExpandEnvironment(Trim(Trim(Path),Chr(34)))
-	;dbg("PreferencePath: *"+Path)
-	If Path="."
-		Path = Dir
-	;ElseIf Path=".." Or Left(Path,2)=".\" Or Left(Path,3)="..\"
-	;	Path = Dir+"\"+Path
-	ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
-		Path = Dir+"\"+Path
-	EndIf
-	;dbg("PreferencePath: >"+NormalizePath(Path))
-	ProcedureReturn NormalizePath(Path)
-EndProcedure
 Procedure _OpenPreference(Prefs.s)
 	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
 		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
@@ -329,9 +306,10 @@ Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
 EndProcedure
 ;}
 ;;======================================================================================================================
+
 Global PureSimplePrefs.s
 Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
-Global PPData.PPData
+Global PPData.PPDATA
 Global DbgRegMode
 Global DbgSpecMode
 Global DbgEnvMode
@@ -354,7 +332,7 @@ Procedure RunFrom(k.s,p.s)
 				ExecuteFlags | #EXECUTE_HIDE
 		EndSelect
 	Next
-	Execute("",ExpandEnvironment(p),ExecuteFlags)
+	Execute("",ExpandEnvironmentStrings(p),ExecuteFlags)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL.l AttachProcess(Instance)
@@ -479,7 +457,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			k = PreferenceKeyName()
 			p = PreferenceKeyValue()
 			If p
-				SetEnvironmentVariable(k,p)
+				SetEnvironmentVariable(k,ExpandEnvironmentStrings(p))
 			Else
 				RemoveEnvironmentVariable(k)
 			EndIf
@@ -511,14 +489,14 @@ ProcedureDLL.l AttachProcess(Instance)
 				If GetExtensionPart(ConfigFile)=""
 					ConfigFile + #CONFIG_FILEEXT
 				EndIf
-				ConfigFile = PreferencePath(p)
+				ConfigFile = PreferencePath(ConfigFile)
 			EndIf
 			InitialFile = ReadPreferenceString("InitFile","")
 			If InitialFile
 				If GetExtensionPart(InitialFile)=""
 					InitialFile + #CONFIG_INITIALEXT
 				EndIf
-				InitialFile = PreferencePath(p)
+				InitialFile = PreferencePath(ConfigFile)
 			EndIf
 			If ReadPreferenceInteger("RegistryDll",0)=1
 				RegistryDll = "kernelbase"
@@ -957,9 +935,11 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = fAbACwAAA-
+; CursorPosition = 624
+; FirstLine = 168
+; Folding = bgbABMCAo
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

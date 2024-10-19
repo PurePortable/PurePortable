@@ -23,7 +23,7 @@ CompilerIf Defined(CONFIG_INITIAL,#PB_Constant)
 	CompilerIf #CONFIG_INITIAL<>""
 		InitialFile = PrgDir+#CONFIG_INITIAL
 		If GetExtensionPart(InitialFile)=""
-			InitialFile + #CONFIG_INITIALEXT
+			InitialFile + #CONFIG_FILEEXT
 		EndIf
 	CompilerElse
 		InitialFile = PrgDir+PrgName+"-Init"+#CONFIG_INITIALEXT
@@ -238,8 +238,8 @@ CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 		DeclareImport(advapi32,_RegLoadAppKeyW@20,RegLoadAppKeyW,RegLoadAppKey_(lpFile,phkResult,samDesired,dwOptions,Reserved))
 		Procedure ReadCfg()
 			Protected err.l = RegLoadAppKey_(@ConfigFile,@hAppKey,#KEY_ALL_ACCESS,0,0)
-			DbgReg("REGLOADAPPKEY: "+Str(err)+" "+ConfigFile)
-			WriteLog("REGLOADAPPKEY: "+Str(err)+" "+ConfigFile)
+			DbgReg("REGLOADAPPKEY: "+Str(err)+": "+ConfigFile)
+			WriteLog("REGLOADAPPKEY: "+Str(err)+": "+ConfigFile)
 			If err<>#ERROR_SUCCESS
 				DbgReg("REGLOADAPPKEY: "+GetLastErrorStr(err))
 				WriteLog("REGLOADAPPKEY: "+GetLastErrorStr(err))
@@ -273,9 +273,9 @@ Procedure WriteCfg()
 EndProcedure
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 122
-; FirstLine = 98
-; Folding = -D9
+; CursorPosition = 241
+; FirstLine = 67
+; Folding = Ag9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

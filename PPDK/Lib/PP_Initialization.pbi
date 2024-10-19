@@ -181,8 +181,6 @@ EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 159
-; FirstLine = 122
 ; Folding = uG+
 ; EnableThread
 ; DisableDebugger
