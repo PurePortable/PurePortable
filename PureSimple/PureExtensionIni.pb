@@ -14,9 +14,6 @@
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.10.0.0
 ;PP_X32_COPYAS "..\Temp\PurePortTxt32.dll"
-;PP_X32_COPYAS "P:\PurePortable\Test\CD Bank Cataloguer\2.7.8\PurePortIni.dll"
-;PP_X32_COPYAS "P:\PurePortable\Test\CD Bank Cataloguer\2.7.7\PurePortIni.dll"
-;PP_X32_COPYAS "I:\Test\CD Bank Cataloguer\2.7.8\PurePortIni.dll"
 ;PP_X64_COPYAS "..\Temp\PurePortTxt64.dll"
 ;PP_CLEAN 2
 
@@ -267,7 +264,6 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 26
 ; Folding = B+
 ; Optimizer
 ; EnableThread
