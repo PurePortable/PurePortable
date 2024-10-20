@@ -169,9 +169,6 @@ EndProcedure
 ; Проверка существования ключа осуществляется из вызывающей функции вызовом IsKey или OpenKey или CreateKey.
 ; Имя передаётся в нижнем регистре.
 
-; http://w32api.narod.ru/functions/RegSetValue.html
-; http://w32api.narod.ru/functions/RegSetValueEx.html
-
 Procedure.l SetDataW(hKey.l,sName.s,dwType.l,*lpData.AnyType,cbData.l)
 	Protected sData.s, sType.s, sBuf.s
 	Protected i, iempty, cbPrev
@@ -905,8 +902,10 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEY
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = CAA-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 170
+; FirstLine = 18
+; Folding = CBA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

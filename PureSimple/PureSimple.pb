@@ -29,6 +29,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;#PREFERENCES_FILENAME = #CONFIG_FILENAME ; Имя файла конфигурации PurePortable
 
 ;;----------------------------------------------------------------------------------------------------------------------
+;{ Общие параметры компиляции
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
 #PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
@@ -51,11 +52,11 @@ XIncludeFile "PurePortableCustom.pbi"
 #PROFILE_STRINGS_FILENAME = "PurePortable"
 #PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
+;}
 ;{ Обработка ошибок
 ;#PROXY_ERROR_MODE = 0
 #MIN_HOOK_ERROR_MODE = 2
 ;}
-;;----------------------------------------------------------------------------------------------------------------------
 ;{ Диагностика
 #DBG_REGISTRY = #DBG_REG_MODE_MAX
 #DBG_SPECIAL_FOLDERS = #DBG_SF_MODE_MAX
@@ -80,7 +81,6 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBGX_FILE_OPERATIONS = 0
 #DBGX_PROFILE_STRINGS = 0
 ;}
-;;----------------------------------------------------------------------------------------------------------------------
 ;{ Блокировка интернета
 #BLOCK_WININET = 1 ; wininet.dll
 #BLOCK_WINHTTP = 1 ; winhttp.dll
@@ -104,6 +104,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
 XIncludeFile "PurePortableSimple.pbi"
 XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
+XIncludeFile "proc\s2guid.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure RFID_DATA
@@ -215,22 +216,6 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-Procedure _OpenPreference(Prefs.s)
-	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
-		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
-		TerminateProcess_(GetCurrentProcess_(),0)
-		ProcedureReturn 0
-	EndIf
-	If PreferenceGroup("Portable") = 0
-		MessageBox_(0,"Section [Portable] not found!","PurePortable",#MB_ICONERROR)
-		TerminateProcess_(GetCurrentProcess_(),0)
-		ProcedureReturn 0
-	EndIf
-	ProcedureReturn 1
-EndProcedure
-;;======================================================================================================================
-XIncludeFile "proc\s2guid.pbi"
-;;======================================================================================================================
 ;{ Перехват VolumeSerialNumber
 Global VolumeSerialNumber
 Prototype GetVolumeInformation(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber.LONG,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
@@ -315,7 +300,21 @@ Global DbgSpecMode
 Global DbgEnvMode
 Global DbgAnyMode
 Global DbgDetach
-
+;;----------------------------------------------------------------------------------------------------------------------
+Procedure _OpenPreference(Prefs.s)
+	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
+		MessageBox_(0,"Config file not found!","PurePortable",#MB_ICONERROR)
+		TerminateProcess_(GetCurrentProcess_(),0)
+		ProcedureReturn 0
+	EndIf
+	If PreferenceGroup("Portable") = 0
+		MessageBox_(0,"Section [Portable] not found!","PurePortable",#MB_ICONERROR)
+		TerminateProcess_(GetCurrentProcess_(),0)
+		ProcedureReturn 0
+	EndIf
+	ProcedureReturn 1
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 XIncludeFile "proc\Execute.pbi"
 Procedure RunFrom(k.s,p.s)
 	Protected i
@@ -470,7 +469,7 @@ ProcedureDLL.l AttachProcess(Instance)
 			;v = PreferenceKeyValue()
 			p = PreferencePath()
 			If p
-				CreatePath(p)
+				;CreatePath(p)
 				SetEnvironmentVariable(k,p)
 			EndIf
 		Wend
@@ -529,6 +528,13 @@ ProcedureDLL.l AttachProcess(Instance)
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
 		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
 		DbgDetach = ReadPreferenceInteger("Detach",1)
+	EndIf
+	;}
+	;{ Создание папок
+	If PreferenceGroup("CreateDirectories")
+		While NextPreferenceKey()
+			CreatePath(PreferencePath(PreferenceKeyName()))
+		Wend
 	EndIf
 	;}
 	;{ Обрабатываемые ключи реестра
@@ -692,7 +698,7 @@ ProcedureDLL.l AttachProcess(Instance)
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
 						SetCfgS(k,v,p)
-						CreatePath(p)
+						;CreatePath(p)
 					Else ; значение по умолчанию?
 					EndIf
 				Wend
@@ -935,11 +941,9 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 624
-; FirstLine = 168
-; Folding = bgbABMCAo
+; Folding = AAwAOQAAA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

@@ -454,6 +454,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = hjj--4v-
+; Folding = gjj--4P-
 ; DisableDebugger
 ; EnableExeConstant

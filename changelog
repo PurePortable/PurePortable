@@ -8,8 +8,6 @@
 (+) Перехват переменных Temp, Tmp
 (+) PureSimple: Параметр Temp в секции [SpecialFolders] для задания пути к временной папке.
 (+) PureSimple: Registry1: Если значение DataFile не задано, pport файл не читается и не создаётся.
-(+) PureSimple: Создание папок указываемых в [Registry.SetPaths].
-(+) PureSimple: Создание папок указываемых в [EnvironmentVariables.SetPaths].
 (*) PPFinish - depricated.
 (+) Макросы PPDetachProcess и PPDetachProcessEnd.
 (+) Счётчик процессов, загрузивших dll.
@@ -21,6 +19,7 @@
 (+) Управление выводом отладочной информации при выгрузке dll (в связи с падением в некоторых программах).
 (+) PureSimple: Параметр Detach в секции Debug.
 (+) PureSimple: Раскрытие переменных среды при установке переменных из секции EnvironmentVariables.
+(+) PureSimple: Секция [CreateDirectories].
 
 [4.10.0.29] 2024-09-25
 (*) Рефакторинг
