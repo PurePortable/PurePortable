@@ -1,21 +1,4 @@
 ﻿;;======================================================================================================================
-; Общие переменные
-;;======================================================================================================================
-
-Global PrgPath.s ; полный путь к исполняемому файлу программы
-Global PrgDir.s	 ; директория программы с "\" на конце
-Global PrgDirN.s ; директория программы без "\" на конце
-Global PrgName.s ; имя программы (без расширения)
-Global DllPath.s, DllName.s
-;Global DllDir.s, DllDirN.s
-;Global ProcessID.l
-
-;Global LogFile.s
-Global PreferenceFile.s
-
-Global WinDir.s, SysDir.s, TempDir.s
-
-;;======================================================================================================================
 CompilerIf Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 0
 CompilerEndIf
@@ -34,10 +17,6 @@ EndDataSection
 ;;======================================================================================================================
 ; Иницилизация
 ;;======================================================================================================================
-Global Dim InitProcedures(0)
-Macro AddInitProcedure(Proc)
-	AddArrayI(InitProcedures(),@Proc())
-EndMacro
 Macro BeginInitHooks : EndMacro ; заглушка
 Macro EndInitHooks : EndMacro ; заглушка
 
@@ -46,7 +25,7 @@ Global DllInstance ; будет иметь то же значение, что и
 Global ProcessCnt
 Global FirstProcess
 Global LastProcess
-Procedure _GlobalInitialization()
+Procedure PPGlobalInitialization()
 	CompilerIf #DBG_ALWAYS
 		DbgDetach = 1
 	CompilerEndIf
@@ -118,7 +97,6 @@ Procedure _GlobalInitialization()
 		dbg("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
 	CompilerEndIf
 EndProcedure
-_GlobalInitialization()
 ;;======================================================================================================================
 Procedure _PPAttachProcess()
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
@@ -180,8 +158,10 @@ Macro PPDetachProcessEnd
 EndMacro
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = uG+
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 27
+; FirstLine = 6
+; Folding = XD-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

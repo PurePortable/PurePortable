@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.30
+;RES_VERSION 4.10.0.31
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
@@ -57,25 +57,18 @@ XIncludeFile "PurePortableCustom.pbi"
 ;#PROXY_ERROR_MODE = 0
 #MIN_HOOK_ERROR_MODE = 2
 ;}
-;{ Диагностика
+;{ Мониторинг
 #DBG_REGISTRY = #DBG_REG_MODE_MAX
 #DBG_SPECIAL_FOLDERS = #DBG_SF_MODE_MAX
 #DBG_ENVIRONMENT_VARIABLES = 0
 #DBG_PROFILE_STRINGS = 0
 #DBG_CBT_HOOK = 0
-#DBG_MIN_HOOK = 0
+#DBG_MIN_HOOK = 1
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
-#DBG_ANY = 1
+#DBG_ANY = 0
 ;}
-;{ Более подробная трассировка
-#LOGGING = 0 ; Сохранять в log-файл
-#LOGGING_CFG = 1 ; Писать логи обращения к данным конфигурации (виртуального реестра) - LoggingCfg
-#LOGGING_REG = 1 ; Писать логи обращения к реальному реестру - LoggingReg
-#LOGGING_SUB = 1 ; Писать логи работы подпрограмм - LoggingSub
-#LOGGING_DBG = 1 ; Переключить LOGGING на DBG вместо записи в файл
-;}
-;{ Дополнительная трассировка
+;{ Мониторинг некоторых вызовов WinApi
 #DBGX_EXECUTE = 0 ; 1 - ShellExecute/CreateProcess, 2 - CreateProcess
 #DBGX_LOAD_LIBRARY = 0 ; 1 - всё, 2 - без GetProcAddress
 #DBGX_FILE_OPERATIONS = 0
@@ -941,20 +934,21 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = AAwAOQAAA+
+; CursorPosition = 16
+; Folding = gBYAHIAAA-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.30
+; VersionField0 = 4.10.0.31
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.30
+; VersionField5 = 4.10.0.31
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024

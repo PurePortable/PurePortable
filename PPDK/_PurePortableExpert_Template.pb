@@ -18,8 +18,8 @@
 ;RES_INTERNALNAME 410.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.10.0.30
-;PP_X32_COPYAS "P:\PurePortable\Apps\proxy32.dll"
-;PP_X64_COPYAS "P:\PurePortable\Apps\proxy64.dll"
+;PP_X32_COPYAS "P:\PurePortable\proxy32.dll"
+;PP_X64_COPYAS "P:\PurePortable\proxy64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
@@ -268,9 +268,7 @@ EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ProcedureDLL.l DetachProcess(Instance)
 	;;------------------------------------------------------------------------------------------------------------------
-	; Завершающие действия выполняемые при портабелизации реестра.
-	; Модификация параметров.
-	; Сохранение конфигурации.
+	; Действия выполняемые при завершении работы программы.
 	;;------------------------------------------------------------------------------------------------------------------
 	PPDetachProcess
 	CompilerIf Defined(MIN_HOOK,#PB_Constant)

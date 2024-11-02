@@ -13,7 +13,26 @@ CompilerIf Not #PB_Compiler_Thread
 CompilerEndIf
 
 ;;======================================================================================================================
+; Общие переменные
+
 Global ProcessId
+
+Global WinDir.s, SysDir.s, TempDir.s
+Global PrgPath.s ; полный путь к исполняемому файлу программы
+Global PrgDir.s	 ; директория программы с "\" на конце
+Global PrgDirN.s ; директория программы без "\" на конце
+Global PrgName.s ; имя программы (без расширения)
+Global DllPath.s, DllName.s
+;Global DllDir.s, DllDirN.s
+
+;Global LogFile.s
+Global PreferenceFile.s
+
+Global Dim InitProcedures(0)
+Macro AddInitProcedure(Proc)
+	AddArrayI(InitProcedures(),@Proc())
+EndMacro
+
 ;;======================================================================================================================
 
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
@@ -35,8 +54,10 @@ XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Logging.pbi"
 XIncludeFile "PP_Subroutines.pbi"
 XIncludeFile "PP_Subroutines2.pbi"
-XIncludeFile "PP_Initialization.pbi"
 XIncludeFile "PP_Proxy.pbi"
+
+Declare PPGlobalInitialization()
+PPGlobalInitialization()
 
 ;;======================================================================================================================
 ; Реестр
@@ -206,7 +227,10 @@ CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFo
 	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
-; Этот блок должен быть в самом конце, так как только здесь точно становится известно, надо ли инициализировать MinHook.
+; Этот блок должен быть в самом конце, так как только здесь точно становится известно, надо ли инициализировать MinHook и пр.
+
+XIncludeFile "PP_Initialization.pbi"
+
 Prototype InitProcedure()
 Global PPInitializationComplete
 Procedure _PPInitialization()
@@ -234,8 +258,9 @@ EndMacro
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1
-; Folding = +
+; CursorPosition = 40
+; FirstLine = 23
+; Folding = 0
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

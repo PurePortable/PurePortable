@@ -100,10 +100,8 @@ EndProcedure
 AddInitProcedure(_InitDbgxExecuteHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 78
-; FirstLine = 67
-; Folding = --
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = A+
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

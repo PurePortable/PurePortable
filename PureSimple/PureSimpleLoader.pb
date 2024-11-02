@@ -17,7 +17,7 @@
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\PPDK\Lib"
+IncludePath "..\PPDK\Lib.4.10"
 ;XIncludeFile "PurePortableCustom.pbi"
 
 #PROXY_DLL = "pureport"

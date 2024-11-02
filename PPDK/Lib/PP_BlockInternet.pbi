@@ -17,6 +17,7 @@ CompilerEndIf
 CompilerIf #DBG_BLOCK_INTERNET
 	Global DbgIntMode = #DBG_BLOCK_INTERNET
 	Procedure DbgInt(txt.s)
+		dbg("!!!")
 		If DbgIntMode
 			dbg(txt)
 		EndIf
@@ -245,7 +246,8 @@ AddInitProcedure(_InitBlockInternetHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 12
+; CursorPosition = 238
+; FirstLine = 211
 ; Folding = --
 ; EnableAsm
 ; DisableDebugger

@@ -15,6 +15,9 @@ CompilerIf #DBG_MIN_HOOK Or Defined(MIN_HOOK_ERROR_MODE,#PB_Constant)
 CompilerElse
 	Macro DbgMinHookError(txt) : EndMacro
 CompilerEndIf
+CompilerIf #DBG_MIN_HOOK And Not Defined(DBG_ALWAYS,#PB_Constant)
+	#DBG_ALWAYS = 1
+CompilerEndIf
 
 ;CompilerIf Not Defined(MIN_HOOK_CHECKRESULT,#PB_Constant) : #MIN_HOOK_CHECKRESULT = 1 : CompilerEndIf
 CompilerIf Not Defined(MIN_HOOK_ERROR_MODE,#PB_Constant) : #MIN_HOOK_ERROR_MODE = 2 : CompilerEndIf
@@ -183,8 +186,8 @@ EndProcedure
 MH_Initialize()
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 5
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 17
 ; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant

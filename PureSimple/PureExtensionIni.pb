@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.30
+;RES_VERSION 4.10.0.31
 ;RES_DESCRIPTION PurePortableSimpleExtension
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME PurePortIni.dll
@@ -271,11 +271,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.30
+; VersionField0 = 4.10.0.31
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.30
+; VersionField5 = 4.10.0.31
 ; VersionField6 = PurePortableSimpleExtension
 ; VersionField7 = PurePortIni.dll
 ; VersionField9 = (c) Smitis, 2017-2024
