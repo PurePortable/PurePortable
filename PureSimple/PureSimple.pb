@@ -488,7 +488,7 @@ ProcedureDLL.l AttachProcess(Instance)
 				If GetExtensionPart(InitialFile)=""
 					InitialFile + #CONFIG_INITIALEXT
 				EndIf
-				InitialFile = PreferencePath(ConfigFile)
+				InitialFile = PreferencePath(InitialFile)
 			EndIf
 			If ReadPreferenceInteger("RegistryDll",0)=1
 				RegistryDll = "kernelbase"
