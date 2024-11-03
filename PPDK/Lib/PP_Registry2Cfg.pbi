@@ -272,10 +272,8 @@ Procedure WriteCfg()
 	; Ничего не делаем
 EndProcedure
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 241
-; FirstLine = 67
-; Folding = Ag9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = AA9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

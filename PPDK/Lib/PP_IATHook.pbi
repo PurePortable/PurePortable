@@ -214,7 +214,7 @@ Procedure.i _IAT_Hook(*ModuleData.MODULE_DATA,DllName.s,FuncName.s,*Detour,*Orig
 							If *OldRef <> *Detour
 								DbgIatHook("  Set import: "+Str(*OldRef)+" "+PeekS(ImageBase+*ImportName\i+OffsetOf(IMAGE_IMPORT_BY_NAME\Name),-1,#PB_Ascii)+" "+Str(*Detour))
 								VirtualProtect_(*ImportAddress,SizeOf(*ImportAddress),#PAGE_EXECUTE_READWRITE,@*OldProtect)
-								;VirtualProtectEx_(GetCurrentProcess_(),@*ImportAddress\i,SizeOf(*Detour),#PAGE_EXECUTE_READWRITE,@*OldProtect)
+								;VirtualProtectEx_(ProcessId,@*ImportAddress\i,SizeOf(*Detour),#PAGE_EXECUTE_READWRITE,@*OldProtect)
 								*ImportAddress\i = *Detour
 								;Break ; можно закончить просмотр?
 							Else
@@ -281,8 +281,8 @@ EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 147
-; FirstLine = 144
+; CursorPosition = 151
+; FirstLine = 146
 ; Folding = 8--
 ; EnableThread
 ; DisableDebugger

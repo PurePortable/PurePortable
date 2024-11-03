@@ -1,6 +1,6 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.10.0.30
-#PP_MAINVERSION = 4.10
+; PurePortable main lib 4.11.0.1
+#PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
 CompilerIf Not Defined(PB_Compiler_Backend,#PB_Constant) : #PB_Compiler_Backend = 0 : CompilerEndIf
@@ -15,9 +15,8 @@ CompilerEndIf
 ;;======================================================================================================================
 ; Общие переменные
 
-Global ProcessId
+Global ProcessId, FirstProcess, LastProcess
 
-Global WinDir.s, SysDir.s, TempDir.s
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
@@ -28,11 +27,18 @@ Global DllPath.s, DllName.s
 ;Global LogFile.s
 Global PreferenceFile.s
 
+Global WinDir.s, SysDir.s, TempDir.s
 Global Dim InitProcedures(0)
-Macro AddInitProcedure(Proc)
-	AddArrayI(InitProcedures(),@Proc())
-EndMacro
+Macro AddInitProcedure(Proc) : AddArrayI(InitProcedures(),@Proc()) : EndMacro
 
+;;======================================================================================================================
+; Некоторые процедуры
+
+Declare PPGlobalInitialization()
+Declare PPInitialization()
+Declare PPExitProcess()
+Declare AttachProcedure(Instance)
+Declare DetachProcedure(Instance)
 ;;======================================================================================================================
 
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
@@ -54,10 +60,22 @@ XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Logging.pbi"
 XIncludeFile "PP_Subroutines.pbi"
 XIncludeFile "PP_Subroutines2.pbi"
-XIncludeFile "PP_Proxy.pbi"
 
-Declare PPGlobalInitialization()
 PPGlobalInitialization()
+
+;;======================================================================================================================
+CompilerIf Not Defined(PORTABLE_CLEANUP,#PB_Constant) : #PORTABLE_CLEANUP = 0 : CompilerEndIf
+CompilerIf Not Defined(DBG_CLEANUP,#PB_Constant) : #DBG_CLEANUP = 0 : CompilerEndIf
+CompilerIf #PORTABLE_CLEANUP
+	XIncludeFile "PP_Cleanup.pbi"
+CompilerElse
+	Macro DetachCleanup : EndMacro
+	Macro Clean(s) : EndMacro
+CompilerEndIf
+
+;;======================================================================================================================
+
+XIncludeFile "PP_Proxy.pbi"
 
 ;;======================================================================================================================
 ; Реестр
@@ -213,14 +231,6 @@ CompilerIf #INCLUDE_IAT_HOOK
 CompilerEndIf
 
 ;;======================================================================================================================
-; Хук на отслеживание закрытие окон и сохранение конфигурации
-CompilerIf Not Defined(PORTABLE_CBT_HOOK,#PB_Constant) : #PORTABLE_CBT_HOOK = 0 : CompilerEndIf
-CompilerIf Not Defined(DBG_CBT_HOOK,#PB_Constant) : #DBG_CBT_HOOK = 0 : CompilerEndIf
-CompilerIf #PORTABLE_CBT_HOOK
-	XIncludeFile "PP_CBTHook.pbi"
-CompilerEndIf
-
-;;======================================================================================================================
 CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFormat=#PB_Compiler_DLL
 	ProcedureDLL PurePortable(id.l,*param1,*param2,reserved)
 		ProcedureReturn 0
@@ -229,11 +239,67 @@ CompilerEndIf
 ;;======================================================================================================================
 ; Этот блок должен быть в самом конце, так как только здесь точно становится известно, надо ли инициализировать MinHook и пр.
 
+;;----------------------------------------------------------------------------------------------------------------------
+; Хук на отслеживание закрытие окон и сохранение конфигурации
+CompilerIf Not Defined(PORTABLE_CBT_HOOK,#PB_Constant) : #PORTABLE_CBT_HOOK = 0 : CompilerEndIf
+CompilerIf Not Defined(DBG_CBT_HOOK,#PB_Constant) : #DBG_CBT_HOOK = 0 : CompilerEndIf
+CompilerIf #PORTABLE_CBT_HOOK
+	XIncludeFile "PP_CBTHook.pbi"
+CompilerEndIf
+
+;;----------------------------------------------------------------------------------------------------------------------
+CompilerIf Not Defined(DBG_ALWAYS,#PB_Constant) : #DBG_ALWAYS = 0 : CompilerEndIf
+CompilerIf #DBG_ALWAYS
+	Procedure DbgAlways(Txt.s)
+		dbg(Txt)
+	EndProcedure
+CompilerElse
+	Macro DbgAlways(Txt) : EndMacro
+CompilerEndIf
+
+;;----------------------------------------------------------------------------------------------------------------------
 XIncludeFile "PP_Initialization.pbi"
+;;----------------------------------------------------------------------------------------------------------------------
+
+; Завершение
+Procedure DecrementProcessCounter()
+	LastProcess = Bool(ProcessCnt=1)
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		!PUSH EAX
+		!MOV EAX, -1
+		!LOCK XADD DWORD [ProcessCnt], EAX
+		!DEC EAX
+		!MOV DWORD [v_ProcessCnt], EAX
+		!POP EAX
+	CompilerElse
+		!PUSH RAX
+		!MOV RAX, -1
+		!LOCK XADD QWORD [ProcessCnt], RAX
+		!DEC RAX
+		!MOV QWORD [v_ProcessCnt], RAX
+		!POP RAX
+	CompilerEndIf
+EndProcedure
+
+Global NoDetachProcedure
+Procedure PPExitProcess()
+	If Not NoDetachProcedure
+		CompilerIf Defined(MIN_HOOK,#PB_Constant)
+			CompilerIf #MIN_HOOK
+				MH_Uninitialize()
+			CompilerEndIf
+		CompilerEndIf
+		DecrementProcessCounter()
+		If DetachProcedure(DllInstance) = 0
+			DetachCleanup
+		EndIf
+		NoDetachProcedure = #True
+	EndIf
+EndProcedure
 
 Prototype InitProcedure()
 Global PPInitializationComplete
-Procedure _PPInitialization()
+Procedure PPInitialization()
 	Protected i, InitProcedure.InitProcedure
 	For i=1 To ArraySize(InitProcedures())
 		InitProcedure = InitProcedures(i)
@@ -247,20 +313,38 @@ Procedure _PPInitialization()
 		CompilerEndIf
 	CompilerEndIf
 	PPInitializationComplete = #True
+	DbgAlways("ATTACHPROCESS: Complete")
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+ProcedureDLL.l DetachProcess(Instance)
 	CompilerIf #DBG_ALWAYS
-		dbg("ATTACHPROCESS: Complete")
+		Global DbgDetach
+		If DbgDetach
+			DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
+		EndIf
+	CompilerEndIf
+		
+	PPExitProcess()
+	
+	CompilerIf #DBG_ALWAYS
+		If DbgDetach
+			DbgAlways("DETACHPROCESS: "+PrgPath)
+		EndIf
 	CompilerEndIf
 EndProcedure
-Macro PPInitialization
-	_PPInitialization()
-EndMacro
+;;======================================================================================================================
+ProcedureDLL.l AttachProcess(Instance)
+	If AttachProcedure(Instance) = 0
+		PPInitialization()
+	EndIf
+EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 40
-; FirstLine = 23
-; Folding = 0
+; CursorPosition = 17
+; FirstLine = 11
+; Folding = t--
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

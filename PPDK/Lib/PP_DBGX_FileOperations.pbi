@@ -253,8 +253,10 @@ EndProcedure
 AddInitProcedure(_InitDbgxFileOperations)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = AAAw
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 136
+; FirstLine = 113
+; Folding = ----
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

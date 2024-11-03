@@ -6,18 +6,18 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.6
+;RES_VERSION 4.11.0.6
 ;RES_DESCRIPTION PurePortableSimple Loader
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 400.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.10.0.0
+;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS "Temp\Proxy32.dll"
 ;PP_X64_COPYAS "Temp\Proxy64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\PPDK\Lib.4.10"
+IncludePath "..\PPDK\Lib"
 ;XIncludeFile "PurePortableCustom.pbi"
 
 #PROXY_DLL = "pureport"
@@ -59,11 +59,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.0
-; VersionField1 = 4.10.0.0
+; VersionField0 = 4.11.0.0
+; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
-; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.0
+; VersionField4 = 4.11.0.0
+; VersionField5 = 4.11.0.0
 ; VersionField6 = PurePortableSimple Loader
 ; VersionField7 = PureSimpleLoader.dll
 ; VersionField9 = (c) Smitis, 2017-2024

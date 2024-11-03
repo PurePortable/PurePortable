@@ -217,8 +217,10 @@ AddInitProcedure(_InitDbgxLoadLibrary)
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = AA5
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 36
+; FirstLine = 23
+; Folding = ---
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

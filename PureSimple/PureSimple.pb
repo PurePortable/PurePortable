@@ -6,18 +6,18 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.32
+;RES_VERSION 4.11.0.1
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
-;RES_INTERNALNAME 400.dll
+;RES_INTERNALNAME PurePort.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.10.0.0
+;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS "Temp\PurePort32.dll"
 ;PP_X64_COPYAS "Temp\PurePort64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\PPDK\Lib.4.10"
+IncludePath "..\PPDK\Lib"
 XIncludeFile "PurePortableCustom.pbi"
 
 #PROXY_DLL = "pureport"
@@ -31,7 +31,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Общие параметры компиляции
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
-#PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
+#PORTABLE_REGISTRY = $101 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
@@ -52,9 +52,10 @@ XIncludeFile "PurePortableCustom.pbi"
 #PROFILE_STRINGS_FILENAME = "PurePortable"
 #PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
+#PORTABLE_CLEANUP = 1
 ;}
 ;{ Обработка ошибок
-;#PROXY_ERROR_MODE = 0
+;#PROXY_ERROR_MODE = 1
 #MIN_HOOK_ERROR_MODE = 2
 ;}
 ;{ Мониторинг
@@ -66,7 +67,8 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_MIN_HOOK = 0
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
-#DBG_ANY = 0
+#DBG_CLEANUP = 1
+#DBG_ANY = 1
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
 #DBGX_EXECUTE = 0 ; 1 - ShellExecute/CreateProcess, 2 - CreateProcess
@@ -98,6 +100,7 @@ XIncludeFile "PurePortableCustom.pbi"
 XIncludeFile "PurePortableSimple.pbi"
 XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 XIncludeFile "proc\s2guid.pbi"
+XIncludeFile "proc\Execute.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure RFID_DATA
@@ -245,42 +248,55 @@ EndProcedure
 ;;======================================================================================================================
 ;{ Подделка даты
 ; https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions
-Global SpoofDate.SYSTEMTIME
+Global SpoofDateST.SYSTEMTIME
+Global SpoofDateFT.FILETIME
+Global SpoofDateTimeout.FILETIME
+Global SpoofDateFlag
+;;----------------------------------------------------------------------------------------------------------------------
+Procedure CheckSpoofDate()
+	;Protected CreationTime.FILETIME, ExitTime.FILETIME, KernelTime.FILETIME, UserTime.FILETIME
+	;If SpoofDateFlag
+	;	If GetProcessTimes_(ProcessId,@CreationTime,@ExitTime,@KernelTime,@UserTime)
+	;		SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,UserTime)>0)
+	;	EndIf
+	;EndIf
+	Protected CurrentTime.FILETIME
+	If SpoofDateFlag
+		If GetSystemTimeAsFileTime_(@CurrentTime)
+			SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,CurrentTime)>0)
+		EndIf
+	EndIf
+	ProcedureReturn SpoofDateFlag	
+EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype GetSystemTime(*SystemTime.SYSTEMTIME)
 Global Original_GetSystemTime.GetSystemTime
 Procedure Detour_GetSystemTime(*SystemTime.SYSTEMTIME)
-	Protected Result = Original_GetSystemTime(*SystemTime)
-	*SystemTime\wDay = SpoofDate\wDay
-	*SystemTime\wDayOfWeek = SpoofDate\wDayOfWeek
-	*SystemTime\wMonth = SpoofDate\wMonth
-	*SystemTime\wYear = SpoofDate\wYear
-	ProcedureReturn Result
+	If CheckSpoofDate()
+		CopyStructure(@SpoofDateST,*SystemTime,SYSTEMTIME)
+		ProcedureReturn #True
+	EndIf
+	ProcedureReturn Original_GetSystemTime(*SystemTime)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype GetSystemTimeAsFileTime(*SystemTimeAsFileTime.FILETIME)
 Global Original_GetSystemTimeAsFileTime.GetSystemTimeAsFileTime
 Procedure Detour_GetSystemTimeAsFileTime(*SystemTimeAsFileTime.FILETIME)
-	Protected FileTime.FILETIME
-	Protected Result = Original_GetSystemTimeAsFileTime(@FileTime)
-	Protected SystemTime.SYSTEMTIME
-	FileTimeToSystemTime_(@FileTime,@SystemTime)
-	SystemTime\wDay = SpoofDate\wDay
-	SystemTime\wDayOfWeek = SpoofDate\wDayOfWeek
-	SystemTime\wMonth = SpoofDate\wMonth
-	SystemTime\wYear = SpoofDate\wYear
-	ProcedureReturn SystemTimeToFileTime_(@SystemTime,*SystemTimeAsFileTime)
+	If CheckSpoofDate()
+		CopyStructure(@SpoofDateFT,*SystemTimeAsFileTime,FILETIME)
+		ProcedureReturn #True
+	EndIf
+	ProcedureReturn Original_GetSystemTimeAsFileTime(*SystemTimeAsFileTime)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype GetLocalTime(*SystemTime.SYSTEMTIME)
 Global Original_GetLocalTime.GetLocalTime
 Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
-	Protected Result = Original_GetLocalTime(*SystemTime)
-	*SystemTime\wDay = SpoofDate\wDay
-	*SystemTime\wDayOfWeek = SpoofDate\wDayOfWeek
-	*SystemTime\wMonth = SpoofDate\wMonth
-	*SystemTime\wYear = SpoofDate\wYear
-	ProcedureReturn Result
+	If CheckSpoofDate()
+		CopyStructure(@SpoofDateST,*SystemTime,SYSTEMTIME)
+		ProcedureReturn #True
+	EndIf
+	ProcedureReturn Original_GetLocalTime(*SystemTime)
 EndProcedure
 ;}
 ;;======================================================================================================================
@@ -308,29 +324,14 @@ Procedure _OpenPreference(Prefs.s)
 	ProcedureReturn 1
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-XIncludeFile "proc\Execute.pbi"
-Procedure RunFrom(k.s,p.s)
-	Protected i
-	Protected Dim Flags.s(0)
-	Protected ExecuteFlags
-	SplitArray(Flags(),k,",")
-	For i=1 To ArraySize(Flags())
-		Select LCase(Flags(i))
-			Case "nowait"
-				ExecuteFlags & (~#EXECUTE_WAIT)
-			Case "wait"
-				ExecuteFlags | #EXECUTE_WAIT
-			Case "hide"
-				ExecuteFlags | #EXECUTE_HIDE
-		EndSelect
-	Next
-	Execute("",ExpandEnvironmentStrings(p),ExecuteFlags)
-EndProcedure
+Declare RunFrom(k.s,p.s)
 ;;----------------------------------------------------------------------------------------------------------------------
-ProcedureDLL.l AttachProcess(Instance)
-	PPAttachProcess
+Procedure AttachProcedure(Instance)
 	If LCase(PrgName) = "rundll32"
 		; TODO: дополнительно проверить ресурсы
+		; Protected CompanyName = 
+		; CompanyName: Microsoft Corporation
+		; InternalName: rundll
 		ProcedureReturn
 	EndIf
 	Protected i, j
@@ -432,7 +433,7 @@ ProcedureDLL.l AttachProcess(Instance)
 				If InvalidReaction=3 Or InvalidReaction=4 ; завершить работу
 					TerminateProcess_(GetCurrentProcess_(),0)
 				EndIf
-				Goto EndAttach
+				ProcedureReturn 1
 			EndIf
 		EndIf
 	EndIf
@@ -734,12 +735,15 @@ ProcedureDLL.l AttachProcess(Instance)
 		SpoofDateP = ReplaceString(SpoofDateP,"/","-")
 		i = FindString(SpoofDateP,"-")
 		If i
-			SpoofDate\wYear = Val(Left(SpoofDateP,i-1))
+			SpoofDateST\wYear = Val(Left(SpoofDateP,i-1))
 			j = FindString(SpoofDateP,"-",i+1)
 			If j
-				SpoofDate\wMonth = Val(Mid(SpoofDateP,i+1,j-i))
-				SpoofDate\wDay = Val(Mid(SpoofDateP,j+1))
-				;dbg("SPOOF DATE: "+Str(SpoofDate\wYear)+" :: "+Str(SpoofDate\wMonth)+" :: "+Str(SpoofDate\wDay))
+				SpoofDateST\wMonth = Val(Mid(SpoofDateP,i+1,j-i))
+				SpoofDateST\wDay = Val(Mid(SpoofDateP,j+1))
+				;dbg("SPOOF DATE: "+Str(SpoofDateST\wYear)+" :: "+Str(SpoofDateST\wMonth)+" :: "+Str(SpoofDateST\wDay))
+				SpoofDateTimeout\dwLowDateTime = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
+				SpoofDateFlag = Bool(SpoofDateTimeout\dwLowDateTime<>0)
+				SystemTimeToFileTime_(@SpoofDateST,@SpoofDateFT)
 				MH_HookApi(kernel32,GetLocalTime)
 				MH_HookApi(kernel32,GetSystemTime)
 				MH_HookApi(kernel32,GetSystemTimeAsFileTime)
@@ -802,28 +806,15 @@ ProcedureDLL.l AttachProcess(Instance)
 	EndIf		
 	;}
 	
-	PPInitialization
-
 	EndAttach:
-	ClosePreferences()
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
-#FOF_NO_CONNECTED_ELEMENTS = $2000 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperation-setoperationflags
-Global DbgClnMode
-Procedure DbgCln(txt.s)
-	If DbgClnMode
-		dbg(txt)
-	EndIf
-EndProcedure
-ProcedureDLL.l DetachProcess(Instance)
-	PPDetachProcess
+Procedure DetachProcedure(Instance)
 	If LCase(PrgName) = "rundll32"
-		ProcedureReturn
+		ProcedureReturn 1
 	EndIf
 		
-	MH_Uninitialize()
-	
 	CompilerIf #PORTABLE_REGISTRY
 		If RegistryPermit
 			WriteCfg()
@@ -831,125 +822,101 @@ ProcedureDLL.l DetachProcess(Instance)
 	CompilerEndIf
 	
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
-		Goto EndDetach
+		ProcedureReturn 1
 	EndIf
 	
 	If LastProcess
-		If PreferenceGroup("Portable")
-			If ReadPreferenceInteger("Cleanup",0)
-				Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+PureSimplePrefs+Chr(34))
-			EndIf
-		EndIf
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 			Wend
 		EndIf
+		
+		; Удаление ненужных файлов и папок.
+		Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
+		If PreferenceGroup("Portable")
+			Cleanup = ReadPreferenceInteger("Cleanup",0)
+			CleanupDirectory = ReadPreferenceString("CleanupDirectory","")
+		EndIf
+		If Cleanup
+			If PreferenceGroup("Debug")
+				DbgClnMode = ReadPreferenceInteger("Cleanup",0)
+			EndIf
+			If CleanupDirectory = ""
+				CleanupDirectory = PrgDirN
+			EndIf
+			DbgCln("CleanupDirectory: "+CleanupDirectory)
+			Protected Dim ClnDirs.s(0), iClnDir
+			Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory)
+			If nClnDir = 0
+				nClnDir = AddArrayS(ClnDirs(),PrgDirN)
+			EndIf
+			For iClnDir=1 To nClnDir
+				ClnDirs(iClnDir) = PreferencePath(ClnDirs(iClnDir))
+			Next
+			ClnDirs(0) = TempDir ; всегда разрешено во временной папке
+			If PreferenceGroup("Cleanup")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					CleanupItem = PreferencePath(PreferenceKeyName())
+					DbgCln("Cleanup: "+CleanupItem)
+					; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
+					Cleanup = 0
+					For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
+						DbgCln("Cleanup: Chk: "+ClnDirs(iClnDir))
+						If StartWithPath(CleanupItem,ClnDirs(iClnDir))
+							Cleanup = 1
+							DbgCln("Cleanup: Into: "+ClnDirs(iClnDir))
+							Break
+						EndIf
+					Next
+					If Cleanup
+						AddCleanItem(CleanupItem)
+					EndIf
+				Wend
+			EndIf
+		EndIf
 	EndIf
-	
-	EndDetach:
-	PPDetachProcessEnd
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-ProcedureDLL PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
-	; *lpszCmdLine в кодировке ASCII !
-	; Командная строка: rundll32 путь_к_dll,PurePortableCleanup process_id "путь_к_файлу_конфигурации"
-	Protected Dim ClnDirs.s(0), iClnDir, nClnDir
-	Protected ProcId = Val(ProgramParameter(2))
-	Protected PrefsFile.s = ProgramParameter(3)
-	If OpenPreferences(PrefsFile,#PB_Preference_NoSpace) = 0
-		ProcedureReturn
-	EndIf
-	
-	Protected k.s, v.s, p.s ; для обработки preferences
-	Protected RetCode
-	Protected Heap = HeapCreate_(0,0,0)
-	Protected *buf = HeapAlloc_(Heap,#HEAP_ZERO_MEMORY,4)
-	Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
-	If PreferenceGroup("Debug")
-		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
-	EndIf
-	If PreferenceGroup("Portable")
-		CleanupDirectory = ReadPreferenceString("CleanupDirectory","")
-	EndIf
-	If CleanupDirectory = ""
-		CleanupDirectory = PrgDirN
-	EndIf
-	nClnDir = SplitArray(ClnDirs(),CleanupDirectory)
-	If nClnDir = 0
-		nClnDir = AddArrayS(ClnDirs(),PrgDirN)
-	EndIf
-	For iClnDir=1 To nClnDir
-		ClnDirs(iClnDir) = PreferencePath(ClnDirs(iClnDir))
+XIncludeFile "PP_ExecuteDll.pbi"
+;;----------------------------------------------------------------------------------------------------------------------
+Procedure RunFrom(k.s,p.s)
+	Protected i
+	Protected Dim Flags.s(0)
+	Protected ExecuteFlags
+	SplitArray(Flags(),k,",")
+	For i=1 To ArraySize(Flags())
+		Select LCase(Flags(i))
+			Case "nowait"
+				ExecuteFlags & (~#EXECUTE_WAIT)
+			Case "wait"
+				ExecuteFlags | #EXECUTE_WAIT
+			Case "hide"
+				ExecuteFlags | #EXECUTE_HIDE
+		EndSelect
 	Next
-	ClnDirs(0) = TempDir ; всегда разрешено во временной папке
-	DbgCln("CleanupDirectory: "+CleanupDirectory)
-	
-	; Чистка
-	Protected SHFileOp.SHFILEOPSTRUCT
-	If PreferenceGroup("Cleanup")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			CleanupItem = PreferencePath(PreferenceKeyName())
-			DbgCln("Cleanup: "+CleanupItem)
-			; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
-			;If LCase(Left(p,lCleanupDirectory)) <> CleanupDirectory
-			Cleanup = 0
-			For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
-				DbgCln("Cleanup: Chk: "+ClnDirs(iClnDir))
-				If StartWithPath(CleanupItem,ClnDirs(iClnDir))
-					Cleanup = 1
-					DbgCln("Cleanup: Into: "+ClnDirs(iClnDir))
-					Break
-				EndIf
-			Next
-			If Cleanup
-				;CleanupItem+"#"
-				;PokeW(@CleanupItem+Len(CleanupItem)*2-2,0) ; Эта строка должна быть завершена двойным значением NULL
-				CleanupItem+#XNUL$
-				DecodeCtrl(@CleanupItem) ; Эта строка должна быть завершена двойным значением NULL
-				;SetCurrentDirectory(CleanupDirectory)
-				; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
-				;SHFileOp\hwnd = 0 ; Окно не нужно
-				SHFileOp\wFunc = #FO_DELETE
-				; #FOF_FILESONLY Если в поле pFrom установлено *.*, то операция будет производиться только с файлами.
-				; #FOF_SILENT Не показывать диалог с индикатором прогресса.
-				; #FOF_NOCONFIRMATION Отвечать "yes to all" на все запросы в ходе опеации.
-				; #FOF_NO_CONNECTED_ELEMENTS
-				SHFileOp\fFlags = #FOF_SILENT|#FOF_NOCONFIRMATION|#FOF_NOERRORUI ;|#FOF_FILESONLY
-				SHFileOp\pFrom = @CleanupItem ; Эта строка должна быть завершена двойным значением NULL
-				;SHFileOp\fAnyOperationsAborted = 0
-				RetCode = SHFileOperation_(SHFileOp)
-				; 124 == 0x7C == The path in the source or destination or both was invalid.
-				; Путь в источнике или пункте назначения или в обоих случаях недействителен.
-				DbgCln("Cleanup: RetCode: "+Str(RetCode))
-			Else
-				DbgCln("Cleanup: Wrong path! "+p)
-			EndIf
-		Wend
-	EndIf
-	ClosePreferences()
+	;Execute("",ExpandEnvironmentStrings(p),ExecuteFlags)
+	ExecuteDll(ExpandEnvironmentStrings(p),ExecuteFlags)
 EndProcedure
-
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
 ; CursorPosition = 22
-; FirstLine = 4
-; Folding = gAYAHIEAA-
+; Folding = xAYA-LEg5
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.32
-; VersionField1 = 4.10.0.0
+; VersionField0 = 4.11.0.1
+; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
-; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.32
+; VersionField4 = 4.11.0.0
+; VersionField5 = 4.11.0.1
 ; VersionField6 = PurePortableSimple
-; VersionField7 = 400.dll
+; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024

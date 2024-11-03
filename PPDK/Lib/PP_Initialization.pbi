@@ -1,8 +1,4 @@
 ﻿;;======================================================================================================================
-CompilerIf Not Defined(DBG_ALWAYS,#PB_Constant)
-	#DBG_ALWAYS = 0
-CompilerEndIf
-;;======================================================================================================================
 ; Общая секция для межпроцессного взаимодействия.
 DataSection
 	!section '.share' data readable writeable shareable notpageable
@@ -15,20 +11,15 @@ DataSection
 	!section '.data' data readable writeable
 EndDataSection
 ;;======================================================================================================================
-; Иницилизация
-;;======================================================================================================================
-Macro BeginInitHooks : EndMacro ; заглушка
-Macro EndInitHooks : EndMacro ; заглушка
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
 Global ProcessCnt
-Global FirstProcess
-Global LastProcess
+;Global FirstProcess
+;Global LastProcess
+Global DbgDetach
 Procedure PPGlobalInitialization()
-	CompilerIf #DBG_ALWAYS
-		DbgDetach = 1
-	CompilerEndIf
+	DbgDetach = 1
 
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
@@ -92,76 +83,18 @@ Procedure PPGlobalInitialization()
 			LoggingFile = PrgDir+PrgName+".log"
 		CompilerEndIf
 	CompilerEndIf
-	CompilerIf #DBG_ALWAYS
-		dbg("ATTACHPROCESS: "+PrgPath)
-		dbg("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
-	CompilerEndIf
+	DbgAlways("ATTACHPROCESS: "+PrgPath)
+	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
 EndProcedure
 ;;======================================================================================================================
-Procedure _PPAttachProcess()
-	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
-EndProcedure
-Macro PPPreparation ; depricated
-	_PPAttachProcess()
-EndMacro
-Macro PPAttachProcess
-	_PPAttachProcess()
-EndMacro
-;;======================================================================================================================
-; Завершение
-Procedure _PPDetachProcess()
-	CompilerIf #DBG_ALWAYS
-		If DbgDetach
-			dbg("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
-		EndIf
-	CompilerEndIf
-	LastProcess = Bool(ProcessCnt=1)
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		!PUSH EAX
-		!MOV EAX, -1
-		!LOCK XADD DWORD [ProcessCnt], EAX
-		!DEC EAX
-		!MOV DWORD [v_ProcessCnt], EAX
-		!POP EAX
-	CompilerElse
-		!PUSH RAX
-		!MOV RAX, -1
-		!LOCK XADD QWORD [ProcessCnt], RAX
-		!DEC RAX
-		!MOV QWORD [v_ProcessCnt], RAX
-		!POP RAX
-	CompilerEndIf
-EndProcedure
-Procedure _PPDetachProcessEnd()
-	CompilerIf #DBG_ALWAYS
-		If DbgDetach
-			dbg("DETACHPROCESS: "+PrgPath)
-		EndIf
-	CompilerEndIf
-EndProcedure
-
-Procedure DbgAny(txt.s)
-	If Left(txt,3)="CBT" ; обеспечиваем совместимость для CBT-хуков
-		dbg(txt)
-	Else
-		_PPDetachProcessEnd()
-	EndIf
-EndProcedure
-Macro PPDetachProcess
-	_PPDetachProcess()
-EndMacro
-Macro PPFinish ; depricated
-	_PPDetachProcessEnd()
-EndMacro
-Macro PPDetachProcessEnd
-	_PPDetachProcessEnd()
-EndMacro
+Macro BeginInitHooks : EndMacro ; заглушка
+Macro EndInitHooks : EndMacro ; заглушка
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 27
-; FirstLine = 6
-; Folding = XD-
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 90
+; FirstLine = 56
+; Folding = -
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

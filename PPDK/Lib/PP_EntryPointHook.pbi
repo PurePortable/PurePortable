@@ -16,7 +16,7 @@ Global Original_EntryPoint
 ; ExeMain, Entry, MainEntry, EntryPoint
 Procedure _InitEntryPointHook()
 	Protected mi.MODULEINFO
-	GetModuleInformation_(GetCurrentProcess_(),GetModuleHandle_(#Null),@mi,SizeOf(MODULEINFO))
+	GetModuleInformation_(ProcessId,GetModuleHandle_(#Null),@mi,SizeOf(MODULEINFO))
 	MH_CreateHook(mi\EntryPoint,?Detour_EntryPoint,@Original_EntryPoint)
 	MH_EnableHook(mi\EntryPoint)
 	;dbg(Str(mi\EntryPoint)+" "+Str(?Detour_EntryPoint)+" "+Str(Original_EntryPoint))
@@ -25,6 +25,7 @@ AddInitProcedure(_InitEntryPointHook)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 18
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

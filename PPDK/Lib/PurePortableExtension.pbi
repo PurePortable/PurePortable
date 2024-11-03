@@ -83,10 +83,16 @@ Procedure _ExtInitialization()
 EndProcedure
 _ExtInitialization()
 ;;======================================================================================================================
+ProcedureDLL PurePortableExtension(*data)
+	*EXT = *data
+	
+	ProcedureReturn 0
+EndProcedure
+;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 32
-; FirstLine = 13
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 89
+; FirstLine = 54
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

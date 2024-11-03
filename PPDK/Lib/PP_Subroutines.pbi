@@ -265,6 +265,12 @@ XIncludeFile "proc\CreatePath.pbi"
 XIncludeFile "proc\NormalizePath.pbi"
 XIncludeFile "proc\CorrectPath.pbi"
 
+; CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+; 	Import "shlwapi.lib" : StrTrim(psz1,psz2) As "_StrTrimW@8" : EndImport
+; CompilerElse
+; 	Import "shlwapi.lib" : StrTrim(psz1,psz2) As "StrTrimW" : EndImport
+; CompilerEndIf
+
 ;;======================================================================================================================
 ;{ Проверка версии/имени файла
 
@@ -276,54 +282,46 @@ XIncludeFile "proc\CorrectPath.pbi"
 
 Macro ValidateProgram(N,R,V,L=0,CP="")
 	If Not _ValidateProgram(GetFileVersionInfo(PrgPath,R,CP),V,L)
-		CompilerSelect N
-			CompilerCase 1		
+		CompilerIf N
+			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
-			CompilerCase 2		
-				ProcedureReturn
-			CompilerCase 3		
-				Goto EndAttach
-		CompilerEndSelect
+			CompilerEndIf
+			ProcedureReturn 1
+		CompilerEndIf
 	EndIf
 EndMacro
 Macro ValidateProgramL(N,R,V,L=0,CP="")
 	If Not _ValidateProgramL(GetFileVersionInfo(PrgPath,R,CP),V,L)
-		CompilerSelect N
-			CompilerCase 1		
+		CompilerIf N
+			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
-			CompilerCase 2		
-				ProcedureReturn
-			CompilerCase 3		
-				Goto EndAttach
-		CompilerEndSelect
+			CompilerEndIf
+			ProcedureReturn 1
+		CompilerEndIf
 	EndIf
 EndMacro
 Macro ValidateProgramName(N,V,L=0)
 	If Not _ValidateProgram(PrgName,V,L)
-		CompilerSelect N
-			CompilerCase 1		
+		CompilerIf N
+			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
-			CompilerCase 2		
-				ProcedureReturn
-			CompilerCase 3		
-				Goto EndAttach
-		CompilerEndSelect
+			CompilerEndIf
+			ProcedureReturn 1
+		CompilerEndIf
 	EndIf
 EndMacro
 Macro ValidateProgramNameL(N,V,L=0)
 	If Not _ValidateProgramL(PrgName,V,L)
-		CompilerSelect N
-			CompilerCase 1		
+		CompilerIf N
+			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
-			CompilerCase 2		
-				ProcedureReturn
-			CompilerCase 3		
-				Goto EndAttach
-		CompilerEndSelect
+			CompilerEndIf
+			ProcedureReturn 1
+		CompilerEndIf
 	EndIf
 EndMacro
 
@@ -455,9 +453,9 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 60
-; FirstLine = 28
-; Folding = 59PwDw6
+; CursorPosition = 287
+; FirstLine = 113
+; Folding = 59PAgA5
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

@@ -23,6 +23,7 @@ Compile-ProxyDll "PureSimple" "comdlg32" -ErrorList $SrcErr -InternalName "comdl
 Compile-ProxyDll "PureSimple" "kernel32" -ErrorList $SrcErr -InternalName "kernel32-1" -FileDescription "PureSimple with Registry 1 module" -Dir32 $Dir32 -Dir64 $Dir64 -O "kernel32-1" -C "PORTABLE_REGISTRY=1" -CorrectExport
 Compile-ProxyDll "PureSimple" "kernel32" -ErrorList $SrcErr -InternalName "kernel32-2" -FileDescription "PureSimple with Registry 2 module" -Dir32 $Dir32 -Dir64 $Dir64 -O "kernel32-2" -C "PORTABLE_REGISTRY=2" -CorrectExport
 
+# Вывод информации об ошибках
 if ($SrcErr.Count -gt 0) {
     Write-Host "Errors: $($SrcErr.Count)" -For White -Bac DarkRed
     foreach ($Err in $SrcErr) {
@@ -32,7 +33,6 @@ if ($SrcErr.Count -gt 0) {
 else {
     Write-Host "Errors: $($SrcErr.Count)" -For White -Bac DarkGreen
 }
-
 Write-Host "Press any key to continue . . . " -For White -NoNewLine
 while ($KeyInfo.VirtualKeyCode -eq $Null) { $KeyInfo = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") }
 Write-Host ""

@@ -19,7 +19,6 @@ XIncludeFile "PurePortable.pbi"
 ; CompilerIf #DBG_ANY And Not Defined(DBG_ALWAYS,#PB_Constant)
 ; 	#DBG_ALWAYS = 1
 ; CompilerEndIf
-Global DbgAnyMode
 ;Global DbgAttach
 Global DbgDetach
 
@@ -49,8 +48,9 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 12
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 21
+; FirstLine = 14
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

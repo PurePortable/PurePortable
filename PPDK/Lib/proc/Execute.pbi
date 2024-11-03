@@ -13,10 +13,11 @@
 #EXECUTE_WAIT = 1
 #EXECUTE_HIDE = 2
 
-Procedure Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
+Procedure.i Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 	Protected StartupInfo.STARTUPINFO
 	Protected ProcessInfo.PROCESS_INFORMATION
 	Protected CreationFlags = #CREATE_DEFAULT_ERROR_MODE | #CREATE_NEW_PROCESS_GROUP
+	Protected ExitCode
 	StartupInfo\cb = SizeOf(STARTUPINFO)
 	;StartupInfo\wShowWindow = #SW_SHOWMAXIMIZED
 	Protected CmdLine.s
@@ -43,17 +44,18 @@ Procedure Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 			;dbg("WaitForSingleObject")
 			WaitForSingleObject_(ProcessInfo\hProcess,#INFINITE)
 			;WaitForSingleObjectEx_(ProcessInfo\hProcess,#INFINITE,#True)
-			;GetExitCodeProcess_(ProcessInfo\hProcess,@ExitCode)
+			GetExitCodeProcess_(ProcessInfo\hProcess,@ExitCode)
 		EndIf
 		CloseHandle_(ProcessInfo\hProcess)
 		CloseHandle_(ProcessInfo\hThread)
 	EndIf
 	;dbg("CreateProcess: END")
+	ProcedureReturn ExitCode
 EndProcedure
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 50
-; FirstLine = 18
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 43
+; FirstLine = 2
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

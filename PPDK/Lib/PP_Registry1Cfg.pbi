@@ -468,7 +468,9 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AAAA-
+; CursorPosition = 308
+; FirstLine = 90
+; Folding = AAAY-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

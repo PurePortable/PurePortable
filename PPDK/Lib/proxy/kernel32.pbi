@@ -691,8 +691,8 @@ DeclareExportFunc(InterlockedFlushSList,kernel32,_InterlockedFlushSList@4,Interl
 DeclareExportFunc(InterlockedPopEntrySList,kernel32,_InterlockedPopEntrySList@4,InterlockedPopEntrySList)
 DeclareExportFunc(InterlockedPushEntrySList,kernel32,_InterlockedPushEntrySList@8,InterlockedPushEntrySList)
 ;DeclareExportFunc(InterlockedPushListSList,kernel32,_InterlockedPushListSList@16,InterlockedPushListSList)
-DeclareExportFunc64(InterlockedPushListSList,kernel32,InterlockedPushListSList)
-DeclareExportFunc(InterlockedPushListSListEx,kernel32,_InterlockedPushListSListEx@16,InterlockedPushListSListEx)
+DeclareExportFunc64(InterlockedPushListSList,kernel32,InterlockedPushListSList) ; ???
+;DeclareExportFunc(InterlockedPushListSListEx,kernel32,_InterlockedPushListSListEx@16,InterlockedPushListSListEx) ; нет в Win 7
 DeclareExportFunc(IsBadCodePtr,kernel32,_IsBadCodePtr@4,IsBadCodePtr)
 DeclareExportFunc(IsBadHugeReadPtr,kernel32,_IsBadHugeReadPtr@8,IsBadHugeReadPtr)
 DeclareExportFunc(IsBadHugeWritePtr,kernel32,_IsBadHugeWritePtr@8,IsBadHugeWritePtr)
@@ -1186,7 +1186,7 @@ DeclareExportFunc(lstrlenW,kernel32,_lstrlenW@4,lstrlenW)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; CursorPosition = 693
-; FirstLine = 676
+; FirstLine = 677
 ; Markers = 151,313,684,802,871,911
 ; EnableAsm
 ; DisableDebugger

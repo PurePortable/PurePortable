@@ -1,12 +1,18 @@
 ﻿;;======================================================================================================================
 CompilerIf Not Defined(DBG_CBT_HOOK,#PB_Constant) : #DBG_CBT_HOOK = 0 : CompilerEndIf
 
+
+CompilerIf Defined(DBG_ALWAYS,#PB_Constant)
+	#DBG_CBT_HOOK_ALWAYS = #DBG_ALWAYS
+CompilerElse
+	#DBG_CBT_HOOK_ALWAYS = 0
+CompilerEndIf
+
 CompilerIf #DBG_CBT_HOOK And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 
 CompilerIf #DBG_CBT_HOOK
-	;UndefineMacro DbgAny : DbgAnyDef
 	Global DbgCbtMode = #DBG_CBT_HOOK
 	Procedure DbgCbt(txt.s)
 		If DbgCbtMode
@@ -20,43 +26,37 @@ CompilerEndIf
 Declare CheckTitle(nCode,Title.s)
 Global hCBTHook
 Procedure.l CBTProc(nCode,wParam,*lParam)
-	Protected title.s = Space(64)
-	Select nCode
-		;Case #HCBT_CREATEWND
-		;	Protected *cw.CBT_CREATEWND
-		;	Protected *cs.CREATESTRUCT
-		;	Protected *as.CBTACTIVATESTRUCT
-		;	DbgCbt("CBTHook: CREATEWND: "+Str(wParam)+" 0x"+Hex(wParam))
-		;	*cw = *lParam
-		;	*cs = *cw\lpcs
-		;	If *cs\lpszClass
-		;		DbgCbt("CBTHook: CLASS: "+PeekS(*cs\lpszClass))
-		;	EndIf
-		;	DbgCbt("CBTHook: CREATEWND: "+Str(wParam)+" 0x"+Hex(wParam)+" «"+PeekSZ(*cs\lpszName)+"»")
-		Case #HCBT_DESTROYWND
-			;DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam))
-			GetWindowText_(wParam,@title,64)
-			DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam)+" «"+title+"»")
-			CharLower_(title)
-			Protected ct = CheckTitle(nCode,title)
-			If ct & #PORTABLE_CBTR_SAVECFG
+	Global DbgDetach
+	Global ProcessCnt
+	Protected Title.s = Space(64)
+	If nCode = #HCBT_DESTROYWND
+		;DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam))
+		GetWindowText_(wParam,@Title,64)
+		DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam)+" «"+Title+"»")
+		CharLower_(Title)
+		Protected ct = CheckTitle(nCode,Title)
+		If ct = #PORTABLE_CBTR_EXIT ; полное завершение работы программы
+			UnhookWindowsHookEx_(hCBTHook)
+			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
+				If DbgDetach
+					dbg("CBTHook: Exit: "+DllPath+" ("+Str(ProcessCnt)+")")
+				EndIf
+			CompilerEndIf
+			PPExitProcess()
+			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
+				If DbgDetach
+					dbg("CBTHook: Exit: "+PrgPath)
+				EndIf
+			CompilerEndIf
+			ProcedureReturn ;CallNextHookEx_(#Null,nCode,wParam,*lParam)
+		EndIf
+		CompilerIf #PORTABLE_REGISTRY
+			If ct = #PORTABLE_CBTR_SAVECFG ; только сохранение конфигурации
 				DbgCbt("CBTHook: WriteCfg")
 				WriteCfg()
 			EndIf
-			CompilerIf Defined(MH_Initialize,#PB_Procedure)
-				If ct & #PORTABLE_CBTR_UNINITIALIZE
-					DbgCbt("CBTHook: Unhook MH")
-					MH_Uninitialize()
-				EndIf
-			CompilerEndIf
-			If ct & #PORTABLE_CBTR_UNHOOK
-				DbgCbt("CBTHook: Unhook CBT")
-				UnhookWindowsHookEx_(hCBTHook)
-			EndIf
-			If ct & $100
-				ProcedureReturn
-			EndIf
-	EndSelect
+		CompilerEndIf
+	EndIf
 	ProcedureReturn CallNextHookEx_(#Null,nCode,wParam,*lParam)
 EndProcedure
 
@@ -72,8 +72,8 @@ AddInitProcedure(_InitCBTHook)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 67
-; FirstLine = 37
+; CursorPosition = 45
+; FirstLine = 30
 ; Folding = -
 ; EnableAsm
 ; DisableDebugger

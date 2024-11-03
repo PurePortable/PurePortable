@@ -19,30 +19,6 @@ CompilerIf Not Defined(DBG_ANY,#PB_Constant) : #DBG_ANY = 0 : CompilerEndIf
 CompilerIf #DBG_ANY And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
-Global DbgAnyMode
-;Global DbgAttach
-Global DbgDetach
-
-; При первом использовании выведет общую информацию
-; Macro DbgAnyDef
-; 	UndefineMacro DbgAny
-; 	CompilerIf Not Defined(DbgAny,#PB_Procedure)
-; 		Global PrgPath.s, DllPath.s
-; 		Global DbgAnyMode = #DBG_ANY
-; 		Procedure DbgAny(txt.s)
-; 			If DbgAnyMode
-; 				dbg(txt)
-; 			EndIf
-; 		EndProcedure
-; 		DbgAny("ATTACHPROCESS: "+PrgPath)
-; 		DbgAny("ATTACHPROCESS: "+DllPath)
-; 	CompilerEndIf
-; EndMacro
-;Macro DbgAny(txt) : EndMacro ; этот макрос будет определён в конце основного файла PurePortable.pbi
-
-;CompilerIf #DBG_ANY
-;	DbgAnyDef
-;CompilerEndIf
 
 ;;======================================================================================================================
 ; CompilerIf Not Defined(LOGGING,#PB_Constant) : #LOGGING = 0 : CompilerEndIf
@@ -92,7 +68,7 @@ Macro LoggingEnd(s) : EndMacro
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 22
+; CursorPosition = 21
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

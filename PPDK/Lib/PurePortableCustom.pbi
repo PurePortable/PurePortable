@@ -54,17 +54,21 @@
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Константы #PORTABLE_CBT_HOOK и для управлением при выходе
+; Начиная с версии 4.10.31 эти значения частично не актуальны
 #PORTABLE_CBT_ON = 1
-#PORTABLE_CBTR_SAVECFG = 2
-#PORTABLE_CBTR_UNHOOK = 4 ; Снимать хук
-#PORTABLE_CBTR_UNINITIALIZE = 8 ; Снимать MinHook-и и прочие
-#PORTABLE_CBTR_FULL = #PORTABLE_CBTR_SAVECFG|#PORTABLE_CBTR_UNHOOK|#PORTABLE_CBTR_UNINITIALIZE
+#PORTABLE_CBTR_EXIT = $1 ; Снять CBT-хук, выполнить DetachProcess (полное завершение работы программы)
+#PORTABLE_CBTR_SAVECFG = $2 ; Выполнить SaveCfg
+#PORTABLE_CBTR_UNHOOK = $4 ; Снимать хук
+#PORTABLE_CBTR_UNINITIALIZE = $8 ; Снимать MinHook-и и прочие
+#PORTABLE_CBTR_DETACHPROCESS = $10 ; Выполнить DetachProcess
+#PORTABLE_CBTR_FULL = #PORTABLE_CBTR_SAVECFG|#PORTABLE_CBTR_UNHOOK|#PORTABLE_CBTR_UNINITIALIZE|#PORTABLE_CBTR_DETACHPROCESS
 
 #PORTABLE_CBTR_NO_CALLNEXTHOOK = $100 ; Не выполнять CallNextHookEx
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
