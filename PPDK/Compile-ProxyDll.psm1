@@ -1,4 +1,26 @@
-﻿function Compile-ProxyDll {
+﻿function Compile-ProxyDll-Start {
+	$global:CompileProxyDllErrors = [System.Collections.Generic.List[string]]::new()
+}
+
+function Compile-ProxyDll-Result {
+	#if (Get-Variable CompileProxyDllErrors -Scope Global -ErrorAction SilentlyContinue) {
+	if (Test-Path variable:global:CompileProxyDllErrors) {
+		if ($global:CompileProxyDllErrors.Count -gt 0) {
+			Write-Host "Errors: $($global:CompileProxyDllErrors.Count)" -For White -Bac DarkRed
+			foreach ($Err in $global:CompileProxyDllErrors) {
+				Write-Host $Err
+			}
+		}
+		else {
+			Write-Host "Errors: $($global:CompileProxyDllErrors.Count)" -For White -Bac DarkGreen
+		}
+		Write-Host "Press any key to continue . . . " -For White -NoNewLine
+		while ($KeyInfo.VirtualKeyCode -eq $Null) { $KeyInfo = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") }
+		Write-Host ""
+	}
+}
+
+function Compile-ProxyDll {
 	param (
 		[Parameter(Mandatory=$true,Position=0)]
 		[Alias('S')] [string] $Src
@@ -41,15 +63,18 @@
 		,
 		[Parameter(Mandatory=$false)]
 		[Alias('CE')] [switch] $CorrectExport
-		,
-		[Parameter(Mandatory=$false)]
-		[Alias('EL')] [System.Collections.Generic.List[string]] $ErrorList
+		#,
+		#[Parameter(Mandatory=$false)]
+		#[Alias('EL')] [System.Collections.Generic.List[string]] $ErrorList
 	)
-
-	$RetCode = 0
-	$Compiler32 = "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe"
-	$Compiler64 = "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe"
-	$CorrectExportC = "$PSScriptRoot\PPCorrectExportC.exe"
+	
+	$Compiler32 = ""
+	$Compiler64 = ""
+	. "$PSScriptRoot\Compile-ProxyDll-Settings.ps1"
+	if ($Compiler32 -eq "" -or -not (Test-Path $Compiler32) -or $Compiler64 -eq "" -or -not (Test-Path $Compiler64)) {
+		Write-Error "The compiler was not found"
+		exit
+	}
 	
 	$SrcTmp = "~tmp.pb"
 	$RcTmp = "~tmp.rc"
@@ -155,11 +180,10 @@
 		}
 		$CompileOutput = (& $Compiler32 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp")
 		if ($LastExitCode) {
-			$RetCode += 1
 			$Err = ($CompileOutput -split "`n") | where {$_ -match '^Error:'}
 			Write-Host $Err -For Red
-			if ($PSBoundParameters.ContainsKey('ErrorList')) {
-				$ErrorList.Add("$OutFile (x32) $Err")
+			if (Test-Path variable:global:CompileProxyDllErrors) {
+				$global:CompileProxyDllErrors.Add("$OutFile (x32) $Err")
 			}
 		}
 		else {
@@ -186,11 +210,10 @@
 		}
 		$CompileOutput = (& $Compiler64 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp")
 		if ($LastExitCode) {
-			$RetCode += 2
 			$Err = ($CompileOutput -split "`n") | where {$_ -match '^Error:'}
 			Write-Host $Err -For Red
-			if ($PSBoundParameters.ContainsKey('ErrorList')) {
-				$ErrorList.Add("$OutFile (x64) $Err")
+			if (Test-Path variable:global:CompileProxyDllErrors) {
+				$global:CompileProxyDllErrors.Add("$OutFile (x64) $Err")
 			}
 		}
 		else {
@@ -207,6 +230,4 @@
 	# Завершение
 	Remove-Item -Lit $SrcTmp -Force -ErrorAction Ignore
 	Remove-Item -Lit $RcTmp -Force -ErrorAction Ignore
-
-	#return $RetCode
 }

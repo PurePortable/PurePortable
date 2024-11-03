@@ -1,6 +1,4 @@
-﻿#function Compile-ProxyDll
-
-param (
+﻿param (
 	[Parameter(Mandatory=$true,Position=0)]
 	[Alias('S')] [string] $Src
 	,
@@ -43,12 +41,20 @@ param (
 	[Parameter(Mandatory=$false)]
 	[Alias('CE')] [switch] $CorrectExport
 )
-$ScriptDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
+#$ScriptDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
 
 $RetCode = 0
-$Compiler32 = "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe"
-$Compiler64 = "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe"
-$CorrectExportC = "$ScriptDir\..\PPDK\PPCorrectExportC.exe"
+
+$Compiler32 = ""
+$Compiler64 = ""
+$CorrectExportC = ".\PPCorrectExportC.exe"
+
+. "$PSScriptRoot\Compile-ProxyDll-Settings.ps1"
+
+if ($Compiler32 -eq "" -or $Compiler64 -eq "") {
+	Write-Error "The compiler was not found"
+	exit
+}
 
 $SrcTmp = "~tmp.pb"
 $RcTmp = "~tmp.rc"
