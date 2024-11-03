@@ -12,12 +12,12 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.0
+;RES_VERSION 4.11.0.0
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
-;RES_INTERNALNAME 410.dll
+;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.10.0.30
+;RES_PRODUCTVERSION 4.11.0.32
 ;PP_X32_COPYAS "P:\PurePortable\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\proxy64.dll"
 ;PP_CLEAN 2
@@ -65,6 +65,8 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
 
+#PORTABLE_CLEANUP = 0
+
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Мониторинг
 #DBG_REGISTRY = 0
@@ -75,6 +77,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_MIN_HOOK = 0
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
+#DBG_CLEANUP = 0
 #DBG_ANY = 0
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
@@ -170,25 +173,26 @@ CompilerEndIf
 ;{ CBT HOOK
 ; Процедура должна вернуть:
 ; 0 - выполнить CallNextHookEx
-; Или сумму флагов
-; 1 - сохранить реестр, 2 - снять CBT-хук (UnhookWindowsHookEx), 4 - снять все хуки
-; $F - сохранить реестр и снять все хуки (при завершении программы)
+; 1 - выполнить процедуру завершения DetachProcedure (как при DetachProcess).
+; 2 - сохранить реестр и продолжить работу.
 CompilerIf #PORTABLE_CBT_HOOK
 	; Заголовок передаётся в нижнем регистре не более 64 символов.
+	; Процедура должна возвратить:
+	; #PORTABLE_CBTR_EXIT если это закрытие главного окна программы. В этом случае принудительно будет выполнена процедура DetachProcess,
+	; при этом при реальном выполнении DetachProcess никаких действий повторно произведено не будет.
+	; #PORTABLE_CBTR_SAVECFG если требуется только сохранение реестра, например, при закрытии окна настроек.
+	; 0 если никаких действий не требуется.
 	Procedure CheckTitle(nCode,Title.s)
-		If Title = "qtpowerdummywindow"
-			CompilerIf Defined(MH_Initialize,#PB_Procedure) : MH_Uninitialize() : CompilerEndIf
-			DbgCbt("CBT EXIT: "+GetFilePart(PrgPath))
-			LoggingEnd("CBT EXIT: "+GetFilePart(PrgPath))
-			ProcedureReturn #PORTABLE_CBTR_FULL
-		EndIf
 		;;-------------------         1         2         3         4         5         6         7         8         9
 		;;-------------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		If Left(Title,10) = "cicmarshalwnd"
-			CompilerIf Defined(MH_Initialize,#PB_Procedure) : MH_Uninitialize() : CompilerEndIf
-			DbgCbt("CBT EXIT: "+GetFilePart(PrgPath))
-			LoggingEnd("CBT EXIT: "+GetFilePart(PrgPath))
-			ProcedureReturn #PORTABLE_CBTR_FULL
+		If Left(Title,08) = "settings"
+			ProcedureReturn #PORTABLE_CBTR_SAVECFG ; только сохранение реестра
+		EndIf
+		If Title = "qtpowerdummywindow"
+			ProcedureReturn #PORTABLE_CBTR_EXIT ; завершение работы программы как при DetachProcess
+		EndIf
+		If Title = "cicmarshalwnd"
+			ProcedureReturn #PORTABLE_CBTR_EXIT ; завершение работы программы как при DetachProcess
 		EndIf
 		ProcedureReturn 0
 	EndProcedure
@@ -202,8 +206,8 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-ProcedureDLL.l AttachProcess(Instance)
-	PPAttachProcess
+; Процедура должна вернуть 1 если не требуется инициализация (установка) хуков
+Procedure AttachProcedure(Instance)
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
 	;ValidateProgramName(1,"program",1) ; Проверка, та ли программа запущена
@@ -212,7 +216,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	;If FileInfo <> "XXX"
 	;	;RaiseError(#ERROR_DLL_INIT_FAILED)
 	;	TerminateProcess_(GetCurrentProcess_(),0)
-	;	ProcedureReturn
+	;	ProcedureReturn 1
 	;EndIf
 
 	;{ Папки
@@ -261,42 +265,40 @@ ProcedureDLL.l AttachProcess(Instance)
 	CompilerEndIf
 	;}
 
-	PPInitialization
-	;EndAttach:
 EndProcedure
 
-;;----------------------------------------------------------------------------------------------------------------------
-ProcedureDLL.l DetachProcess(Instance)
+;;======================================================================================================================
+; Процедура должна вернуть 1 если не требуется деиницилизация хуков и выполнение очистки (cleanup).
+Procedure DetachProcedure(Instance)
 	;;------------------------------------------------------------------------------------------------------------------
 	; Действия выполняемые при завершении работы программы.
 	;;------------------------------------------------------------------------------------------------------------------
-	PPDetachProcess
-	CompilerIf Defined(MIN_HOOK,#PB_Constant)
-		CompilerIf #MIN_HOOK
-			MH_Uninitialize()
-		CompilerEndIf
-	CompilerEndIf
+	
+	;{ Сохранение реестра
 	CompilerIf #PORTABLE_REGISTRY
 		WriteCfg()
 	CompilerEndIf
-	;{ Чистка временных папок
-	CompilerIf #PORTABLE_SPECIAL_FOLDERS Or #PORTABLE_ENVIRONMENT_VARIABLES
-		;If AppDataRedir
-		;	DeleteDirectory(AppDataRedir+"\NVIDIA Corporation","",#PB_FileSystem_Recursive)
-		;	DeleteDirectory(AppDataRedir+"\NVIDIA","",#PB_FileSystem_Recursive)
-		;	DeleteDirectory(AppDataRedir+"\Microsoft","",#PB_FileSystem_Recursive)
-		;EndIf
-	CompilerEndIf
+	;}
+		
+	;{ Удаление ненужных файлов и папок.
+	; Для работы необходимо установить #PORTABLE_CLEANUP=1
+	; Если процессов было запущено несколько, удаление файлов и папок будет выполнено только при завершении последнего процесса.
+	; Команда Clean добавляет файл или папку в список. Выполнение удаления будет вызвано из PPDetachProcessEnd.
+	; Относительные пути рассматриваются относительно папки программы.
+	Clean(AppDataRedir+"\NVIDIA Corporation")
+	Clean(AppDataRedir+"\NVIDIA")
+	Clean(AppDataRedir+"\Microsoft")
 	;}
 	
-	PPDetachProcessEnd
 EndProcedure
 
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = I1rG0
+; CursorPosition = 270
+; FirstLine = 120
+; Folding = Iw5G0
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll

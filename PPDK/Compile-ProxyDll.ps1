@@ -45,6 +45,7 @@ param (
 )
 $ScriptDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
 
+$RetCode = 0
 $Compiler32 = "P:\PureBasic\6.04.x86\Compilers\pbcompiler.exe"
 $Compiler64 = "P:\PureBasic\6.04.x64\Compilers\pbcompiler.exe"
 $CorrectExportC = "$ScriptDir\..\PPDK\PPCorrectExportC.exe"
@@ -149,7 +150,9 @@ if ($x32 -or ((-not $x32) -and (-not $x64))) {
 			New-Item $SubDir -Type Directory
 		}
 	}
-	& $Compiler32 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp"
+	if ((& $Compiler32 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp") -ne 0) {
+		$RetCode += 1
+	}
 	if ($CorrectExport) {
 		& $CorrectExportC "$SubDir\$OutFile"
 	}
@@ -166,7 +169,9 @@ if ($x64 -or ((-not $x32) -and (-not $x64))) {
 			New-Item $SubDir -Type Directory
 		}
 	}
-	& $Compiler64 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp"
+	if ((& $Compiler64 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp") -ne 0) {
+		$RetCode += 2
+	}
 	if ($CorrectExport) {
 		& $CorrectExportC "$SubDir\$OutFile"
 	}
@@ -180,3 +185,5 @@ Remove-Item -Lit $RcTmp -Force -ErrorAction Ignore
 Write-Host ""
 Write-Host "Done"
 Write-Host ""
+
+#return $RetCode

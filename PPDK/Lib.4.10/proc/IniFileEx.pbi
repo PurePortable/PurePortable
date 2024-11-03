@@ -1,41 +1,34 @@
 ﻿;;======================================================================================================================
-; PurePortableSimple Extention
-; Расширение для обработки ini-файлов
+; TODO
+; - Сделать поле Plain строкой. Если Key="" And Value="", использовать Plain для строки.
+; - Section -> Group ???
+; - IniDelete ???
 ;;======================================================================================================================
 
-;PP_SILENT
-;PP_PUREPORTABLE 1
-;PP_FORMAT DLL
-;PP_ENABLETHREAD 1
-;RES_VERSION 4.10.0.31
-;RES_DESCRIPTION PurePortableSimpleExtension
-;RES_COPYRIGHT (c) Smitis, 2017-2024
-;RES_INTERNALNAME PurePortIni.dll
-;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.10.0.0
-;PP_X32_COPYAS "..\Temp\PurePortTxt32.dll"
-;PP_X64_COPYAS "..\Temp\PurePortTxt64.dll"
-;PP_CLEAN 2
+CompilerIf Not Defined(DBG_INIFILEEX,#PB_Constant) : #DBG_INIFILEEX = 0 : CompilerEndIf
+CompilerIf #DBG_INIFILEEX
+	Macro DbgIni(txt) : dbg(txt) : EndMacro
+CompilerElse
+	Macro DbgIni(txt) : EndMacro
+CompilerEndIf
 
-EnableExplicit
-IncludePath "..\PPDK\Lib.4.10"
-
-#DBG_EXTENSION = 0
-XIncludeFile "PurePortableExtension.pbi"
+XIncludeFile "CorrectPath.pbi"
 
 ;;======================================================================================================================
-;{ Работа с ini-файлами
+
 Structure INIDATA
 	Section.s
 	SectionL.s
 	Key.s
 	KeyL.s
 	Value.s
-	Deleted.i
 	Plain.i
+	Deleted.i
+	Written.i ;Saved.i
 EndStructure
 Global Dim IniData.INIDATA(0)
 Global IniFile.s,IniChanged,IniSize,IniCodepage
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniRead(Ini.s)
 	;IniFile = PrgDir+Ini
 	IniFile = Ini
@@ -74,8 +67,9 @@ Procedure IniRead(Ini.s)
 		CloseFile(hIni)
 	EndIf
 EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; После вызова этой процедуры работа с ini-файлом нежелательна.
 Procedure IniWrite()
-	;SortStructuredArray(IniData(),#PB_Sort_Ascending+#PB_Sort_NoCase,OffsetOf(INIDATA\SectionL),TypeOf(INIDATA\SectionL),1,n)
 	Protected CurrentSection.s
 	Protected i, j, hIni
 	If IniChanged
@@ -83,37 +77,42 @@ Procedure IniWrite()
 		If hIni
 			IniChanged = #False
 			For i=1 To IniSize
-				If Not IniData(i)\Deleted
+				If Not IniData(i)\Deleted And Not IniData(i)\Written
 					If CurrentSection<>IniData(i)\SectionL ; начало новой секции
 						CurrentSection = IniData(i)\SectionL
 						WriteStringN(hIni,"["+IniData(i)\Section+"]",IniCodepage)
+						IniData(i)\Written = #True
 					EndIf
 					If IniData(i)\Plain
-						DbgExt("IniWrite: "+IniData(i)\Key)
+						DbgIni("IniWrite: "+IniData(i)\Key)
 						WriteStringN(hIni,IniData(i)\Key,IniCodepage)
 					Else
-						DbgExt("IniWrite: "+IniData(i)\Key+"="+IniData(i)\Value)
+						DbgIni("IniWrite: "+IniData(i)\Key+"="+IniData(i)\Value)
 						WriteStringN(hIni,IniData(i)\Key+"="+IniData(i)\Value,IniCodepage)
 					EndIf
 					; Чтобы склеить секцию, ищем все ключи этой секции
 					For j=i+1 To IniSize
-						If Not IniData(j)\Deleted And CurrentSection=IniData(j)\SectionL
+						If Not IniData(j)\Deleted And Not IniData(j)\Written And CurrentSection=IniData(j)\SectionL
 							If IniData(j)\Plain
-								DbgExt("IniWrite: "+IniData(j)\Key)
+								DbgIni("IniWrite: "+IniData(j)\Key)
 								WriteStringN(hIni,IniData(j)\Key,IniCodepage)
 							Else
-								DbgExt("IniWrite: "+IniData(j)\Key+"="+IniData(j)\Value)
+								DbgIni("IniWrite: "+IniData(j)\Key+"="+IniData(j)\Value)
 								WriteStringN(hIni,IniData(j)\Key+"="+IniData(j)\Value,IniCodepage)
 							EndIf
-							IniData(j)\Deleted = #True ; больше обрабатывать не надо
+							IniData(j)\Written = #True ; больше обрабатывать не надо
 						EndIf
 					Next
 				EndIf
+			Next
+			For i=1 To IniSize
+				IniData(i)\Written = #False
 			Next
 			CloseFile(hIni)
 		EndIf
 	EndIf
 EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniSetKey(Key.s,Value.s)
 	Protected i
 	Protected k.s = LCase(Key)
@@ -127,15 +126,16 @@ Procedure IniSetKey(Key.s,Value.s)
 		EndIf
 	Next
 EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniCorrectKey(Key.s,Base.s,Flags=0)
 	Protected i, Path.s
 	Protected k.s = LCase(Key)
 	For i=1 To IniSize
 		If Not IniData(i)\Deleted And Not IniData(i)\Plain And IniData(i)\KeyL=k
-			DbgExt("IniCorrectKey: < "+IniData(i)\Value)
+			DbgIni("IniCorrectKey: < "+IniData(i)\Value)
 			Path = CorrectPath(IniData(i)\Value,Base,Flags)
 			If IniData(i)\Value<>Path
-				DbgExt("IniCorrectKey: > "+Path)
+				DbgIni("IniCorrectKey: > "+Path)
 				IniData(i)\Value = Path
 				IniChanged = #True
 			EndIf
@@ -143,6 +143,7 @@ Procedure IniCorrectKey(Key.s,Base.s,Flags=0)
 		EndIf
 	Next
 EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniSet(Section.s,Key.s,Value.s)
 	Protected i
 	Protected k.s = LCase(Key)
@@ -167,15 +168,16 @@ Procedure IniSet(Section.s,Key.s,Value.s)
 		IniChanged = #True
 	EndIf
 EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniCorrect(Section.s,Key.s,Base.s,Flags=0)
 	Protected i, Path.s
 	Protected k.s = LCase(Key)
 	Protected s.s = LCase(Section)
 	For i=1 To IniSize
 		If Not IniData(i)\Deleted And Not IniData(i)\Plain And IniData(i)\KeyL=k And IniData(i)\SectionL=s
-			DbgExt("IniCorrect: < "+IniData(i)\Value)
+			DbgIni("IniCorrect: < "+IniData(i)\Value)
 			Path = CorrectPath(IniData(i)\Value,Base,Flags)
-			DbgExt("IniCorrect: > "+Path)
+			DbgIni("IniCorrect: > "+Path)
 			If IniData(i)\Value<>Path
 				IniData(i)\Value = Path
 				IniChanged = #True
@@ -184,98 +186,27 @@ Procedure IniCorrect(Section.s,Key.s,Base.s,Flags=0)
 		EndIf
 	Next
 EndProcedure
-;}
 ;;======================================================================================================================
-
-Global *EXT.PPData
-Structure INIFILE
-	num.s
-	ini.s
-	cp.i
-EndStructure
-Global Dim Inis.INIFILE(0), iInis, nInis
-
-ProcedureDLL PurePortableExtension(*data)
-	*EXT = *data
-	Protected i, k.s, v.s, g.s, p.s
-	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
-	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
-		; Составляем список ini-файлов
-		If PreferenceGroup("IniFiles")
-			ExaminePreferenceKeys()
-			While NextPreferenceKey()
-				k = LCase(PreferenceKeyName())
-				v = PreferencePath()
-				;dbg("PurePortIni: "+v)
-				nInis+1
-				ReDim Inis(nInis)
-				Inis(nInis)\num = k
-				Inis(nInis)\ini = v
-			Wend
-		EndIf
-		; Перебираем все ini-файлы
-		For iInis=1 To nInis
-			IniNum = Inis(iInis)\num
-			IniFile = Inis(iInis)\ini
-			IniRead(IniFile)
-			DbgExt("PurePortIni: "+IniNum+" :: "+IniFile)
-			If PreferenceGroup(IniNum) ; общие данные для ini-файла
-			EndIf
-			IniPref = IniNum+":"
-			ExaminePreferenceGroups()
-			While NextPreferenceGroup()
-				IniGroup = PreferenceGroupName()
-				If Left(IniGroup,Len(IniPref)) = IniPref ; группа, имеющая отношение к ini-файлу
-					Select LCase(Mid(IniGroup,Len(IniPref)+1))
-						Case "correctpaths"
-							ExaminePreferenceKeys()
-							While NextPreferenceKey()
-								k = PreferenceKeyName()
-								v = PreferencePath()
-								i = FindString(k,"|")
-								If i
-									IniCorrect(Left(k,i-1),Mid(k,i+1),v)
-								Else
-									IniCorrectKey(k,v)
-								EndIf
-							Wend
-						Case "setpaths"
-							ExaminePreferenceKeys()
-							While NextPreferenceKey()
-								k = PreferenceKeyName()
-								v = PreferencePath(ExpandEnvironmentStrings(PreferenceKeyValue()))
-								i = FindString(k,"|")
-								If i
-									IniSet(Left(k,i-1),Mid(k,i+1),v)
-									CreatePath(v)
-								EndIf
-							Wend
-					EndSelect
-				EndIf
-			Wend
-			IniWrite()
-		Next
-		ClosePreferences()
-	EndIf
+; Example 1
+; 	IniRead("Sch.ini") ; начало работы с ini-файлом
+; 	IniSet("KeyFilename",PrgDir+"Sch.key")
+; 	IniWrite() ; завершение работы с ini-файлом
 	
-	ProcedureReturn 1
-EndProcedure
+; Example 2
+; 	Protected i
+; 	IniRead("WinMerge.ini") ; начало работы с ini-файлом
+; 	For i=1 To IniSize ; перебор всех ключей независимо от их принадлежности группе
+; 		If Left(IniData(i)\KeyL,6)="files\"
+; 			IniData(i)\Deleted=#True
+; 			IniChanged=#True
+; 		EndIf
+; 	Next
+; 	IniWrite() ; завершение работы с ini-файлом
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; ExecutableFormat = Shared dll
-; Folding = B+
-; Optimizer
-; EnableThread
-; Executable = PurePortIni.dll
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 4
+; Folding = 8-
+; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
-; IncludeVersionInfo
-; VersionField0 = 4.10.0.31
-; VersionField1 = 4.10.0.0
-; VersionField3 = PurePortable
-; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.31
-; VersionField6 = PurePortableSimpleExtension
-; VersionField7 = PurePortIni.dll
-; VersionField9 = (c) Smitis, 2017-2024
