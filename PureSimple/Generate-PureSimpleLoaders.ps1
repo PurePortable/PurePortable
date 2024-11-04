@@ -1,7 +1,4 @@
-﻿$ScriptDir = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
-#Set-Location -Lit $ScriptDir
-#[System.IO.Directory]::SetCurrentDirectory($ScriptDir)
-
+﻿
 $Dir32 = "$PSScriptRoot\bin\x32\loaders"
 $Dir64 = "$PSScriptRoot\bin\x64\loaders"
 
@@ -13,16 +10,14 @@ Compile-ProxyDll-Start
 	"winmm", "version", "version+"
 	"avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "glu32", "iphlpapi", "ktmw32"
 	"mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "secur32"
-	"urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wintrust", "wtsapi32"
-	"shfolder", "vcruntime140"
+	"shfolder", "urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wtsapi32", "vcruntime140"
+	"comdlg32", "wintrust"
 ) | foreach { Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 }
 
 # Загрузчики, требующие коррекцию экспорта
 @(
 	"msimg32"
-	"shell32"
-	"user32"
-	"advapi32"
+	"shell32", "user32", "advapi32", "kernel32"
 	#"comctl32"
 ) | foreach { Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 -CorrectExport}
 
