@@ -5,6 +5,9 @@
 EnableExplicit
 
 XIncludeFile "PurePortable.pbi"
+XIncludeFile "proc\s2guid.pbi"
+XIncludeFile "proc\Execute.pbi"
+XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
@@ -23,6 +26,7 @@ XIncludeFile "PurePortable.pbi"
 Global DbgDetach
 
 XIncludeFile "PP_Extension.pbi"
+
 ;;======================================================================================================================
 Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
 	Protected Result.s
@@ -33,8 +37,8 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 		Dir = PrgDirN
 	EndIf
 	;dbg("PreferencePath: <"+Path)
-	;Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
-	Path = Trim(Trim(Path),Chr(34))
+	Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
+	;Path = Trim(Trim(Path),Chr(34))
 	;dbg("PreferencePath: *"+Path)
 	If Path="."
 		Path = Dir
@@ -49,8 +53,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 21
-; FirstLine = 14
+; CursorPosition = 40
+; FirstLine = 18
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

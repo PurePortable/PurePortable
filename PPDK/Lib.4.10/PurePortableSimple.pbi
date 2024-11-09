@@ -34,7 +34,7 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 		Dir = PrgDirN
 	EndIf
 	;dbg("PreferencePath: <"+Path)
-	;Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
+	Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
 	Path = Trim(Trim(Path),Chr(34))
 	;dbg("PreferencePath: *"+Path)
 	If Path="."
@@ -50,7 +50,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 12
+; CursorPosition = 36
+; FirstLine = 15
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
