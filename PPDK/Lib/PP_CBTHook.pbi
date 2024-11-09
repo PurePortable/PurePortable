@@ -42,7 +42,7 @@ Procedure.l CBTProc(nCode,wParam,*lParam)
 					dbg("CBTHook: Exit: "+DllPath+" ("+Str(ProcessCnt)+")")
 				EndIf
 			CompilerEndIf
-			PPExitProcess()
+			ExitProcedure()
 			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
 				If DbgDetach
 					dbg("CBTHook: Exit: "+PrgPath)
@@ -71,9 +71,9 @@ EndProcedure
 AddInitProcedure(_InitCBTHook)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 45
-; FirstLine = 30
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 44
+; FirstLine = 18
 ; Folding = -
 ; EnableAsm
 ; DisableDebugger

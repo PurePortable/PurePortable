@@ -902,10 +902,8 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEY
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 170
-; FirstLine = 18
-; Folding = CBA-
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = CAA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

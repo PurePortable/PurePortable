@@ -1,6 +1,6 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.10.30
-#PP_MAINVERSION = 4.10
+; PurePortable main lib 4.11.0.1
+#PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
 CompilerIf Not Defined(PB_Compiler_Backend,#PB_Constant) : #PB_Compiler_Backend = 0 : CompilerEndIf
@@ -131,7 +131,7 @@ CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFo
 	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
 ; CursorPosition = 1
 ; Folding = --

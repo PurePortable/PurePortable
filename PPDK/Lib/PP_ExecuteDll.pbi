@@ -21,13 +21,12 @@ ProcedureDLL PurePortableExecute(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	CmdLine = PeekS(PathGetArgs_(@CmdLine)) ; отбрасываем первый параметр
 	;dbg("«"+CmdLine+"»")
 	Execute("",CmdLine,ExecuteFlags)
-	
 EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 18
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 22
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

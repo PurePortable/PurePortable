@@ -11,8 +11,8 @@ CompilerIf #DBG_CLEANUP And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 
+Global DbgClnMode = 1
 CompilerIf #DBG_CLEANUP
-	Global DbgClnMode
 	Procedure DbgCln(Txt.s)
 		If DbgClnMode
 			dbg(Txt)
@@ -36,25 +36,26 @@ Procedure AddCleanItem(Item.s)
 	If hCleaupList = 0
 		CleanupList = Space(#MAX_PATH)
 		RetCode = GetTempFileName_(TempDir,"~PP",0,@CleanupList)
-		CleanupList = CleanupList
+		;CleanupList = CleanupList ; убрать лишние символы
 		hCleaupList = OpenFile(#PB_Any,CleanupList,#PB_UTF8)
 		;hCleaupList = CreateFile(#PB_Any,CleanupList)
 		WriteStringFormat(hCleaupList,#PB_UTF8)
+		WriteStringN(hCleaupList,Str(DbgClnMode),#PB_UTF8) ; первая строка режим вывода сообщений для PureSimple
 	EndIf
 	WriteStringN(hCleaupList,NormalizePath(Item),#PB_UTF8)
 EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 ; Ручное добавление цели в список очистки для использования в PureExpert из DetachProcedure.
 Procedure Clean(Item.s)
-	If LastProcess
+	If Not IsRunDll And LastProcess
 		AddCleanItem(Item)
 	EndIf
 EndProcedure
-
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Команды для добавления в DetachProcedure
 ; Если это последний процесс и список очистки создан (вызывались Clean или AddCleanItem), будет создан отдельный процесс для очистки.
 Macro DetachCleanup
-	If LastProcess And hCleaupList
+	If Not IsRunDll And LastProcess And hCleaupList
 		CloseFile(hCleaupList)
 		;dbg("Execute rundll32 "+Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34))
 		Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34))
@@ -79,6 +80,7 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	hCleaupList = ReadFile(#PB_Any,CleanupList,#PB_UTF8)
 	ReadStringFormat(hCleaupList) ; не важен, всегда должен быть UTF8
 	If hCleaupList
+		DbgClnMode = Val(ReadString(hCleaupList,#PB_UTF8)) ; первая строка режим вывода сообщений для PureSimple
 		While Not Eof(hCleaupList)
 			CleanupItem = ReadString(hCleaupList,#PB_UTF8)
 			DbgCln("PurePortableCleanup: "+CleanupItem)
@@ -106,9 +108,9 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 14
-; FirstLine = 9
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 59
+; FirstLine = 38
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

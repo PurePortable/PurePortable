@@ -59,7 +59,7 @@ EndProcedure
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 Global ProcessId
 
-Procedure _ExtInitialization()
+Procedure ExtensionInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
 		!MOV [v_DllInstance], EAX
@@ -81,18 +81,19 @@ Procedure _ExtInitialization()
 		ExtPrefs+".ini"
 	EndIf
 EndProcedure
-_ExtInitialization()
+ExtensionInitialization()
 ;;======================================================================================================================
 ProcedureDLL PurePortableExtension(*data)
 	*EXT = *data
 	
+	ExtensionProcedure(*data)
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 89
-; FirstLine = 54
+; CursorPosition = 83
+; FirstLine = 56
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

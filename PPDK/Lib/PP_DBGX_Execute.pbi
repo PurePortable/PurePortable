@@ -57,7 +57,6 @@ CompilerIf #DETOUR_CREATEPROCESS
 	Global Original_CreateProcessA.CreateProcess
 	Procedure Detour_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
 		Protected ApplicationName.s = PeekSZ(lpApplicationName,-1,#PB_Ascii)
-		Protected ApplicationNameA.s
 		Protected CommandLine.s = PeekSZ(lpCommandLine,-1,#PB_Ascii)
 		dbg("CreateProcessA: «"+ApplicationName+"» «"+CommandLine+"»")
 		;ApplicationNameEx = ExpandEnvironmentStrings(ApplicationName)
@@ -101,8 +100,8 @@ AddInitProcedure(_InitDbgxExecuteHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 78
-; FirstLine = 67
+; CursorPosition = 59
+; FirstLine = 51
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

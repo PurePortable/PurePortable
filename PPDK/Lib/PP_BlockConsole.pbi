@@ -94,6 +94,7 @@ EndProcedure
 ;;======================================================================================================================
 
 XIncludeFile "PP_MinHook.pbi"
+
 ;;======================================================================================================================
 
 Global BlockConsolePermit = 1
@@ -113,7 +114,8 @@ AddInitProcedure(_InitBlockConsoleHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 13
+; CursorPosition = 96
+; FirstLine = 78
 ; Folding = -
 ; DisableDebugger
 ; EnableExeConstant
