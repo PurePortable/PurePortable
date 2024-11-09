@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.1
+;RES_VERSION 4.11.0.2
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME PurePort.dll
@@ -31,7 +31,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Общие параметры компиляции
 #PORTABLE = 1 ; Управление портабелизацией: 0 - прозрачный режим, 1 - перехват
-#PORTABLE_REGISTRY = $101 ; Перехват функций для работы с реестром
+#PORTABLE_REGISTRY = 1 ; Перехват функций для работы с реестром
 ;{ Управление хуками PORTABLE_REGISTRY
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
@@ -61,14 +61,14 @@ XIncludeFile "PurePortableCustom.pbi"
 ;{ Мониторинг
 #DBG_REGISTRY = #DBG_REG_MODE_MAX
 #DBG_SPECIAL_FOLDERS = #DBG_SF_MODE_MAX
-#DBG_ENVIRONMENT_VARIABLES = 0
+#DBG_ENVIRONMENT_VARIABLES = 1
 #DBG_PROFILE_STRINGS = 0
 #DBG_CBT_HOOK = 0
 #DBG_MIN_HOOK = 0
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
 #DBG_CLEANUP = 1
-#DBG_ANY = 1
+#DBG_ANY = 0
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
 #DBGX_EXECUTE = 0 ; 1 - ShellExecute/CreateProcess, 2 - CreateProcess
@@ -98,9 +98,6 @@ XIncludeFile "PurePortableCustom.pbi"
 #INCLUDE_MIN_HOOK = 1 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
 XIncludeFile "PurePortableSimple.pbi"
-XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
-XIncludeFile "proc\s2guid.pbi"
-XIncludeFile "proc\Execute.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure RFID_DATA
@@ -186,19 +183,10 @@ CompilerEndIf
 CompilerIf #PORTABLE_CBT_HOOK
 	; Заголовок передаётся в нижнем регистре не более 64 символов.
 	Procedure CheckTitle(nCode,Title.s)
-		If Title = "qtpowerdummywindow"
-			CompilerIf Defined(MH_Initialize,#PB_Procedure) : MH_Uninitialize() : CompilerEndIf
-			dbgany("CBT EXIT: "+GetFilePart(PrgPath))
-			LoggingEnd("CBT EXIT: "+GetFilePart(PrgPath))
-			ProcedureReturn #PORTABLE_CBTR_FULL
-		EndIf
 		;;-------------------         1         2         3         4         5         6         7         8         9
 		;;-------------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		If Left(Title,10) = "cicmarshalwnd"
-			CompilerIf Defined(MH_Initialize,#PB_Procedure) : MH_Uninitialize() : CompilerEndIf
-			dbgany("CBT EXIT: "+GetFilePart(PrgPath))
-			LoggingEnd("CBT EXIT: "+GetFilePart(PrgPath))
-			ProcedureReturn #PORTABLE_CBTR_FULL
+			ProcedureReturn #PORTABLE_CBTR_EXIT
 		EndIf
 		ProcedureReturn 0
 	EndProcedure
@@ -300,7 +288,6 @@ Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
 EndProcedure
 ;}
 ;;======================================================================================================================
-
 Global PureSimplePrefs.s
 Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
 Global PPData.PPDATA
@@ -326,14 +313,10 @@ EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Declare RunFrom(k.s,p.s)
 ;;----------------------------------------------------------------------------------------------------------------------
+; Действия выполняемые при запуске программы.
+; Процедура должна вернуть 1 если не требуется выполнение процедуры инициализации (инициализация модулей, установка хуков и т.п.).
+; Для rundll32 не выполняется.
 Procedure AttachProcedure(Instance)
-	If LCase(PrgName) = "rundll32"
-		; TODO: дополнительно проверить ресурсы
-		; Protected CompanyName = 
-		; CompanyName: Microsoft Corporation
-		; InternalName: rundll
-		ProcedureReturn
-	EndIf
 	Protected i, j
 	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
 	Protected RetCode
@@ -350,7 +333,7 @@ Procedure AttachProcedure(Instance)
 	ElseIf FileExist(PrgDir+"PurePort.ini")
 		PureSimplePrefs = PrgDir+"PurePort.ini"
 	EndIf
-	_OpenPreference(PureSimplePrefs)
+	_OpenPreference(PureSimplePrefs) ; текущая группа будет Portable
 	;}
 	;{ Мультиконфиг
 	; После _OpenPreference текущая группа Portable
@@ -396,7 +379,7 @@ Procedure AttachProcedure(Instance)
 			If PreferenceGroup("ValidateProgram") = 0
 				MessageBox_(0,"Section [ValidateProgram] not found!","PurePortable",#MB_ICONERROR)
 				TerminateProcess_(GetCurrentProcess_(),0)
-				Goto EndAttach
+				ProcedureReturn 1
 			EndIf
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -501,6 +484,7 @@ Procedure AttachProcedure(Instance)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
+		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)
 		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
 		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
 		BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
@@ -806,15 +790,13 @@ Procedure AttachProcedure(Instance)
 	EndIf		
 	;}
 	
-	EndAttach:
 EndProcedure
 
-;;----------------------------------------------------------------------------------------------------------------------
+;;======================================================================================================================
+; Действия выполняемые при завершении работы программы.
+; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
+; Для rundll32 не выполняется.
 Procedure DetachProcedure(Instance)
-	If LCase(PrgName) = "rundll32"
-		ProcedureReturn 1
-	EndIf
-		
 	CompilerIf #PORTABLE_REGISTRY
 		If RegistryPermit
 			WriteCfg()
@@ -902,21 +884,20 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 22
-; Folding = xAYA-LEg5
+; Folding = xEYAHIAAw
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.1
+; VersionField0 = 4.11.0.2
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.1
+; VersionField5 = 4.11.0.2
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024

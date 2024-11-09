@@ -195,7 +195,7 @@ Structure INIFILE
 EndStructure
 Global Dim Inis.INIFILE(0), iInis, nInis
 
-ProcedureDLL PurePortableExtension(*data)
+Procedure ExtensionProcedure(*data)
 	*EXT = *data
 	Protected i, k.s, v.s, g.s, p.s
 	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
@@ -262,8 +262,10 @@ ProcedureDLL PurePortableExtension(*data)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 197
+; FirstLine = 42
 ; Folding = B+
 ; Optimizer
 ; EnableThread

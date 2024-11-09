@@ -29,16 +29,16 @@ XIncludeFile "PurePortableProxy.pbi"
 ProcedureDLL.l AttachProcess(Instance)
 	DisableThreadLibraryCalls_(Instance)
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Protected dll.s = "PurePort32.dll"
+		Protected PurePortDll.s = "PurePort32.dll"
 	CompilerElse
-		Protected dll.s = "PurePort64.dll"
+		Protected PurePortDll.s = "PurePort64.dll"
 	CompilerEndIf
-	If FileExist(PrgDir+dll)
-		dll = PrgDir+dll
+	If FileExist(PrgDir+PurePortDll)
+		PurePortDll = PrgDir+PurePortDll
 	ElseIf FileExist(PrgDir+"PurePort.dll")
-		dll = PrgDir+"PurePort.dll"
+		PurePortDll = PrgDir+"PurePort.dll"
 	EndIf
-	LoadLibrary_(@dll)
+	LoadLibrary_(@PurePortDll)
 	;PPInitialization
 EndProcedure
 
@@ -51,7 +51,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 8
+; CursorPosition = 36
+; FirstLine = 15
 ; Folding = -
 ; Optimizer
 ; EnableThread

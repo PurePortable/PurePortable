@@ -1,7 +1,4 @@
 ﻿;;======================================================================================================================
-; TODO:
-; - PreferencePath - раскрытие переменных среды
-;;======================================================================================================================
 EnableExplicit
 
 XIncludeFile "PurePortable.pbi"
@@ -52,9 +49,8 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 40
-; FirstLine = 18
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 1
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
