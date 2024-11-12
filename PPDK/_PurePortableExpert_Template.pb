@@ -12,12 +12,12 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.0
+;RES_VERSION 4.11.0.2
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.11.0.32
+;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS "P:\PurePortable\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\proxy64.dll"
 ;PP_CLEAN 2
@@ -206,15 +206,22 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-; Процедура должна вернуть 1 если не требуется инициализация (установка) хуков
+; Действия выполняемые при запуске программы.
+; Процедура должна вернуть 1 если не требуется выполнение процедуры инициализации (инициализация модулей, установка хуков и т.п.).
+; Для rundll32 не выполняется.
 Procedure AttachProcedure()
+	; Проверка, та ли программа запущена
+	; Макросы ValidateProgram вставят ProcedureReturn 1 автоматически.
+	; Первый параметр макросов:
+	; 0 - Не проверять.
+	; 1 - Проверить и выдать предупреждение, если не та программа. Завершить неправильный процесс при необходимости.
+	; 2 - Проверить, если программа не та, не проводить инициализацию хуков.
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
-	;ValidateProgramName(1,"program",1) ; Проверка, та ли программа запущена
+	;ValidateProgramName(1,"program",1) ; Проверка по имени, та ли программа запущена
 	;Protected FileInfo.s = LCase(GetFileVersionInfo(PrgPath,"InternalName"))
 	;Protected FileInfo.s = LCase(GetFilePart(GetFileVersionInfo(PrgPath,"OriginalFilename"),#PB_FileSystem_NoExtension))
 	;If FileInfo <> "XXX"
-	;	;RaiseError(#ERROR_DLL_INIT_FAILED)
 	;	TerminateProcess_(GetCurrentProcess_(),0)
 	;	ProcedureReturn 1
 	;EndIf
@@ -268,28 +275,23 @@ Procedure AttachProcedure()
 EndProcedure
 
 ;;======================================================================================================================
-; Процедура должна вернуть 1 если не требуется деиницилизация хуков и выполнение очистки (cleanup).
+; Действия выполняемые при завершении работы программы.
+; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
+; Для rundll32 не выполняется.
 Procedure DetachProcedure()
-	;;------------------------------------------------------------------------------------------------------------------
-	; Действия выполняемые при завершении работы программы.
-	;;------------------------------------------------------------------------------------------------------------------
-	
 	;{ Сохранение реестра
 	CompilerIf #PORTABLE_REGISTRY
 		WriteCfg()
 	CompilerEndIf
 	;}
-		
 	;{ Удаление ненужных файлов и папок.
 	; Для работы необходимо установить #PORTABLE_CLEANUP=1
 	; Если процессов было запущено несколько, удаление файлов и папок будет выполнено только при завершении последнего процесса.
-	; Команда Clean добавляет файл или папку в список. Выполнение удаления будет вызвано из PPDetachProcessEnd.
+	; Команда Clean добавляет файл или папку в список.
 	; Относительные пути рассматриваются относительно папки программы.
-	Clean(AppDataRedir+"\NVIDIA Corporation")
-	Clean(AppDataRedir+"\NVIDIA")
-	Clean(AppDataRedir+"\Microsoft")
+	;Clean(AppDataRedir+".\NVIDIA")
+	;Clean(AppDataRedir+".\Microsoft")
 	;}
-	
 EndProcedure
 
 ;;======================================================================================================================
@@ -305,11 +307,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.0
+; VersionField0 = 4.10.0.2
 ; VersionField1 = 4.10.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.0
+; VersionField5 = 4.10.0.2
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
