@@ -316,7 +316,7 @@ Declare RunFrom(k.s,p.s)
 ; Действия выполняемые при запуске программы.
 ; Процедура должна вернуть 1 если не требуется выполнение процедуры инициализации (инициализация модулей, установка хуков и т.п.).
 ; Для rundll32 не выполняется.
-Procedure AttachProcedure(Instance)
+Procedure AttachProcedure()
 	Protected i, j
 	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
 	Protected RetCode
@@ -796,7 +796,7 @@ EndProcedure
 ; Действия выполняемые при завершении работы программы.
 ; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
 ; Для rundll32 не выполняется.
-Procedure DetachProcedure(Instance)
+Procedure DetachProcedure()
 	CompilerIf #PORTABLE_REGISTRY
 		If RegistryPermit
 			WriteCfg()
