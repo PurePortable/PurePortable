@@ -534,6 +534,8 @@ Procedure AttachProcedure()
 					v = Mid(k,10)
 					AddKeyData(k,v)
 					AddKeyData(v,v)
+				Else ; используем as is
+					AddKeyData(k,k)
 				EndIf
 			Wend
 		EndIf
@@ -889,9 +891,9 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = xEYAHIAAw
+; Folding = xGYAHIAAg
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
