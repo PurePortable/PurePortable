@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.11.0.2
+; PurePortable main lib 4.11.0.3
 #PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
@@ -73,8 +73,8 @@ Macro AddInitProcedure(Proc) : AddArrayI(ModuleInitProcedures(),@Proc()) : EndMa
 ; Некоторые процедуры
 Declare InitProcedure()
 Declare ExitProcedure()
-Declare AttachProcedure(Instance)
-Declare DetachProcedure(Instance)
+Declare AttachProcedure()
+Declare DetachProcedure()
 
 ;;======================================================================================================================
 XIncludeFile "PurePortableCustom.pbi"
@@ -380,7 +380,7 @@ Procedure ExitProcedure()
 			!MOV QWORD [v_ProcessCnt], RAX
 		CompilerEndIf
 		LastProcess = Bool(ProcessCnt=0)
-		If DetachProcedure(DllInstance) = 0
+		If DetachProcedure() = 0
 			DetachCleanup
 		EndIf
 		ExitProcedureIsComleted = #True
@@ -410,7 +410,7 @@ EndProcedure
 
 Prototype InitProcProto()
 ProcedureDLL.l AttachProcess(Instance)
-	If Not IsRunDll And AttachProcedure(Instance) = 0
+	If Not IsRunDll And AttachProcedure() = 0
 		Protected i, InitProc.InitProcProto
 		For i=1 To ArraySize(ModuleInitProcedures())
 			InitProc = ModuleInitProcedures(i)
@@ -430,8 +430,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 314
-; FirstLine = 269
+; CursorPosition = 412
+; FirstLine = 384
 ; Folding = u-
 ; EnableThread
 ; DisableDebugger

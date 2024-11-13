@@ -40,18 +40,12 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 	If Dir=""
 		Dir = PrgDirN
 	EndIf
-	;dbg("PreferencePath: <"+Path)
-	;Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
-	Path = Trim(Trim(Path),Chr(34))
-	;dbg("PreferencePath: *"+Path)
+	Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
 	If Path="."
 		Path = Dir
-	;ElseIf Path=".." Or Left(Path,2)=".\" Or Left(Path,3)="..\"
-	;	Path = Dir+"\"+Path
 	ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
 		Path = Dir+"\"+Path
 	EndIf
-	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
@@ -83,17 +77,17 @@ Procedure ExtensionInitialization()
 EndProcedure
 ExtensionInitialization()
 ;;======================================================================================================================
-ProcedureDLL PurePortableExtension(*data)
-	*EXT = *data
+ProcedureDLL PurePortableExtension(*PPD)
+	*EXT = *PPD
 	
-	ExtensionProcedure(*data)
+	ExtensionProcedure(*PPD)
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 83
-; FirstLine = 56
+; CursorPosition = 82
+; FirstLine = 51
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
