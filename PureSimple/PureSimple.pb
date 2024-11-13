@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.2
+;RES_VERSION 4.11.0.3
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME PurePort.dll
@@ -241,21 +241,7 @@ Global SpoofDateFT.FILETIME
 Global SpoofDateTimeout.FILETIME
 Global SpoofDateFlag
 ;;----------------------------------------------------------------------------------------------------------------------
-Procedure CheckSpoofDate()
-	;Protected CreationTime.FILETIME, ExitTime.FILETIME, KernelTime.FILETIME, UserTime.FILETIME
-	;If SpoofDateFlag
-	;	If GetProcessTimes_(ProcessId,@CreationTime,@ExitTime,@KernelTime,@UserTime)
-	;		SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,UserTime)>0)
-	;	EndIf
-	;EndIf
-	Protected CurrentTime.FILETIME
-	If SpoofDateFlag
-		If GetSystemTimeAsFileTime_(@CurrentTime)
-			SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,CurrentTime)>0)
-		EndIf
-	EndIf
-	ProcedureReturn SpoofDateFlag	
-EndProcedure
+Declare CheckSpoofDate()
 ;;----------------------------------------------------------------------------------------------------------------------
 Prototype GetSystemTime(*SystemTime.SYSTEMTIME)
 Global Original_GetSystemTime.GetSystemTime
@@ -285,6 +271,25 @@ Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
 		ProcedureReturn #True
 	EndIf
 	ProcedureReturn Original_GetLocalTime(*SystemTime)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+Procedure CheckSpoofDate()
+	;Protected CreationTime.FILETIME, ExitTime.FILETIME, KernelTime.FILETIME, UserTime.FILETIME
+	;If SpoofDateFlag
+	;	If GetProcessTimes_(ProcessId,@CreationTime,@ExitTime,@KernelTime,@UserTime)
+	;		SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,UserTime)>0)
+	;	EndIf
+	;EndIf
+	If SpoofDateTimeout\dwLowDateTime = 0
+		ProcedureReturn #True
+	EndIf
+	Protected CurrentTime.FILETIME
+	If SpoofDateFlag
+		If Original_GetSystemTimeAsFileTime(@CurrentTime)
+			SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,CurrentTime)>0)
+		EndIf
+	EndIf
+	ProcedureReturn SpoofDateFlag	
 EndProcedure
 ;}
 ;;======================================================================================================================
@@ -484,6 +489,7 @@ Procedure AttachProcedure()
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
+		SpoofDateTimeout\dwLowDateTime = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)
 		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
 		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
@@ -725,7 +731,6 @@ Procedure AttachProcedure()
 				SpoofDateST\wMonth = Val(Mid(SpoofDateP,i+1,j-i))
 				SpoofDateST\wDay = Val(Mid(SpoofDateP,j+1))
 				;dbg("SPOOF DATE: "+Str(SpoofDateST\wYear)+" :: "+Str(SpoofDateST\wMonth)+" :: "+Str(SpoofDateST\wDay))
-				SpoofDateTimeout\dwLowDateTime = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 				SpoofDateFlag = Bool(SpoofDateTimeout\dwLowDateTime<>0)
 				SystemTimeToFileTime_(@SpoofDateST,@SpoofDateFT)
 				MH_HookApi(kernel32,GetLocalTime)
@@ -893,11 +898,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.2
+; VersionField0 = 4.11.0.3
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.2
+; VersionField5 = 4.11.0.3
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024
