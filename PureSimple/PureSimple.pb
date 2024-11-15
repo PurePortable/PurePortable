@@ -236,57 +236,70 @@ EndProcedure
 ;;======================================================================================================================
 ;{ Подделка даты
 ; https://learn.microsoft.com/en-us/windows/win32/sysinfo/time-functions
-Global SpoofDateST.SYSTEMTIME
-Global SpoofDateFT.FILETIME
-Global SpoofDateTimeout.FILETIME
+; https://learn.microsoft.com/en-us/windows/win32/sysinfo/windows-time
+; https://learn.microsoft.com/en-us/windows/win32/sysinfo/local-time
+Global SpoofDateTimeout.q
+Global SpoofDateShift.q
 Global SpoofDateFlag
 ;;----------------------------------------------------------------------------------------------------------------------
 Declare CheckSpoofDate()
 ;;----------------------------------------------------------------------------------------------------------------------
-Prototype GetSystemTime(*SystemTime.SYSTEMTIME)
-Global Original_GetSystemTime.GetSystemTime
-Procedure Detour_GetSystemTime(*SystemTime.SYSTEMTIME)
-	If CheckSpoofDate()
-		CopyStructure(@SpoofDateST,*SystemTime,SYSTEMTIME)
-		ProcedureReturn #True
-	EndIf
-	ProcedureReturn Original_GetSystemTime(*SystemTime)
-EndProcedure
-;;----------------------------------------------------------------------------------------------------------------------
-Prototype GetSystemTimeAsFileTime(*SystemTimeAsFileTime.FILETIME)
+Prototype GetSystemTimeAsFileTime(*SystemTimeAsFileTime.QUAD)
 Global Original_GetSystemTimeAsFileTime.GetSystemTimeAsFileTime
-Procedure Detour_GetSystemTimeAsFileTime(*SystemTimeAsFileTime.FILETIME)
+Procedure Detour_GetSystemTimeAsFileTime(*SystemTimeAsFileTime.QUAD)
+	;dbg("GetSystemTimeAsFileTime")
 	If CheckSpoofDate()
-		CopyStructure(@SpoofDateFT,*SystemTimeAsFileTime,FILETIME)
+		Protected TempFT.q
+		Original_GetSystemTimeAsFileTime(*SystemTimeAsFileTime)
+		*SystemTimeAsFileTime\q = *SystemTimeAsFileTime\q - SpoofDateShift
 		ProcedureReturn #True
 	EndIf
 	ProcedureReturn Original_GetSystemTimeAsFileTime(*SystemTimeAsFileTime)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
+Prototype GetSystemTime(*SystemTime.SYSTEMTIME)
+Global Original_GetSystemTime.GetSystemTime
+Procedure Detour_GetSystemTime(*SystemTime.SYSTEMTIME)
+	;dbg("GetSystemTime")
+	If CheckSpoofDate()
+		Protected TempFT.q
+		Original_GetSystemTimeAsFileTime(@TempFT)
+		TempFT = TempFT - SpoofDateShift
+		ProcedureReturn FileTimeToSystemTime_(@TempFT,*SystemTime)
+	EndIf
+	ProcedureReturn Original_GetSystemTime(*SystemTime)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Prototype GetLocalTime(*SystemTime.SYSTEMTIME)
 Global Original_GetLocalTime.GetLocalTime
 Procedure Detour_GetLocalTime(*SystemTime.SYSTEMTIME)
+	;dbg("GetLocalTime")
 	If CheckSpoofDate()
-		CopyStructure(@SpoofDateST,*SystemTime,SYSTEMTIME)
-		ProcedureReturn #True
+		Protected TempST.SYSTEMTIME, TempFT.q
+		Original_GetLocalTime(@TempST)
+		SystemTimeToFileTime_(@TempST,@TempFT)
+		TempFT = TempFT - SpoofDateShift
+		ProcedureReturn FileTimeToSystemTime_(@TempFT,*SystemTime)
 	EndIf
 	ProcedureReturn Original_GetLocalTime(*SystemTime)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocesstimes
 Procedure CheckSpoofDate()
-	;Protected CreationTime.FILETIME, ExitTime.FILETIME, KernelTime.FILETIME, UserTime.FILETIME
-	;If SpoofDateFlag
-	;	If GetProcessTimes_(ProcessId,@CreationTime,@ExitTime,@KernelTime,@UserTime)
-	;		SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,UserTime)>0)
-	;	EndIf
-	;EndIf
-	If SpoofDateTimeout\dwLowDateTime = 0
+	;Protected CreationTime.q, ExitTime.q, KernelTime.q, UserTime.q
+	If SpoofDateTimeout = 0
 		ProcedureReturn #True
 	EndIf
-	Protected CurrentTime.FILETIME
 	If SpoofDateFlag
-		If Original_GetSystemTimeAsFileTime(@CurrentTime)
-			SpoofDateFlag = Bool(CompareFileTime_(SpoofDateTimeout,CurrentTime)>0)
+		; не работает GetProcessTimes
+		;If GetProcessTimes_(GetCurrentProcessId_(),@CreationTime,@ExitTime,@KernelTime,@UserTime)
+		;EndIf
+		Protected TempFT.q
+		If Original_GetSystemTimeAsFileTime(@TempFT)
+			;dbg("SpoofDateCurrent: "+RSet(Str(TempFT),24))
+			;dbg("SpoofDateTimeout: "+RSet(Str(SpoofDateTimeout),24))
+			SpoofDateFlag = Bool(SpoofDateTimeout>TempFT)
+			;dbg("Flag: "+SpoofDateFlag)
 		EndIf
 	EndIf
 	ProcedureReturn SpoofDateFlag	
@@ -295,7 +308,7 @@ EndProcedure
 ;;======================================================================================================================
 Global PureSimplePrefs.s
 Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
-Global PPData.PPDATA
+Global PPData.PP_DATA
 Global DbgRegMode
 Global DbgSpecMode
 Global DbgEnvMode
@@ -489,7 +502,7 @@ Procedure AttachProcedure()
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
-		SpoofDateTimeout\dwLowDateTime = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
+		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)
 		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
 		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
@@ -723,18 +736,46 @@ Procedure AttachProcedure()
 	;}
 	;{ Установка хуков для подмены даты
 	If SpoofDateP
+		Protected TempST.SYSTEMTIME, TempFT.q
+		Protected SpoofST.SYSTEMTIME, SpoofFT.q
 		SpoofDateP = ReplaceString(SpoofDateP,".","-")
 		SpoofDateP = ReplaceString(SpoofDateP,"/","-")
 		i = FindString(SpoofDateP,"-")
 		If i
-			SpoofDateST\wYear = Val(Left(SpoofDateP,i-1))
+			SpoofST\wYear = Val(Left(SpoofDateP,i-1)) ; Дата для подстановки
 			j = FindString(SpoofDateP,"-",i+1)
 			If j
-				SpoofDateST\wMonth = Val(Mid(SpoofDateP,i+1,j-i))
-				SpoofDateST\wDay = Val(Mid(SpoofDateP,j+1))
+				; Дата для подстановки
+				SpoofST\wMonth = Val(Mid(SpoofDateP,i+1,j-i))
+				SpoofST\wDay = Val(Mid(SpoofDateP,j+1))
+				SystemTimeToFileTime_(@SpoofST,@SpoofFT)
+				;dbg("SpoofDate:        "+RSet(Str(SpoofFT),24))
+				; Текущая дата
+				GetSystemTimeAsFileTime_(@TempFT)
+				;dbg("CurrentTime:      "+RSet(Str(TempFT),24))
+				; Когда выключить подстановку
+				If SpoofDateTimeout <> 0
+					SpoofDateFlag = #True
+					SpoofDateTimeout = TempFT + SpoofDateTimeout
+				EndIf
+				;dbg("SpoofDateTimeout: "+RSet(Str(SpoofDateTimeout),24))
+				;dbg("Flag: "+SpoofDateFlag)
+				; Текущая дата на 00:00:00.000
+				FileTimeToSystemTime_(@TempFT,@TempST)
+				TempST\wHour = 0
+				TempST\wMinute = 0
+				TempST\wSecond = 0
+				TempST\wMilliseconds = 0
+				SystemTimeToFileTime_(@TempST,@TempFT)
+				; Вычисляем сдвиг во времени
+				SpoofDateShift = TempFT - SpoofFT
+				;dbg("SpoofDateShift:   "+RSet(Str(SpoofDateShift),24))
+				;SpoofDateLimit = SpoofDateLimit + SpoofDateShift
+				;dbg("SpoofDateLimit:   "+RSet(Str(SpoofDateLimit),24))
+				
 				;dbg("SPOOF DATE: "+Str(SpoofDateST\wYear)+" :: "+Str(SpoofDateST\wMonth)+" :: "+Str(SpoofDateST\wDay))
-				SpoofDateFlag = Bool(SpoofDateTimeout\dwLowDateTime<>0)
-				SystemTimeToFileTime_(@SpoofDateST,@SpoofDateFT)
+				;SystemTimeToFileTime_(@SpoofDateST,@SpoofDateFT)
+				
 				MH_HookApi(kernel32,GetLocalTime)
 				MH_HookApi(kernel32,GetSystemTime)
 				MH_HookApi(kernel32,GetSystemTimeAsFileTime)
@@ -766,14 +807,14 @@ Procedure AttachProcedure()
 			;k = PreferenceKeyName()
 			;v = PreferenceKeyValue()
 			LoadableLibrary = PreferencePath(PreferenceKeyName())
-			dbg("ATTACHPROCESS: EXT: "+LoadableLibrary)
+			;dbg("ATTACHPROCESS: EXT: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
 				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
 				If PurePortableExtension
 					If PPData\Version = 0 ; надо инициализировать структуру
 						PPData\Version = 1
-						PPData\Prefs = PureSimplePrefs
+						PPData\PrefsFile = @PureSimplePrefs
 					EndIf
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
@@ -782,7 +823,7 @@ Procedure AttachProcedure()
 						FreeLibrary_(hLoadableLibrary)
 					EndIf
 				EndIf
-				dbg("ATTACHPROCESS: EXT: OK")
+				;dbg("ATTACHPROCESS: EXT: OK")
 			EndIf
 		Wend
 	EndIf
@@ -891,9 +932,12 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = xGYAHIAAg
+; CursorPosition = 291
+; FirstLine = 129
+; Folding = xGYA-LEgg
+; Markers = 748
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
