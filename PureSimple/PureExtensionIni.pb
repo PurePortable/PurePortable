@@ -187,7 +187,7 @@ EndProcedure
 ;}
 ;;======================================================================================================================
 
-Global *EXT.PPData
+Global *ExtData.EXT_DATA
 Structure INIFILE
 	num.s
 	ini.s
@@ -195,8 +195,7 @@ Structure INIFILE
 EndStructure
 Global Dim Inis.INIFILE(0), iInis, nInis
 
-Procedure ExtensionProcedure(*data)
-	*EXT = *data
+Procedure ExtensionProcedure()
 	Protected i, k.s, v.s, g.s, p.s
 	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
 	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
@@ -264,8 +263,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 197
-; FirstLine = 42
+; CursorPosition = 189
+; FirstLine = 29
 ; Folding = B+
 ; Optimizer
 ; EnableThread

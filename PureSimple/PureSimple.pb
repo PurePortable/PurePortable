@@ -308,7 +308,7 @@ EndProcedure
 ;;======================================================================================================================
 Global PureSimplePrefs.s
 Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
-Global PPData.PP_DATA
+Global ExtData.EXT_DATA
 Global DbgRegMode
 Global DbgSpecMode
 Global DbgEnvMode
@@ -812,13 +812,13 @@ Procedure AttachProcedure()
 			If hLoadableLibrary
 				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
 				If PurePortableExtension
-					If PPData\Version = 0 ; надо инициализировать структуру
-						PPData\Version = 1
-						PPData\PrefsFile = @PureSimplePrefs
+					If ExtData\Version = 0 ; надо инициализировать структуру
+						ExtData\Version = 1
+						ExtData\PrefsFile = @PureSimplePrefs
 					EndIf
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
-					i = PurePortableExtension(@PPData)
+					i = PurePortableExtension(@ExtData)
 					If i = 1
 						FreeLibrary_(hLoadableLibrary)
 					EndIf
@@ -932,11 +932,11 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 291
-; FirstLine = 129
-; Folding = xGYA-LEgg
+; CursorPosition = 820
+; FirstLine = 296
+; Folding = xGYA-LEgi
 ; Markers = 748
 ; Optimizer
 ; EnableThread

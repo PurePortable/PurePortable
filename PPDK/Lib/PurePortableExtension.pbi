@@ -77,16 +77,17 @@ Procedure ExtensionInitialization()
 EndProcedure
 ExtensionInitialization()
 ;;======================================================================================================================
+Declare ExtensionProcedure()
 ProcedureDLL PurePortableExtension(*PPD)
-	*EXT = *PPD
+	;*EXT = *PPD
 	
-	ExtensionProcedure(*PPD)
+	ExtensionProcedure()
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 82
+; CursorPosition = 79
 ; FirstLine = 51
 ; Folding = -
 ; EnableThread
