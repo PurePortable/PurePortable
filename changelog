@@ -4,7 +4,7 @@
 (-) удалено
 (?) непонятно ))
 
-[4.11.0.3] 2024-11-13
+[4.11.0.3] 2024-11-14
 (+) PureSimple: Записи в секции [Registry] без значения (после =) используются как есть.
 (*) PureExpert: Из AttachProcedure и DetachProcedure убран параметр Instance. Вместо него использовать глобальную переменную DllInstance.
 (!) PureSimple: Исправление SpoofDate

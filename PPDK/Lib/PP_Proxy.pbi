@@ -32,6 +32,9 @@ CompilerIf Not Defined(PROXY_ERROR_MODE,#PB_Constant)
 		#PROXY_ERROR_MODE = 2
 	CompilerEndIf
 CompilerEndIf
+CompilerIf #DBG_PROXY_DLL And Not Defined(DBG_ALWAYS,#PB_Constant)
+	#DBG_ALWAYS = 1
+CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
 UndefineMacro DoubleQuote
@@ -325,8 +328,10 @@ EndProcedure
 Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассемблера
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = -AAw
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 34
+; FirstLine = 6
+; Folding = -wF9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
