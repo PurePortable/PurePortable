@@ -209,9 +209,14 @@ XIncludeFile "PP_MinHook.pbi"
 
 Global BlockWinInetPermit = 1
 Global BlockWinHttpPermit = 1
-CompilerIf #BLOCK_WINSOCKS=2 Or #BLOCK_WINSOCKS2
-	Global BlockWinSocksPermit = 2
+CompilerIf #BLOCK_WINSOCKS2 ; Depricated
+	Global WinSocksDll.s = "ws2_32"
+	Global BlockWinSocksPermit = 1
 CompilerElseIf #BLOCK_WINSOCKS=1
+	Global WinSocksDll.s = "wsock32"
+	Global BlockWinSocksPermit = 1
+CompilerElse ; #BLOCK_WINSOCKS=2
+	Global WinSocksDll.s = "ws2_32"
 	Global BlockWinSocksPermit = 1
 CompilerEndIf
 Procedure _InitBlockInternetHooks()
@@ -228,16 +233,10 @@ Procedure _InitBlockInternetHooks()
 			MH_HookApi(winhttp,WinHttpOpen)
 		EndIf
 	CompilerEndIf
-	CompilerIf #BLOCK_WINSOCKS=1
-		If BlockWinSocksPermit = 1
-			LoadDll("wsock32")
-			MH_HookApi(wsock32,socket)
-		EndIf
-	CompilerEndIf
-	CompilerIf #BLOCK_WINSOCKS=2 Or #BLOCK_WINSOCKS2
-		If BlockWinSocksPermit = 2
-			LoadDll("ws2_32")
-			MH_HookApi(ws2_32,socket)
+	CompilerIf #BLOCK_WINSOCKS Or #BLOCK_WINSOCKS2
+		If BlockWinSocksPermit
+			LoadDll(WinSocksDll)
+			MH_HookApiD(WinSocksDll,socket)
 		EndIf
 	CompilerEndIf
 EndProcedure
@@ -245,7 +244,8 @@ AddInitProcedure(_InitBlockInternetHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 12
+; CursorPosition = 239
+; FirstLine = 209
 ; Folding = --
 ; EnableAsm
 ; DisableDebugger

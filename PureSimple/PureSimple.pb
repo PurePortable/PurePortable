@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.3
+;RES_VERSION 4.11.0.4
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME PurePort.dll
@@ -79,8 +79,8 @@ XIncludeFile "PurePortableCustom.pbi"
 ;{ Блокировка интернета
 #BLOCK_WININET = 1 ; wininet.dll
 #BLOCK_WINHTTP = 1 ; winhttp.dll
-#BLOCK_WINSOCKS = 1 ; wsock32.dll
-#BLOCK_WINSOCKS2 = 1 ; ws2_32.dll
+#BLOCK_WINSOCKS = 2 ; по умолчанию будет ws2_32
+;#BLOCK_WINSOCKS2 = 1 ; ws2_32.dll
 #DBG_BLOCK_INTERNET = 0
 ;}
 ;{ Блокировка консоли
@@ -504,9 +504,18 @@ Procedure AttachProcedure()
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)
-		BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
-		BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
-		BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
+		CompilerIf Defined(BLOCK_WININET,#PB_Constant)
+			BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
+		CompilerEndIf
+		CompilerIf Defined(BLOCK_WINHTTP,#PB_Constant)
+			BlockWinHttpPermit = ReadPreferenceInteger("BlockWinHttp",0)
+		CompilerEndIf
+		CompilerIf Defined(BLOCK_WINSOCKS,#PB_Constant)
+			BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
+			If BlockWinSocksPermit = 1 ; wsock32 иначе ws2_32, т.к. #BLOCK_WINSOCKS=2 
+				WinSocksDll = "wsock32"
+			EndIf
+		CompilerEndIf
 		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
 			SetCurrentDirectory(PreferencePath(p))
@@ -934,21 +943,20 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 820
-; FirstLine = 296
-; Folding = xGYA-LEgi
-; Markers = 748
+; CursorPosition = 81
+; FirstLine = 53
+; Folding = xGYA-LEAg
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.3
+; VersionField0 = 4.11.0.4
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.3
+; VersionField5 = 4.11.0.4
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024
