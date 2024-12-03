@@ -42,7 +42,7 @@ DataSection
 EndDataSection
 
 ; Общие переменные
-Global ProcessId, FirstProcess, LastProcess
+Global ProcessId, ProcessCnt, SingleProcess
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
@@ -55,7 +55,6 @@ Global PreferenceFile.s
 Global WinDir.s, SysDir.s, TempDir.s
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
-Global ProcessCnt
 Global DbgDetach = 1
 ; Инициализация общих переменных
 Declare GlobalInitialization()
@@ -347,7 +346,7 @@ Procedure GlobalInitialization()
 			!INC RAX
 			!MOV QWORD [v_ProcessCnt], RAX
 		CompilerEndIf
-		FirstProcess = Bool(ProcessCnt=1)
+		SingleProcess = Bool(ProcessCnt=1)
 	EndIf
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
 	ProcessId = GetCurrentProcessId_()
@@ -379,7 +378,7 @@ Procedure ExitProcedure()
 			!DEC RAX
 			!MOV QWORD [v_ProcessCnt], RAX
 		CompilerEndIf
-		LastProcess = Bool(ProcessCnt=0)
+		SingleProcess = Bool(ProcessCnt=0)
 		If DetachProcedure() = 0
 			DetachCleanup
 		EndIf

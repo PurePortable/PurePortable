@@ -839,7 +839,7 @@ Procedure AttachProcedure()
 	FreeMemory(*PurePortableExtensionNameA)
 	;}
 	;{ Запуск приложений
-	If FirstProcess And PreferenceGroup("RunFromAttachProcess")
+	If SingleProcess And PreferenceGroup("RunFromAttachProcess")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
@@ -864,7 +864,7 @@ Procedure DetachProcedure()
 		ProcedureReturn 1
 	EndIf
 	
-	If LastProcess
+	If SingleProcess
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -942,11 +942,11 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 81
-; FirstLine = 53
-; Folding = xGYA-LEAg
+; CursorPosition = 848
+; FirstLine = 267
+; Folding = xGYA-rEAs
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
