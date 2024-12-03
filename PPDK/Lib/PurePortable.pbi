@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.11.0.3
+; PurePortable main lib 4.11.0.4
 #PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
@@ -42,6 +42,7 @@ DataSection
 EndDataSection
 
 ; Общие переменные
+Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
 Global ProcessId, ProcessCnt, SingleProcess
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
@@ -283,9 +284,23 @@ Procedure GlobalInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
 		!MOV [v_DllInstance], EAX
+		!MOV EAX, DWORD [FS:30h]
+		!MOV EDX, DWORD [EAX+00A4h]
+		!MOV DWORD [v_OSMajorVersion], EDX
+		!MOV EDX, DWORD [EAX+00A8h]
+		!MOV DWORD [v_OSMinorVersion], EDX
+		;!MOV EDX, DWORD [EAX+00B0h]
+		;!MOV DWORD [v_OSPlatformId], EDX
 	CompilerElse
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
+		!MOV RAX, QWORD [GS:60h]
+		!MOV EDX, DWORD [RAX+0118h]
+		!MOV DWORD [v_OSMajorVersion], EDX
+		!MOV EDX, DWORD [RAX+011Ch]
+		!MOV DWORD [v_OSMinorVersion], EDX
+		;!MOV EDX, DWORD [RAX+0124h]
+		;!MOV DWORD [v_OSPlatformId], EDX
 	CompilerEndIf
 	
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
@@ -429,8 +444,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 412
-; FirstLine = 384
+; CursorPosition = 302
+; FirstLine = 267
 ; Folding = u-
 ; EnableThread
 ; DisableDebugger
