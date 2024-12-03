@@ -4,9 +4,10 @@
 ; https://vsokovikov.narod.ru/New_MSDN_API/Process_thread/fn_commandlinetoargvw.htm
 
 XIncludeFile "proc\Execute.pbi"
+XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 
-Procedure ExecuteDll(CmdLine.s,ExecuteFlags)
-	Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableExecute "+ExecuteFlags+" "+ExpandEnvironmentStrings(CmdLine),ExecuteFlags&#EXECUTE_WAIT)
+Procedure ExecuteDll(CmdLine.s,ExecuteFlags=0)
+	Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableExecute "+Str(ExecuteFlags)+" "+ExpandEnvironmentStrings(CmdLine),ExecuteFlags&#EXECUTE_WAIT)
 EndProcedure
 
 ProcedureDLL PurePortableExecute(hWnd,hInst,*lpszCmdLine,nCmdShow)
@@ -26,7 +27,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 22
+; CursorPosition = 8
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
