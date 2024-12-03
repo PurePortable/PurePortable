@@ -108,9 +108,9 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 59
-; FirstLine = 38
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 57
+; FirstLine = 45
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

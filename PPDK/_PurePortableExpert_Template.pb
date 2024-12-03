@@ -12,7 +12,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.3
+;RES_VERSION 4.11.0.0
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 411.dll
@@ -298,19 +298,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 14
-; Folding = ow5C6
+; Folding = IwIG6
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.10.0.3
-; VersionField1 = 4.10.0.0
+; VersionField0 = 4.11.0.0
+; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
-; VersionField4 = 4.10.0.0
-; VersionField5 = 4.10.0.3
+; VersionField4 = 4.11.0.0
+; VersionField5 = 4.11.0.0
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 400.dll
 ; VersionField9 = (c) Smitis, 2017-2024
