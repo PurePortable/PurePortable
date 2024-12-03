@@ -846,7 +846,7 @@ Procedure AttachProcedure()
 		Wend
 	EndIf		
 	;}
-	
+	ClosePreferences()
 EndProcedure
 
 ;;======================================================================================================================
@@ -917,6 +917,7 @@ Procedure DetachProcedure()
 			EndIf
 		EndIf
 	EndIf
+	ClosePreferences()
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 XIncludeFile "PP_ExecuteDll.pbi"
