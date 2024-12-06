@@ -27,7 +27,7 @@ Declare CheckTitle(nCode,Title.s)
 Global hCBTHook
 Procedure.l CBTProc(nCode,wParam,*lParam)
 	Global DbgDetach
-	Global ProcessCnt
+	Global ProcessNum
 	Protected Title.s = Space(64)
 	If nCode = #HCBT_DESTROYWND
 		;DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam))
@@ -39,7 +39,7 @@ Procedure.l CBTProc(nCode,wParam,*lParam)
 			UnhookWindowsHookEx_(hCBTHook)
 			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
 				If DbgDetach
-					dbg("CBTHook: Exit: "+DllPath+" ("+Str(ProcessCnt)+")")
+					dbg("CBTHook: Exit: "+DllPath+" ("+Str(ProcessNum)+")")
 				EndIf
 			CompilerEndIf
 			ExitProcedure()

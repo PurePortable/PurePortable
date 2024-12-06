@@ -32,18 +32,18 @@ CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPAT
 ; Общая секция для межпроцессного взаимодействия.
 DataSection
 	!section '.share' data readable writeable shareable notpageable
-	ProcessCnt:
+	ProcessNum:
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		!ProcessCnt: DD 0
+		!ProcessNum: DD 0
 	CompilerElse
-		!ProcessCnt: DQ 0
+		!ProcessNum: DQ 0
 	CompilerEndIf
 	!section '.data' data readable writeable
 EndDataSection
 
 ; Общие переменные
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
-Global ProcessId, ProcessCnt, SingleProcess
+Global ProcessId, ProcessNum, SingleProcess
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
@@ -352,22 +352,22 @@ Procedure GlobalInitialization()
 	If Not IsRunDll
 		CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 			!MOV EAX, 1
-			!LOCK XADD DWORD [ProcessCnt], EAX
+			!LOCK XADD DWORD [ProcessNum], EAX
 			!INC EAX
-			!MOV DWORD [v_ProcessCnt], EAX
+			!MOV DWORD [v_ProcessNum], EAX
 		CompilerElse
 			!MOV RAX, 1
-			!LOCK XADD QWORD [ProcessCnt], RAX
+			!LOCK XADD QWORD [ProcessNum], RAX
 			!INC RAX
-			!MOV QWORD [v_ProcessCnt], RAX
+			!MOV QWORD [v_ProcessNum], RAX
 		CompilerEndIf
-		SingleProcess = Bool(ProcessCnt=1)
+		SingleProcess = Bool(ProcessNum=1)
 	EndIf
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
 	ProcessId = GetCurrentProcessId_()
 	
 	DbgAlways("ATTACHPROCESS: "+PrgPath)
-	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
+	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
 EndProcedure
 ;;======================================================================================================================
 ; Детач из процесса. Завершение.
@@ -384,16 +384,16 @@ Procedure ExitProcedure()
 		CompilerEndIf
 		CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 			!MOV EAX, -1
-			!LOCK XADD DWORD [ProcessCnt], EAX
+			!LOCK XADD DWORD [ProcessNum], EAX
 			!DEC EAX
-			!MOV DWORD [v_ProcessCnt], EAX
+			!MOV DWORD [v_ProcessNum], EAX
 		CompilerElse
 			!MOV RAX, -1
-			!LOCK XADD QWORD [ProcessCnt], RAX
+			!LOCK XADD QWORD [ProcessNum], RAX
 			!DEC RAX
-			!MOV QWORD [v_ProcessCnt], RAX
+			!MOV QWORD [v_ProcessNum], RAX
 		CompilerEndIf
-		SingleProcess = Bool(ProcessCnt=0)
+		SingleProcess = Bool(ProcessNum=0)
 		If DetachProcedure() = 0
 			DetachCleanup
 		EndIf
@@ -405,7 +405,7 @@ ProcedureDLL.l DetachProcess(Instance)
 	CompilerIf #DBG_ALWAYS
 		Global DbgDetach
 		If DbgDetach
-			DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCnt)+")")
+			DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
 		EndIf
 	CompilerEndIf
 		
@@ -444,8 +444,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 302
-; FirstLine = 267
+; CursorPosition = 407
+; FirstLine = 384
 ; Folding = u-
 ; EnableThread
 ; DisableDebugger
