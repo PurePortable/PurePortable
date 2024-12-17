@@ -401,7 +401,7 @@ Procedure ExitProcedure()
 	EndIf
 EndProcedure
 
-ProcedureDLL.l DetachProcess(Instance)
+Procedure DetachProcedure()
 	CompilerIf #DBG_ALWAYS
 		Global DbgDetach
 		If DbgDetach
@@ -423,7 +423,7 @@ EndProcedure
 ; Аттач к процессу. Инициализация.
 
 Prototype InitProcProto()
-ProcedureDLL.l AttachProcess(Instance)
+Procedure AttachProcedure()
 	If Not IsRunDll And AttachProcedure() = 0
 		Protected i, InitProc.InitProcProto
 		For i=1 To ArraySize(ModuleInitProcedures())

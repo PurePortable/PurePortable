@@ -26,7 +26,7 @@ IncludePath "..\PPDK\Lib"
 
 XIncludeFile "PurePortableProxy.pbi"
 ;;======================================================================================================================
-ProcedureDLL.l AttachProcess(Instance)
+Procedure AttachProcedure()
 	DisableThreadLibraryCalls_(Instance)
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		Protected PurePortDll.s = "PurePort32.dll"
@@ -43,7 +43,7 @@ ProcedureDLL.l AttachProcess(Instance)
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
-;ProcedureDLL.l DetachProcess(Instance)
+;Procedure DetachProcedure()
 ;
 ;	PPFinish
 ;EndProcedure

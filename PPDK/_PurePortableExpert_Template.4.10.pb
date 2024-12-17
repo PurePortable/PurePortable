@@ -202,7 +202,7 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-ProcedureDLL.l AttachProcess(Instance)
+Procedure AttachProcedure()
 	PPAttachProcess
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
@@ -266,7 +266,7 @@ ProcedureDLL.l AttachProcess(Instance)
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
-ProcedureDLL.l DetachProcess(Instance)
+Procedure DetachProcedure()
 	;;------------------------------------------------------------------------------------------------------------------
 	; Действия выполняемые при завершении работы программы.
 	;;------------------------------------------------------------------------------------------------------------------

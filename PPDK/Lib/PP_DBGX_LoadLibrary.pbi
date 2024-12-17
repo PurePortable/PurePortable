@@ -20,7 +20,6 @@ CompilerIf #DETOUR_ADDDLLDIRECTORY
 		dbg("AddDllDirectory: "+PeekS(*NewDirectory))
 		ProcedureReturn Original_AddDllDirectory(*NewDirectory)
 	EndProcedure
-	;Global Trampoline_AddDllDirectory = @Detour_AddDllDirectory()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
@@ -56,13 +55,11 @@ CompilerIf #DETOUR_SETDLLDIRECTORY
 		dbg("SetDllDirectoryA: "+PeekSZ(*lpPathName,-1,#PB_Ascii))
 		ProcedureReturn Original_SetDllDirectoryA(*lpPathName)
 	EndProcedure
-	;Global Trampoline_SetDllDirectoryA = @Detour_SetDllDirectoryA()
 	Global Original_SetDllDirectoryW.SetDllDirectory
 	Procedure Detour_SetDllDirectoryW(*lpPathName)
 		dbg("SetDllDirectoryW: "+PeekSZ(*lpPathName))
 		ProcedureReturn Original_SetDllDirectoryW(*lpPathName)
 	EndProcedure
-	;Global Trampoline_SetDllDirectoryW = @Detour_SetDllDirectoryW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setsearchpathmode
@@ -87,7 +84,6 @@ CompilerIf #DETOUR_SETSEARCHPATHMODE
 		dbg("SetSearchPathMode: "+FlagsText)
 		ProcedureReturn Original_SetSearchPathMode(Flags)
 	EndProcedure
-	;Global Trampoline_SetSearchPathMode = @Detour_SetSearchPathMode()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw
@@ -100,14 +96,12 @@ CompilerIf #DETOUR_LOADLIBRARY
 		dbg("LoadLibraryA: "+Str(Result)+" "+PeekSZ(*LibFileName,-1,#PB_Ascii))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_LoadLibraryA = @Detour_LoadLibraryA()
 	Global Original_LoadLibraryW.LoadLibrary
 	Procedure Detour_LoadLibraryW(*LibFileName)
 		Protected Result = Original_LoadLibraryW(*LibFileName)
 		dbg("LoadLibraryW: "+Str(Result)+" "+PeekSZ(*LibFileName))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_LoadLibraryW = @Detour_LoadLibraryW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryexw
@@ -120,14 +114,12 @@ CompilerIf #DETOUR_LOADLIBRARYEX
 		dbg("LoadLibraryExA: "+Str(Result)+" "+PeekSZ(*LibFileName,-1,#PB_Ascii))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_LoadLibraryExA = @Detour_LoadLibraryExA()
 	Global Original_LoadLibraryExW.LoadLibraryEx
 	Procedure Detour_LoadLibraryExW(*LibFileName,hFile,dwFlags)
 		Protected Result = Original_LoadLibraryExW(*LibFileName,hFile,dwFlags)
 		dbg("LoadLibraryExW: "+Str(Result)+" "+PeekSZ(*LibFileName))
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_LoadLibraryExW = @Detour_LoadLibraryExW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress
@@ -144,7 +136,6 @@ CompilerIf #DETOUR_GETPROCADDRESS
 		EndIf
 		ProcedureReturn Result
 	EndProcedure
-	;Global Trampoline_GetProcAddress = @Detour_GetProcAddress()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulehandlea
@@ -156,13 +147,11 @@ CompilerIf #DETOUR_GETMODULEHANDLE
 		dbg("GetModuleHandleA: "+PeekSZ(*lpModuleName,-1,#PB_Ascii))
 		ProcedureReturn Original_GetModuleHandleA(*lpModuleName)
 	EndProcedure
-	;Global Trampoline_GetModuleHandleA = @Detour_GetModuleHandleA()
 	Global Original_GetModuleHandleW.GetModuleHandle
 	Procedure Detour_GetModuleHandleW(*lpModuleName)
 		dbg("GetModuleHandleW: "+PeekSZ(*lpModuleName))
 		ProcedureReturn Original_GetModuleHandleW(*lpModuleName)
 	EndProcedure
-	;Global Trampoline_GetModuleHandleW = @Detour_GetModuleHandleW()
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulehandleexa
@@ -175,13 +164,11 @@ CompilerIf #DETOUR_GETMODULEHANDLEEX
 		dbg("GetModuleHandleExA: "+PeekSZ(*lpModuleName,-1,#PB_Ascii))
 		ProcedureReturn Original_GetModuleHandleExA(dwFlags.l,*lpModuleName,*phModule)
 	EndProcedure
-	;Global Trampoline_GetModuleHandleExA = @Detour_GetModuleHandleExA()
 	Global Original_GetModuleHandleExW.GetModuleHandleEx
 	Procedure Detour_GetModuleHandleExW(dwFlags.l,*lpModuleName,*phModule)
 		dbg("GetModuleHandleExW: "+PeekSZ(*lpModuleName))
 		ProcedureReturn Original_GetModuleHandleExW(dwFlags.l,*lpModuleName,*phModule)
 	EndProcedure
-	;Global Trampoline_GetModuleHandleExW = @Detour_GetModuleHandleExW()
 CompilerEndIf
 ;;======================================================================================================================
 

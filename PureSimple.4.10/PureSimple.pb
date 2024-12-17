@@ -327,7 +327,7 @@ Procedure RunFrom(k.s,p.s)
 	Execute("",ExpandEnvironmentStrings(p),ExecuteFlags)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-ProcedureDLL.l AttachProcess(Instance)
+Procedure AttachProcedure()
 	PPAttachProcess
 	If LCase(PrgName) = "rundll32"
 		; TODO: дополнительно проверить ресурсы
@@ -816,7 +816,7 @@ Procedure DbgCln(txt.s)
 		dbg(txt)
 	EndIf
 EndProcedure
-ProcedureDLL.l DetachProcess(Instance)
+Procedure DetachProcedure()
 	PPDetachProcess
 	If LCase(PrgName) = "rundll32"
 		ProcedureReturn

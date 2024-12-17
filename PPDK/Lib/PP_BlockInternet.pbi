@@ -45,7 +45,6 @@ CompilerIf #BLOCK_WININET
 		SetLastError_(#ERROR_INTERNET_INTERNAL_ERROR)
 		ProcedureReturn 0
 	EndProcedure
-	;Global Trampoline_InternetOpenA = @Detour_InternetOpenA()
 	Global Original_InternetOpenW
 	Procedure.l Detour_InternetOpenW(lpszAgent,dwAccessType.l,lpszProxy,lpszProxyBypass,dwFlags.l)
 		DbgInt("InternetOpenW: "+PeekS(lpszAgent))
@@ -243,10 +242,8 @@ EndProcedure
 AddInitProcedure(_InitBlockInternetHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 239
-; FirstLine = 209
-; Folding = --
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = C+
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
