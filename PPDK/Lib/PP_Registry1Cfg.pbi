@@ -319,7 +319,7 @@ Procedure ReadCfgFile(Config.s)
 		While Not Eof(hCfg)
 			s = ReadString(hCfg,CodePage)
 			x1 = FindCtrl(s)
-			If x1
+			If x1 > 1
 				x2 = FindCtrl(s,x1+1)
 				x3 = FindCtrl(s,x2+1)
 				If x2 And x3
@@ -379,8 +379,9 @@ Procedure ReadCfgFile(Config.s)
 						EndIf
 					EndIf
 				EndIf
-			Else ; ключ без значения
+			ElseIf x1 = 0 ; ключ без значения
 				AddKey(sKey)
+			;Else Иначе x1 = 1 строка начинается со спецсимвола, пропускаем как комментарий
 			EndIf
 		Wend
 		CloseFile(hCfg)
@@ -467,9 +468,9 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 308
-; FirstLine = 90
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 383
+; FirstLine = 168
 ; Folding = AAAY-
 ; EnableThread
 ; DisableDebugger

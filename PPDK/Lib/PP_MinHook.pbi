@@ -143,21 +143,21 @@ EndProcedure
 
 Global MinHookErrorMode = #MIN_HOOK_ERROR_MODE
 
-Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.Integer,flags=0)
+Procedure _MH_HookApi(sModule.s,sProcName.s,*pDetour,*ppOriginal,*ppTarget.Integer,flags=0)
 	Protected ErrorText.s
-	Protected MH_Status = MH_CreateHookApiEx(pszModule,pszProcName,*pDetour,*ppOriginal,*ppTarget)
+	Protected MH_Status = MH_CreateHookApiEx(sModule,sProcName,*pDetour,*ppOriginal,*ppTarget)
 	If MH_Status = #MH_OK
-		DbgMinHook("MINHOOK CREATE: "+pszModule+"."+pszProcName+" OK")
+		DbgMinHook("MINHOOK CREATE: "+sModule+"."+sProcName+" OK")
 		If flags & #MH_HOOKAPI_INIT
 			MH_Status = MH_EnableHook(*ppTarget\i)
 			If MH_Status = #MH_OK
-				DbgMinHook("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" OK")
+				DbgMinHook("MINHOOK ENABLE: "+sModule+"."+sProcName+" OK")
 			Else
 				ErrorText.s = _MH_Error(MH_Status)
 				;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
-				DbgMinHookError("MINHOOK ENABLE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
+				DbgMinHookError("MINHOOK ENABLE: "+sModule+"."+sProcName+" ERROR: "+ErrorText)
 				If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-					PPErrorMessage("Error enable hook "+pszModule+"."+pszProcName+#CR$+ErrorText)
+					PPErrorMessage("Error enable hook "+sModule+"."+sProcName+#CR$+ErrorText)
 					If MinHookErrorMode = 2
 						;RaiseError(#ERROR_DLL_INIT_FAILED)
 						TerminateProcess_(GetCurrentProcess_(),0)
@@ -168,10 +168,10 @@ Procedure _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.I
 	Else
 		ErrorText.s = _MH_Error(MH_Status)
 		;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
-		DbgMinHookError("MINHOOK CREATE: "+pszModule+"."+pszProcName+" ERROR: "+ErrorText)
+		DbgMinHookError("MINHOOK CREATE: "+sModule+"."+sProcName+" ERROR: "+ErrorText)
 		If (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
 			If MinHookErrorMode
-				PPErrorMessage("Error create hook "+pszModule+"."+pszProcName+#CR$+ErrorText)
+				PPErrorMessage("Error create hook "+sModule+"."+sProcName+#CR$+ErrorText)
 				If MinHookErrorMode = 2
 					;RaiseError(#ERROR_DLL_INIT_FAILED)
 					TerminateProcess_(GetCurrentProcess_(),0)
@@ -187,6 +187,8 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 170
+; FirstLine = 103
 ; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant

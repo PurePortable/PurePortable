@@ -173,7 +173,7 @@ Procedure ImportCfg(Config.s)
 		While Not Eof(hCfg)
 			s = ReadString(hCfg,CodePage)
 			x1 = FindCtrl(s)
-			If x1
+			If x1 > 1
 				x2 = FindCtrl(s,x1+1)
 				x3 = FindCtrl(s,x2+1)
 				If x2 And x3
@@ -220,10 +220,11 @@ Procedure ImportCfg(Config.s)
 						RegCloseKey_(hKey)
 					EndIf
 				EndIf
-			Else ; ключ без значения
+			ElseIf x1 = 0 ; ключ без значения
 				If RegCreateKey_(hAppKey,@sKey,@hKey) = #NO_ERROR
 					RegCloseKey_(hKey)
 				EndIf
+			;Else Иначе x1 = 1 строка начинается со спецсимвола, пропускаем как комментарий
 			EndIf
 		Wend
 		CloseFile(hCfg)
@@ -272,8 +273,10 @@ Procedure WriteCfg()
 	; Ничего не делаем
 EndProcedure
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AA9
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 224
+; FirstLine = 107
+; Folding = AQ9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -401,7 +401,7 @@ Procedure ExitProcedure()
 	EndIf
 EndProcedure
 
-Procedure DetachProcedure()
+ProcedureDLL.l DetachProcess(Instance)
 	CompilerIf #DBG_ALWAYS
 		Global DbgDetach
 		If DbgDetach
@@ -423,7 +423,7 @@ EndProcedure
 ; Аттач к процессу. Инициализация.
 
 Prototype InitProcProto()
-Procedure AttachProcedure()
+ProcedureDLL.l AttachProcess(Instance)
 	If Not IsRunDll And AttachProcedure() = 0
 		Protected i, InitProc.InitProcProto
 		For i=1 To ArraySize(ModuleInitProcedures())
@@ -444,8 +444,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 407
-; FirstLine = 384
+; CursorPosition = 412
+; FirstLine = 378
 ; Folding = u-
 ; EnableThread
 ; DisableDebugger
