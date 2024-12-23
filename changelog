@@ -4,12 +4,12 @@
 (-) удалено
 (?) непонятно ))
 
-[4.11.0.4]
+[4.11.0.4] 2024-12-22
 (*) #BLOCK_WINSOCKS2 depricated, использовать #BLOCK_WINSOCKS со значениями 0, 1 или 2. Имя dll задаётся через переменную.
 (*) PureSimple: Рефакторинг блокировки интернета.
 (*) Переменная SingleProcess вместо FirstProcess и LastProcess.
 (+) Переменные OSMajorVersion и OSMinorVersion с определением реальной версии ОС через PEB.
-(*) PureSimple: ClosePreferences.
+(!) PureSimple: ClosePreferences.
 
 [4.11.0.3] 2024-11-14
 (+) PureSimple: Записи в секции [Registry] без значения (после =) используются как есть.
