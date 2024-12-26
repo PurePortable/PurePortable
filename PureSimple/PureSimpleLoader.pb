@@ -24,7 +24,7 @@ IncludePath "..\PPDK\Lib"
 ;#PROXY_DLL_COMPATIBILITY = 7 ; Совместимость: 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
 #PROXY_ERROR_MODE = 0
 
-XIncludeFile "PurePortableProxy.pbi"
+XIncludeFile "PurePortableLoader.pbi"
 ;;======================================================================================================================
 Procedure AttachProcedure()
 	DisableThreadLibraryCalls_(Instance)

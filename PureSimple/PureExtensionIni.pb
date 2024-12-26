@@ -188,6 +188,7 @@ EndProcedure
 ;;======================================================================================================================
 
 Global *ExtData.EXT_DATA
+
 Structure INIFILE
 	num.s
 	ini.s
@@ -263,8 +264,6 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 189
-; FirstLine = 29
 ; Folding = B+
 ; Optimizer
 ; EnableThread
