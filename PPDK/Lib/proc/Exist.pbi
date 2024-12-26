@@ -4,7 +4,8 @@
 ; Функции PathFileExists и PathIsDirectory работают неадекватно!
 
 Procedure FileExist(fn.s)
-	ProcedureReturn Bool(GetFileAttributes_(@fn)&#FILE_ATTRIBUTE_DIRECTORY=0)
+	Protected attr = GetFileAttributes_(@fn)
+	ProcedureReturn Bool(attr<>#INVALID_FILE_ATTRIBUTES And (attr&#FILE_ATTRIBUTE_DIRECTORY)=0)
 	;ProcedureReturn PathFileExists_(@fn)
 EndProcedure
 
@@ -15,7 +16,7 @@ Procedure DirectoryExist(fn.s)
 EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 15
+; CursorPosition = 7
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
