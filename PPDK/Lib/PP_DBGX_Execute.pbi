@@ -100,6 +100,7 @@ AddInitProcedure(_InitDbgxExecuteHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 1
 ; Folding = A+
 ; EnableThread
 ; DisableDebugger
