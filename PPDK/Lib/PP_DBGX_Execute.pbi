@@ -39,12 +39,12 @@ CompilerIf #DETOUR_SHELLEXECUTEEX
 	Prototype ShellExecuteEx(*pExecInfo.SHELLEXECUTEINFO)
 	Global Original_ShellExecuteExA.ShellExecuteEx
 	Procedure Detour_ShellExecuteExA(*pExecInfo.SHELLEXECUTEINFO)
-		dbg("ShellExecuteExA: verb: «"+PeekSZ(*pExecInfo\lpVerb,-1,#PB_Ascii)+"» file: «"+PeekSZ(*pExecInfo\lpFile,-1,#PB_Ascii)+"» params: «"+PeekSZ(*pExecInfo\lpParameters,-1,#PB_Ascii)+"»")
+		dbg("ShellExecuteExA: «"+PeekSZ(*pExecInfo\lpVerb,-1,#PB_Ascii)+"» «"+PeekSZ(*pExecInfo\lpFile,-1,#PB_Ascii)+"» «"+PeekSZ(*pExecInfo\lpParameters,-1,#PB_Ascii)+"»")
 		ProcedureReturn Original_ShellExecuteExA(*pExecInfo)
 	EndProcedure
 	Global Original_ShellExecuteExW.ShellExecuteEx
 	Procedure Detour_ShellExecuteExW(*pExecInfo.SHELLEXECUTEINFO)
-		dbg("ShellExecuteExW: verb: «"+PeekSZ(*pExecInfo\lpVerb)+"» file: «"+PeekSZ(*pExecInfo\lpFile)+"» params: «"+PeekSZ(*pExecInfo\lpParameters)+"»")
+		dbg("ShellExecuteExW: «"+PeekSZ(*pExecInfo\lpVerb)+"» «"+PeekSZ(*pExecInfo\lpFile)+"» «"+PeekSZ(*pExecInfo\lpParameters)+"»")
 		ProcedureReturn Original_ShellExecuteExW(*pExecInfo)
 	EndProcedure
 CompilerEndIf
@@ -99,7 +99,7 @@ EndProcedure
 AddInitProcedure(_InitDbgxExecuteHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; Folding = A+
 ; EnableThread
 ; DisableDebugger
