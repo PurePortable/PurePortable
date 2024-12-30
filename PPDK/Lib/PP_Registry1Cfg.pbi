@@ -211,7 +211,6 @@ CompilerIf #PROC_ICFG
 		ElseIf dwType=#REG_SZ
 			Cfg(Index)\a = sData
 			Cfg(Index)\c = StringByteLength(sData)+2
-			Cfg(Index)\m = Cfg(Index)\c
 		EndIf
 	EndProcedure
 	Procedure SetICS(Index,sData.s)
@@ -468,10 +467,8 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 383
-; FirstLine = 168
-; Folding = AAAY-
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = AAAA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
