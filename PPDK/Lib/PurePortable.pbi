@@ -341,15 +341,17 @@ Procedure DecProcessNum()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, -1
 		!LOCK XADD DWORD [ProcessNum], EAX
-		;!DEC EAX ; корретировать не надо, для последнего процесса будет 1
+		;!DEC EAX ; коррекция не нужна, для последнего процесса будет 1
 		;!MOV DWORD [v_ProcessNum], EAX
+		!RET
 	CompilerElse
 		!MOV RAX, -1
 		!LOCK XADD QWORD [ProcessNum], RAX
-		;!DEC RAX ; корретировать не надо, для последнего процесса будет 1
+		;!DEC RAX ; коррекция не нужна, для последнего процесса будет 1
 		;!MOV QWORD [v_ProcessNum], RAX
+		!ADD RSP,40
+		!RET
 	CompilerEndIf
-	; Процедура вернёт значение EAX/RAX
 EndProcedure
 
 ; Общая процедура завершения.
@@ -398,7 +400,6 @@ ProcedureDLL.l DetachProcess(Instance)
 EndProcedure
 ;;======================================================================================================================
 ; Аттач к процессу. Инициализация.
-Prototype InitProcProto()
 
 ; Увеличение счётчика процессов
 Procedure IncProcessNum()
@@ -406,14 +407,14 @@ Procedure IncProcessNum()
 		!MOV EAX, 1
 		!LOCK XADD DWORD [ProcessNum], EAX
 		!INC EAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
-		;!MOV DWORD [v_ProcessNum], EAX
+		!RET
 	CompilerElse
 		!MOV RAX, 1
 		!LOCK XADD QWORD [ProcessNum], RAX
 		!INC RAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
-		;!MOV QWORD [v_ProcessNum], RAX
+		!ADD RSP,40
+		!RET
 	CompilerEndIf
-	; Процедура вернёт значение EAX/RAX
 EndProcedure
 
 ; Общая процедура при старте.
@@ -458,6 +459,7 @@ CompilerIf Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant)
 	Declare CheckProgram()	
 CompilerEndIf
 
+Prototype InitProcProto()
 ProcedureDLL.l AttachProcess(Instance)
 	DbgAlways("ATTACHPROCESS: "+PrgPath)
 	If GetFileVersionInfo(PrgPath,"InternalName") = "rundll"
@@ -502,10 +504,10 @@ ProcedureDLL.l AttachProcess(Instance)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 412
-; FirstLine = 386
+; CursorPosition = 377
+; FirstLine = 357
 ; Folding = u--
 ; EnableThread
 ; DisableDebugger

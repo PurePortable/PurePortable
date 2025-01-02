@@ -13,6 +13,7 @@
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
+;PP_X32_COPYAS "P:\ProgramsA\FoxitPDFEditor12\PurePort.dll"
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
@@ -949,8 +950,10 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 30
+; FirstLine = 30
 ; Folding = xHcA-LCCQ-
 ; Optimizer
 ; EnableThread

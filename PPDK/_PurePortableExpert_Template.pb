@@ -207,16 +207,16 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-; Если эта процедура описана, она должна проверить, к той ли программе приатачена dll.
+; Если установленна константа #PORTABLE_CHECK_PROGRAM=1 и описана эта процедура, она должна проверить, к той ли программе приатачена dll.
 ; В этом случае нет необходимости делать проверку в AttachProcedure.
 ; Процедура должна вернуть #INVALID_PROGRAM (1), если проверка не пройдена или #VALID_PROGRAM (0), если проверка пройдена.
 ; По умолчанию возвращается #VALID_PROGRAM (0).
 Procedure CheckProgram()
-	; Макросы ValidateProgram вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	; Первый параметр макросов:
 	; 0 - Не проверять.
-	; 1 - Проверить и выдать предупреждение, если не та программа. Завершить неправильный процесс при необходимости.
-	; 2 - Проверить, если программа не та, не проводить инициализацию хуков.
+	; 1 - Проверить, если программа не та, завершить неправильный процесс.
+	; 2 - Проверить, если программа не та, не проводить инициализацию хуков. Программа запустится как обычно.
+	; Макросы ValidateProgram* при N=2 вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
 	;ValidateProgramName(1,"program",1) ; Проверка по имени, та ли программа запущена
@@ -300,7 +300,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 18
+; CursorPosition = 218
+; FirstLine = 75
 ; Folding = IwIOy
 ; Optimizer
 ; EnableThread
