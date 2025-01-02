@@ -281,26 +281,26 @@ XIncludeFile "proc\CorrectPath.pbi"
 ; https://learn.microsoft.com/ru-ru/windows/win32/api/winver/nf-winver-verqueryvaluew
 
 Macro ValidateProgram(N,R,V,L=0,CP="")
-	If Not _ValidateProgram(GetFileVersionInfo(PrgPath,R,CP),V,L)
-		CompilerIf N
+	CompilerIf N
+		If Not _ValidateProgram(GetFileVersionInfo(PrgPath,R,CP),V,L)
 			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			CompilerEndIf
-			ProcedureReturn 1
-		CompilerEndIf
-	EndIf
+			ProcedureReturn #INVALID_PROGRAM
+		EndIf
+	CompilerEndIf
 EndMacro
 Macro ValidateProgramL(N,R,V,L=0,CP="")
-	If Not _ValidateProgramL(GetFileVersionInfo(PrgPath,R,CP),V,L)
-		CompilerIf N
+	CompilerIf N
+		If Not _ValidateProgramL(GetFileVersionInfo(PrgPath,R,CP),V,L)
 			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			CompilerEndIf
-			ProcedureReturn 1
-		CompilerEndIf
-	EndIf
+			ProcedureReturn #INVALID_PROGRAM
+		EndIf
+	CompilerEndIf
 EndMacro
 Macro ValidateProgramName(N,V,L=0)
 	If Not _ValidateProgram(PrgName,V,L)
@@ -309,20 +309,20 @@ Macro ValidateProgramName(N,V,L=0)
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			CompilerEndIf
-			ProcedureReturn 1
+			ProcedureReturn #INVALID_PROGRAM
 		CompilerEndIf
 	EndIf
 EndMacro
 Macro ValidateProgramNameL(N,V,L=0)
-	If Not _ValidateProgramL(PrgName,V,L)
-		CompilerIf N
+	CompilerIf N
+		If Not _ValidateProgramL(PrgName,V,L)
 			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
 			CompilerEndIf
-			ProcedureReturn 1
-		CompilerEndIf
-	EndIf
+			ProcedureReturn #INVALID_PROGRAM
+		EndIf
+	CompilerEndIf
 EndMacro
 
 CompilerIf Not Defined(PROC_GETVERSIONINFO,#PB_Constant) : #PROC_GETVERSIONINFO = 1 : CompilerEndIf
@@ -453,9 +453,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 287
-; FirstLine = 113
-; Folding = 59PAgA5
+; Folding = 59PAgg5
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger
