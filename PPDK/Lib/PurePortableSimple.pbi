@@ -25,6 +25,17 @@ Global DbgDetach
 XIncludeFile "PP_Extension.pbi"
 
 ;;======================================================================================================================
+
+Global *EXT.EXT_DATA
+
+Macro EXT_MH_HookApi(DllName,FuncName,flags=0)
+	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
+	Global Target_#FuncName
+	_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
+	;CompilerEndIf
+EndMacro
+
+;;======================================================================================================================
 Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
 	Protected Result.s
 	If Path=""
@@ -49,8 +60,9 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 1
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 29
+; FirstLine = 6
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

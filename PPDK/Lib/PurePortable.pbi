@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.11.0.4
+; PurePortable main lib 4.11.0.5
 #PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
@@ -12,6 +12,7 @@ CompilerIf Not #PB_Compiler_Thread
 	CompilerError "Enable threadsafe in compiler options"
 CompilerEndIf
 
+CompilerIf Not Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant) : #PORTABLE_CHECK_PROGRAM = 0 : CompilerEndIf
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
 ;#PROXY_DLL_COMPATIBILITY_DEFAULT = 7 ; Это совместимость по умолчанию для #PROXY_DLL_COMPATIBILITY=0 ???
 
@@ -38,19 +39,25 @@ DataSection
 	CompilerElse
 		!ProcessNum: DQ 0
 	CompilerEndIf
+	TickCount:
+	!DD 0
+	bGUID:
+	!DB 16 DUP(0)
+	sGUID:
+	!DU 40 DUP(0)
 	!section '.data' data readable writeable
 EndDataSection
 
 ; Общие переменные
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
-Global ProcessId, ProcessNum, SingleProcess
+Global ProcessId, ProcessNum, SingleProcess, ProcessTickCount.l, ProcessGUID.s
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
 Global PrgName.s ; имя программы (без расширения)
+Global PrgIsValid ; программа прошла проверку
 Global DllPath.s, DllName.s
 ;Global DllDir.s, DllDirN.s ; это теперь PrgDir и PrgDirN !!!
-Global IsRunDll ; текущая программа rundll32
 ;Global LogFile.s
 Global PreferenceFile.s
 Global WinDir.s, SysDir.s, TempDir.s
@@ -310,8 +317,6 @@ Procedure GlobalInitialization()
 	PrgName = GetFilePart(PrgPath,#PB_FileSystem_NoExtension)
 	;PrgDir = GetPathPart(PrgPath)
 	;PrgDirN = RTrim(PrgDir,"\")
-	IsRunDll = Bool(GetFileVersionInfo(PrgPath,"InternalName")="rundll") ; это имя есть даже в Win98
-	;IsRunDll = Bool(GetFileVersionInfo(PrgPath,"InternalName")="rundll" And GetFileVersionInfo(PrgPath,"CompanyName")="Microsoft Corporation") ; CompanyName может быть на другом языке
 	
 	GetModuleFileName_(DllInstance,@buf,#MAX_PATH_EXTEND)
 	DllPath = buf ; полный путь к прокси-dll
@@ -326,6 +331,94 @@ Procedure GlobalInitialization()
 	GetTempPath_(#MAX_PATH_EXTEND,@buf)
 	TempDir = RTrim(buf,"\")
 	
+	ProcessId = GetCurrentProcessId_()
+EndProcedure
+;;======================================================================================================================
+; Детач из процесса. Завершение.
+
+; Уменьшение счётчика просессов
+Procedure DecProcessNum()
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		!MOV EAX, -1
+		!LOCK XADD DWORD [ProcessNum], EAX
+		;!DEC EAX ; корретировать не надо, для последнего процесса будет 1
+		;!MOV DWORD [v_ProcessNum], EAX
+	CompilerElse
+		!MOV RAX, -1
+		!LOCK XADD QWORD [ProcessNum], RAX
+		;!DEC RAX ; корретировать не надо, для последнего процесса будет 1
+		;!MOV QWORD [v_ProcessNum], RAX
+	CompilerEndIf
+	; Процедура вернёт значение EAX/RAX
+EndProcedure
+
+; Общая процедура завершения.
+; Может быть вызвана из разных мест, в том числе из DetachProcess и CBT-хуков.
+; Отсюда выполняется пользовательская DetachProcedure.
+Global ExitProcedureIsComleted ; Истина, если процедура завершения уже была выполнена, например, из CBT-хуков.
+Procedure ExitProcedure()
+	If Not ExitProcedureIsComleted
+		CompilerIf Defined(MIN_HOOK,#PB_Constant)
+			CompilerIf #MIN_HOOK
+				MH_Uninitialize()
+			CompilerEndIf
+		CompilerEndIf
+		ProcessNum = DecProcessNum()
+		SingleProcess = Bool(ProcessNum=1)
+		If DetachProcedure() = 0
+			DetachCleanup
+		EndIf
+		ExitProcedureIsComleted = #True
+	EndIf
+EndProcedure
+
+ProcedureDLL.l DetachProcess(Instance)
+	If PrgIsValid
+		CompilerIf #DBG_ALWAYS
+			Global DbgDetach
+			If DbgDetach
+				DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
+			EndIf
+		CompilerEndIf
+		ExitProcedure()
+		CompilerIf #DBG_ALWAYS
+			If DbgDetach
+				DbgAlways("DETACHPROCESS: "+PrgPath+" ("+Str(ProcessNum)+")")
+			EndIf
+		CompilerEndIf
+	Else
+		CompilerIf #DBG_ALWAYS
+			Global DbgDetach
+			If DbgDetach
+				DbgAlways("DETACHPROCESS: "+DllPath)
+				DbgAlways("DETACHPROCESS: "+PrgPath)
+			EndIf
+		CompilerEndIf
+	EndIf
+EndProcedure
+;;======================================================================================================================
+; Аттач к процессу. Инициализация.
+Prototype InitProcProto()
+
+; Увеличение счётчика процессов
+Procedure IncProcessNum()
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		!MOV EAX, 1
+		!LOCK XADD DWORD [ProcessNum], EAX
+		!INC EAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
+		;!MOV DWORD [v_ProcessNum], EAX
+	CompilerElse
+		!MOV RAX, 1
+		!LOCK XADD QWORD [ProcessNum], RAX
+		!INC RAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
+		;!MOV QWORD [v_ProcessNum], RAX
+	CompilerEndIf
+	; Процедура вернёт значение EAX/RAX
+EndProcedure
+
+; Общая процедура при старте.
+; Нужна для совместимости с проек  тами, использующими CheckProgram (новые) и не использующие (старые).
+Procedure StartProcedure()
 	CompilerIf Defined(PREFERENCES_FILENAME,#PB_Constant)
 		CompilerIf #PREFERENCES_FILENAME<>""
 			PreferenceFile = PrgDir+#PREFERENCES_FILENAME
@@ -348,105 +441,72 @@ Procedure GlobalInitialization()
 			LoggingFile = PrgDir+PrgName+".log"
 		CompilerEndIf
 	CompilerEndIf
-	
-	If Not IsRunDll
-		CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-			!MOV EAX, 1
-			!LOCK XADD DWORD [ProcessNum], EAX
-			!INC EAX
-			!MOV DWORD [v_ProcessNum], EAX
-		CompilerElse
-			!MOV RAX, 1
-			!LOCK XADD QWORD [ProcessNum], RAX
-			!INC RAX
-			!MOV QWORD [v_ProcessNum], RAX
-		CompilerEndIf
-		SingleProcess = Bool(ProcessNum=1)
+	ProcessNum = IncProcessNum()
+	SingleProcess = Bool(ProcessNum=1)
+	If SingleProcess
+		PokeL(?TickCount,GetTickCount_())
+		UuidCreate_(?bGUID)
+		StringFromGUID2_(?bGUID,?sGUID,40)
 	EndIf
+	ProcessGUID = PeekS(?sGUID)
+	ProcessTickCount = PeekL(?TickCount)
+	;dbg("GUID: "+ProcessGUID+" TC: "+Str(ProcessTickCount))
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
-	ProcessId = GetCurrentProcessId_()
-	
-	DbgAlways("ATTACHPROCESS: "+PrgPath)
-	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
-EndProcedure
-;;======================================================================================================================
-; Детач из процесса. Завершение.
-
-; Общая процедура завершения.
-; Может быть вызвана из разных мест, в том числе из DetachProcess и CBT-хуков.
-Global ExitProcedureIsComleted ; Истина, если процедура завершения уже была выполнена, например, из CBT-хуков.
-Procedure ExitProcedure()
-	If Not ExitProcedureIsComleted
-		CompilerIf Defined(MIN_HOOK,#PB_Constant)
-			CompilerIf #MIN_HOOK
-				MH_Uninitialize()
-			CompilerEndIf
-		CompilerEndIf
-		CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-			!MOV EAX, -1
-			!LOCK XADD DWORD [ProcessNum], EAX
-			!DEC EAX
-			!MOV DWORD [v_ProcessNum], EAX
-		CompilerElse
-			!MOV RAX, -1
-			!LOCK XADD QWORD [ProcessNum], RAX
-			!DEC RAX
-			!MOV QWORD [v_ProcessNum], RAX
-		CompilerEndIf
-		SingleProcess = Bool(ProcessNum=0)
-		If DetachProcedure() = 0
-			DetachCleanup
-		EndIf
-		ExitProcedureIsComleted = #True
-	EndIf
 EndProcedure
 
-ProcedureDLL.l DetachProcess(Instance)
-	CompilerIf #DBG_ALWAYS
-		Global DbgDetach
-		If DbgDetach
-			DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
-		EndIf
-	CompilerEndIf
-		
-	If Not IsRunDll
-		ExitProcedure()
-	EndIf
-	
-	CompilerIf #DBG_ALWAYS
-		If DbgDetach
-			DbgAlways("DETACHPROCESS: "+PrgPath)
-		EndIf
-	CompilerEndIf
-EndProcedure
-;;======================================================================================================================
-; Аттач к процессу. Инициализация.
+CompilerIf Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant)
+	Declare CheckProgram()	
+CompilerEndIf
 
-Prototype InitProcProto()
 ProcedureDLL.l AttachProcess(Instance)
-	If Not IsRunDll And AttachProcedure() = 0
-		Protected i, InitProc.InitProcProto
-		For i=1 To ArraySize(ModuleInitProcedures())
-			InitProc = ModuleInitProcedures(i)
-			If InitProc
-				InitProc()
-			EndIf
-		Next
-		CompilerIf Defined(MIN_HOOK,#PB_Constant)
-			CompilerIf #MIN_HOOK
-				MH_EnableHook(#MH_ALL_HOOKS)
-			CompilerEndIf
-		CompilerEndIf
-		DbgAlways("ATTACHPROCESS: Complete")
+	DbgAlways("ATTACHPROCESS: "+PrgPath)
+	If GetFileVersionInfo(PrgPath,"InternalName") = "rundll"
+		;PrgIsValid = 0
+		DbgAlways("ATTACHPROCESS: "+DllPath)
+		ProcedureReturn
 	EndIf
+	CompilerIf #PORTABLE_CHECK_PROGRAM
+		If CheckProgram() = #INVALID_PROGRAM
+			;PrgIsValid = 0
+			DbgAlways("ATTACHPROCESS: "+DllPath)
+			ProcedureReturn
+		EndIf
+		StartProcedure()
+		AttachProcedure()
+	CompilerElse
+		; Для совместимости - когда нет CheckProgram, проверка осуществляется в AttachProcedure.
+		StartProcedure()
+		If AttachProcedure() = #INVALID_PROGRAM
+			;PrgIsValid = 0
+			DbgAlways("ATTACHPROCESS: "+DllPath)
+			ProcedureReturn
+		EndIf
+	CompilerEndIf
+
+	PrgIsValid = 1
+	
+	Protected i, InitProc.InitProcProto
+	For i=1 To ArraySize(ModuleInitProcedures())
+		InitProc = ModuleInitProcedures(i)
+		If InitProc
+			InitProc()
+		EndIf
+	Next
+	CompilerIf Defined(MIN_HOOK,#PB_Constant)
+		CompilerIf #MIN_HOOK
+			MH_EnableHook(#MH_ALL_HOOKS)
+		CompilerEndIf
+	CompilerEndIf
+	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
+	;DbgAlways("ATTACHPROCESS: Complete")
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
 ; CursorPosition = 412
-; FirstLine = 378
-; Folding = u-
+; FirstLine = 386
+; Folding = u--
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -6,14 +6,14 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.4
+;RES_VERSION 4.11.0.5
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME PurePort.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
-;PP_X32_COPYAS "Temp\PurePort32.dll"
-;PP_X64_COPYAS "Temp\PurePort64.dll"
+;PP_X32_COPYAS nul
+;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
 EnableExplicit
@@ -53,6 +53,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
 #PORTABLE_CLEANUP = 1
+#PORTABLE_CHECK_PROGRAM = 1
 ;}
 ;{ Обработка ошибок
 ;#PROXY_ERROR_MODE = 1
@@ -331,14 +332,9 @@ EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Declare RunFrom(k.s,p.s)
 ;;----------------------------------------------------------------------------------------------------------------------
-; Действия выполняемые при запуске программы.
-; Процедура должна вернуть 1 если не требуется выполнение процедуры инициализации (инициализация модулей, установка хуков и т.п.).
-; Для rundll32 не выполняется.
-Procedure AttachProcedure()
-	Protected i, j
+Procedure CheckProgram()
 	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
 	Protected RetCode
-	
 	;{ Файл конфигурации
 	PureSimplePrefs = PrgDir+DllName
 	Protected MultiConfigPrefs.s 
@@ -397,7 +393,7 @@ Procedure AttachProcedure()
 			If PreferenceGroup("ValidateProgram") = 0
 				MessageBox_(0,"Section [ValidateProgram] not found!","PurePortable",#MB_ICONERROR)
 				TerminateProcess_(GetCurrentProcess_(),0)
-				ProcedureReturn 1
+				ProcedureReturn #INVALID_PROGRAM
 			EndIf
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -434,11 +430,22 @@ Procedure AttachProcedure()
 				If InvalidReaction=3 Or InvalidReaction=4 ; завершить работу
 					TerminateProcess_(GetCurrentProcess_(),0)
 				EndIf
-				ProcedureReturn 1
+				ProcedureReturn #INVALID_PROGRAM
 			EndIf
 		EndIf
 	EndIf
 	;}
+	ClosePreferences()
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; Действия выполняемые при запуске программы.
+Procedure AttachProcedure()
+	Protected i, j
+	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
+	Protected RetCode
+	
+	OpenPreferences(PureSimplePrefs)
+	
 	;{ Установка переменных среды
 	SetEnvironmentVariable("PP_PrgPath",PrgPath)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
@@ -565,8 +572,9 @@ Procedure AttachProcedure()
 	;}
 	;{ Перенаправление специальных папок
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
-		p = PreferencePath(ReadPreferenceString("AllDirs",""))
-		If p
+		v = Trim(ReadPreferenceString("AllDirs",""),"\")
+		If v
+			p = PreferencePath(v)
 			ProfileRedir = p
 			AppDataRedir = p
 			LocalAppDataRedir = p
@@ -577,8 +585,8 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			v = PreferenceKeyValue()
-			p = PreferencePath()
+			v = RTrim(PreferenceKeyValue(),"\")
+			p = PreferencePath(v)
 			Select LCase(k)
 				Case "profile"
 					ProfileRedir = p
@@ -859,7 +867,6 @@ Procedure DetachProcedure()
 			WriteCfg()
 		EndIf
 	CompilerEndIf
-	
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
 		ProcedureReturn 1
 	EndIf
@@ -944,20 +951,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 848
-; FirstLine = 267
-; Folding = xGYA-rEAs
+; Folding = xHcA-LCCQ-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.4
+; VersionField0 = 4.11.0.5
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.4
+; VersionField5 = 4.11.0.5
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2024

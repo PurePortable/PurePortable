@@ -17,7 +17,7 @@
 ;RES_COPYRIGHT (c) Smitis, 2017-2024
 ;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.11.0.0
+;RES_PRODUCTVERSION 4.11.0.5
 ;PP_X32_COPYAS "P:\PurePortable\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\proxy64.dll"
 ;PP_CLEAN 2
@@ -66,6 +66,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_ENTRYPOINT = 0
 
 #PORTABLE_CLEANUP = 0
+#PORTABLE_CHECK_PROGRAM = 1 ; Использовать CheckProgram
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Мониторинг
@@ -206,12 +207,12 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
-; Действия выполняемые при запуске программы.
-; Процедура должна вернуть 1 если не требуется выполнение процедуры инициализации (инициализация модулей, установка хуков и т.п.).
-; Для rundll32 не выполняется.
-Procedure AttachProcedure()
-	; Проверка, та ли программа запущена
-	; Макросы ValidateProgram вставят ProcedureReturn 1 автоматически.
+; Если эта процедура описана, она должна проверить, к той ли программе приатачена dll.
+; В этом случае нет необходимости делать проверку в AttachProcedure.
+; Процедура должна вернуть #INVALID_PROGRAM (1), если проверка не пройдена или #VALID_PROGRAM (0), если проверка пройдена.
+; По умолчанию возвращается #VALID_PROGRAM (0).
+Procedure CheckProgram()
+	; Макросы ValidateProgram вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	; Первый параметр макросов:
 	; 0 - Не проверять.
 	; 1 - Проверить и выдать предупреждение, если не та программа. Завершить неправильный процесс при необходимости.
@@ -219,12 +220,13 @@ Procedure AttachProcedure()
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
 	;ValidateProgramName(1,"program",1) ; Проверка по имени, та ли программа запущена
+EndProcedure
+;;======================================================================================================================
+; Действия выполняемые при запуске программы.
+; Для rundll32 не выполняется.
+Procedure AttachProcedure()
 	;Protected FileInfo.s = LCase(GetFileVersionInfo(PrgPath,"InternalName"))
 	;Protected FileInfo.s = LCase(GetFilePart(GetFileVersionInfo(PrgPath,"OriginalFilename"),#PB_FileSystem_NoExtension))
-	;If FileInfo <> "XXX"
-	;	TerminateProcess_(GetCurrentProcess_(),0)
-	;	ProcedureReturn 1
-	;EndIf
 
 	;{ Папки
 	CompilerIf #PORTABLE_SPECIAL_FOLDERS Or #PORTABLE_ENVIRONMENT_VARIABLES
@@ -296,9 +298,10 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = IwIG6
+; CursorPosition = 18
+; Folding = IwIOy
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
