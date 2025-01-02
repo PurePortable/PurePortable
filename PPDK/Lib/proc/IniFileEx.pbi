@@ -65,10 +65,11 @@ Procedure IniRead(Ini.s)
 			EndIf
 		Wend
 		CloseFile(hIni)
+		ProcedureReturn #True
 	EndIf
+	;ProcedureReturn #False
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-; После вызова этой процедуры работа с ini-файлом нежелательна.
 Procedure IniWrite()
 	Protected CurrentSection.s
 	Protected i, j, hIni
@@ -169,6 +170,19 @@ Procedure IniSet(Section.s,Key.s,Value.s)
 	EndIf
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
+Procedure.s IniGet(Section.s,Key.s)
+	Protected Result.s, i
+	Protected k.s = LCase(Key)
+	Protected s.s = LCase(Section)
+	For i=1 To IniSize
+		If Not IniData(i)\Deleted And Not IniData(i)\Plain And IniData(i)\KeyL=k And IniData(i)\SectionL=s
+			Result = IniData(i)\Value
+			Break
+		EndIf
+	Next
+	ProcedureReturn Result
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniCorrect(Section.s,Key.s,Base.s,Flags=0)
 	Protected i, Path.s
 	Protected k.s = LCase(Key)
@@ -205,8 +219,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 4
-; Folding = 8-
+; Folding = D5
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
