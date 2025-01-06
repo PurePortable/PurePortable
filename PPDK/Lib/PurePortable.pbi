@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.11.0.5
+; PurePortable main lib 4.11.0.6
 #PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
@@ -554,8 +554,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 479
-; FirstLine = 451
+; CursorPosition = 1
 ; Folding = u--
 ; EnableThread
 ; DisableDebugger
