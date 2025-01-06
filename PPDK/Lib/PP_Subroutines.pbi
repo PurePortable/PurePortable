@@ -282,7 +282,7 @@ XIncludeFile "proc\CorrectPath.pbi"
 
 Macro ValidateProgram(N,R,V,L=0,CP="")
 	CompilerIf N
-		If Not _ValidateProgram(GetFileVersionInfo(PrgPath,R,CP),V,L)
+		If Not _ValidateProgramL(GetFileVersionInfo(PrgPath,R,CP),V,L)
 			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)
@@ -303,7 +303,7 @@ Macro ValidateProgramL(N,R,V,L=0,CP="")
 	CompilerEndIf
 EndMacro
 Macro ValidateProgramName(N,V,L=0)
-	If Not _ValidateProgram(PrgName,V,L)
+	If Not _ValidateProgramL(PrgName,V,L)
 		CompilerIf N
 			CompilerIf N=1		
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
@@ -397,16 +397,16 @@ Procedure.s GetFileVersionInfo(FileName.s,SubBlock.s="FileVersion",LangAndCodepa
 	CloseLibrary(hModule)
 	ProcedureReturn Result
 EndProcedure
-Procedure _ValidateProgram(w.s,v.s,l=0)
-	CharLower_(@w)
-	CharLower_(@v)
-	ProcedureReturn Bool((l=0 And w=v) Or (l=1 And Left(w,Len(v))=v) Or (l>1 And Left(w,l)=v) Or (l=-1 And Right(w,Len(v))=v) Or (l<0 And Right(w,-l)=v))
-EndProcedure
-Procedure _ValidateProgramL(w.s,v.s,l=0)
+;{ Procedure _ValidateProgram(w.s,v.s,l=1)
+; 	CharLower_(@w)
+; 	CharLower_(@v)
+; 	ProcedureReturn Bool((l=0 And w=v) Or (l=1 And Left(w,Len(v))=v) Or (l>1 And Left(w,l)=v) Or (l=-1 And Right(w,Len(v))=v) Or (l<0 And Right(w,-l)=v))
+;} EndProcedure
+Procedure _ValidateProgramL(w.s,v.s,l=1)
 	CharLower_(@w)
 	CharLower_(@v)
 	Protected Dim a.s(0)
-	Protected n = SplitArray(a(),v)
+	Protected n = SplitArray(a(),v,"|")
 	Protected i
 	For i=1 To n
 		v = a(i)
@@ -453,7 +453,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = 59PAgg5
+; Folding = 59PAgA5
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger
