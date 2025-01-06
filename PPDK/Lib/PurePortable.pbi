@@ -33,11 +33,17 @@ CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPAT
 ; Общая секция для межпроцессного взаимодействия.
 DataSection
 	!section '.share' data readable writeable shareable notpageable
-	ProcessNum:
+	DllInstancesCnt:
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		!ProcessNum: DD 0
+		!DllInstancesCnt: DD 0
 	CompilerElse
-		!ProcessNum: DQ 0
+		!DllInstancesCnt: DQ 0
+	CompilerEndIf
+	DllInitComplete:
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		!DllInitComplete: DD 0
+	CompilerElse
+		!DllInitComplete: DQ 0
 	CompilerEndIf
 	TickCount:
 	!DD 0
@@ -49,8 +55,10 @@ DataSection
 EndDataSection
 
 ; Общие переменные
+Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
-Global ProcessId, ProcessNum, SingleProcess, ProcessTickCount.l, ProcessGUID.s
+Global PPTickCount.l, PPGUID.s
+Global ProcessMutexName.s, hProcessMutex, ProcessPipeName.s, hProcessPipe
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
@@ -337,16 +345,16 @@ EndProcedure
 ; Детач из процесса. Завершение.
 
 ; Уменьшение счётчика просессов
-Procedure DecProcessNum()
+Procedure DecDllInstancesCnt()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, -1
-		!LOCK XADD DWORD [ProcessNum], EAX
+		!LOCK XADD DWORD [DllInstancesCnt], EAX
 		;!DEC EAX ; коррекция не нужна, для последнего процесса будет 1
 		;!MOV DWORD [v_ProcessNum], EAX
 		!RET
 	CompilerElse
 		!MOV RAX, -1
-		!LOCK XADD QWORD [ProcessNum], RAX
+		!LOCK XADD QWORD [DllInstancesCnt], RAX
 		;!DEC RAX ; коррекция не нужна, для последнего процесса будет 1
 		;!MOV QWORD [v_ProcessNum], RAX
 		!ADD RSP,40
@@ -359,33 +367,44 @@ EndProcedure
 ; Отсюда выполняется пользовательская DetachProcedure.
 Global ExitProcedureIsComleted ; Истина, если процедура завершения уже была выполнена, например, из CBT-хуков.
 Procedure ExitProcedure()
-	If Not ExitProcedureIsComleted
-		CompilerIf Defined(MIN_HOOK,#PB_Constant)
-			CompilerIf #MIN_HOOK
-				MH_Uninitialize()
-			CompilerEndIf
-		CompilerEndIf
-		ProcessNum = DecProcessNum()
-		SingleProcess = Bool(ProcessNum=1)
-		If DetachProcedure() = 0
-			DetachCleanup
-		EndIf
-		ExitProcedureIsComleted = #True
+	If ExitProcedureIsComleted
+		ProcedureReturn
 	EndIf
+	CompilerIf Defined(MIN_HOOK,#PB_Constant)
+		CompilerIf #MIN_HOOK
+			MH_Uninitialize()
+		CompilerEndIf
+	CompilerEndIf
+	
+	; В это время может завершаться или запускаться другой процесс
+	;hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
+	;WaitForSingleObject_(hProcessMutex,#INFINITE)
+	ProcessCntPrev = ProcessCnt
+	GetNamedPipeHandleState_(hProcessPipe,#Null,@ProcessCnt,#Null,#Null,#Null,0)
+	SingleProcess = Bool(ProcessCnt=1)
+	CloseHandle_(hProcessPipe)
+	;ReleaseMutex_(hProcessMutex)
+	;CloseHandle_(hProcessMutex)
+	
+	If DetachProcedure() = 0
+		DetachCleanup
+	EndIf
+	
+	ExitProcedureIsComleted = #True
 EndProcedure
 
 ProcedureDLL.l DetachProcess(Instance)
 	If PrgIsValid
-		CompilerIf #DBG_ALWAYS
-			Global DbgDetach
-			If DbgDetach
-				DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
-			EndIf
-		CompilerEndIf
 		ExitProcedure()
 		CompilerIf #DBG_ALWAYS
+			Global DbgDetach
+			Protected Inst.s = Str(ProcessCnt)
+			If SingleProcess
+				Inst = "LAST"
+			EndIf
 			If DbgDetach
-				DbgAlways("DETACHPROCESS: "+PrgPath+" ("+Str(ProcessNum)+")")
+				DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCntPrev)+"/"+Inst+")")
+				DbgAlways("DETACHPROCESS: "+PrgPath)
 			EndIf
 		CompilerEndIf
 	Else
@@ -401,16 +420,20 @@ EndProcedure
 ;;======================================================================================================================
 ; Аттач к процессу. Инициализация.
 
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_public_object_basic_information
+; https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryobject
+
 ; Увеличение счётчика процессов
-Procedure IncProcessNum()
+Procedure IncDllInstancesCnt()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, 1
-		!LOCK XADD DWORD [ProcessNum], EAX
+		!LOCK XADD DWORD [DllInstancesCnt], EAX
 		!INC EAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
 		!RET
 	CompilerElse
 		!MOV RAX, 1
-		!LOCK XADD QWORD [ProcessNum], RAX
+		!LOCK XADD QWORD [DllInstancesCnt], RAX
 		!INC RAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
 		!ADD RSP,40
 		!RET
@@ -442,15 +465,36 @@ Procedure StartProcedure()
 			LoggingFile = PrgDir+PrgName+".log"
 		CompilerEndIf
 	CompilerEndIf
-	ProcessNum = IncProcessNum()
-	SingleProcess = Bool(ProcessNum=1)
-	If SingleProcess
+	If IncDllInstancesCnt() = 1 And PeekI(?DllInitComplete) = 0
 		PokeL(?TickCount,GetTickCount_())
 		UuidCreate_(?bGUID)
 		StringFromGUID2_(?bGUID,?sGUID,40)
+		PokeI(?DllInitComplete,1)
 	EndIf
-	ProcessGUID = PeekS(?sGUID)
-	ProcessTickCount = PeekL(?TickCount)
+	; ???
+	; Может, здесь нужен цикл ожидания на случай, если первый процесс ещё не закончил инициализацию,
+	; а следующий уже пытается определить PPGUID и имена мьютекса и канала?
+	; С другой стороны, пока первый процесс не закончил инициализацию, откуда взяться второму?
+	PPGUID = PeekS(?sGUID)
+	PPTickCount = PeekL(?TickCount)
+	;ProcessMutexName = PrgName+"."+PPGUID
+	ProcessPipeName = "\\.\pipe\"+PrgName+"."+PPGUID
+	
+	; В это время может завершаться или запускаться другой процесс
+	;hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
+	;WaitForSingleObject_(hProcessMutex,#INFINITE)
+	hProcessPipe = CreateNamedPipe_(@ProcessPipeName,#PIPE_ACCESS_DUPLEX,0,#PIPE_UNLIMITED_INSTANCES,16,16,0,#Null)
+	If hProcessPipe
+		; https://learn.microsoft.com/ru-ru/windows/win32/api/winbase/nf-winbase-getnamedpipehandlestatew
+		GetNamedPipeHandleState_(hProcessPipe,#Null,@ProcessCnt,#Null,#Null,#Null,0)
+		SingleProcess = Bool(ProcessCnt=1)
+	Else
+		dbg("CreateNamedPipe: «"+ProcessPipeName+"»")
+		dbg("CreateNamedPipe: "+GetLastErrorStr())
+	EndIf
+	;ReleaseMutex_(hProcessMutex)
+	;CloseHandle_(hProcessMutex)
+	
 	;dbg("GUID: "+ProcessGUID+" TC: "+Str(ProcessTickCount))
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
 EndProcedure
@@ -499,15 +543,19 @@ ProcedureDLL.l AttachProcess(Instance)
 			MH_EnableHook(#MH_ALL_HOOKS)
 		CompilerEndIf
 	CompilerEndIf
-	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Str(ProcessNum)+")")
+	Protected Inst.s = Str(ProcessCnt)
+	If SingleProcess
+		Inst = "FIRST"
+	EndIf
+	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Inst+")")
 	;DbgAlways("ATTACHPROCESS: Complete")
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 377
-; FirstLine = 357
+; CursorPosition = 479
+; FirstLine = 451
 ; Folding = u--
 ; EnableThread
 ; DisableDebugger
