@@ -51,7 +51,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_SPECIAL_FOLDERS = 1 ; Перехват функций для работы со специальными папками
 ;{ Управление хуками PORTABLE_SPECIAL_FOLDERS
 #DETOUR_SHFOLDER = 0 ; Перехват функций из shfolder.dll
-#DETOUR_USERENV = 0	; Перехват функций из userenv.dll
+#DETOUR_USERENV = 0 ; Перехват функций из userenv.dll
 ;}
 #PORTABLE_ENVIRONMENT_VARIABLES = 0
 ;{ Управление хуками PORTABLE_ENVIRONMENT_VARIABLES
@@ -62,7 +62,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 #PORTABLE_PROFILE_STRINGS = 0
 #PROFILE_STRINGS_FILENAME = "PurePortable"
-#PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
+#PORTABLE_CBT_HOOK = 0 ; Хук для отслеживания закрытия окон для сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
 
 #PORTABLE_CLEANUP = 0
@@ -219,7 +219,7 @@ Procedure CheckProgram()
 	; Макросы ValidateProgram* при N=2 вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
-	;ValidateProgramName(1,"program",1) ; Проверка по имени, та ли программа запущена
+	;ValidateProgramName(1,"program") ; Проверка по имени, та ли программа запущена
 EndProcedure
 ;;======================================================================================================================
 ; Действия выполняемые при запуске программы.
@@ -298,11 +298,9 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 218
-; FirstLine = 75
-; Folding = IwIOy
+; Folding = KwIOy
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
