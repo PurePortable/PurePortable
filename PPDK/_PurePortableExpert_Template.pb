@@ -232,6 +232,7 @@ Procedure AttachProcedure()
 	CompilerIf #PORTABLE_SPECIAL_FOLDERS Or #PORTABLE_ENVIRONMENT_VARIABLES
 		;ProfileRedir = NormalizePath(PrgDir+"..")
 		ProfileRedir = PrgDirN
+		UserProfileDirectory = PrgDirN ; специально для GetUserProfileDirectory
 		AppDataRedir = PrgDirN
 		LocalAppDataRedir = PrgDirN
 		;LocalLowAppDataRedir = PrgDirN

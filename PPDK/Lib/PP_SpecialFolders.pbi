@@ -14,6 +14,7 @@ Global DocumentsRedir.s
 Global CommonAppDataRedir.s
 Global CommonDocumentsRedir.s
 Global TempRedir.s
+Global UserProfileDirectory.s ; специально для GetUserProfileDirectory
 
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf Not Defined(DETOUR_SHFOLDER,#PB_Constant) : #DETOUR_SHFOLDER = 0 : CompilerEndIf
@@ -596,18 +597,22 @@ CompilerIf #DETOUR_USERENV
 			DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Ascii))
 			DbgSpec("GetUserProfileDirectoryA: RESULT: "+Str(Result)+" ERROR: "+Str(GetLastError_()))
 		CompilerElse
-			If *lpcchSize
-				*lpcchSize\l = ProfileDirSize
-			EndIf
-			If *lpProfileDir=#Null Or *lpcchSize=#Null Or *lpcchSize\l<ProfileDirSize
-				Result = #False
-				SetLastError_(122)
-				DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+")")
+			If UserProfileDirectory
+				If *lpcchSize
+					*lpcchSize\l = ProfileDirSize
+				EndIf
+				If *lpProfileDir=#Null Or *lpcchSize=#Null Or *lpcchSize\l<ProfileDirSize
+					Result = #False
+					SetLastError_(122)
+					DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+")")
+				Else
+					Result = #True
+					PokeS(*lpProfileDir,ProfileRedir,-1,#PB_Ascii)
+					SetLastError_(0)
+					DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Ascii))
+				EndIf
 			Else
-				Result = #True
-				PokeS(*lpProfileDir,ProfileRedir,-1,#PB_Ascii)
-				SetLastError_(0)
-				DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Ascii))
+				Result = Original_GetUserProfileDirectoryA(hToken,*lpProfileDir,*lpcchSize)
 			EndIf
 		CompilerEndIf
 		ProcedureReturn Result
@@ -621,18 +626,22 @@ CompilerIf #DETOUR_USERENV
 			DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Unicode))
 			DbgSpec("GetUserProfileDirectoryW: RESULT: "+Str(Result)+" ERROR: "+Str(GetLastError_()))
 		CompilerElse
-			If *lpcchSize
-				*lpcchSize\l = ProfileDirSize
-			EndIf
-			If *lpProfileDir=#Null Or *lpcchSize=#Null Or *lpcchSize\l<ProfileDirSize
-				Result = #False
-				SetLastError_(122)
-				DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+")")
+			If UserProfileDirectory
+				If *lpcchSize
+					*lpcchSize\l = ProfileDirSize
+				EndIf
+				If *lpProfileDir=#Null Or *lpcchSize=#Null Or *lpcchSize\l<ProfileDirSize
+					Result = #False
+					SetLastError_(122)
+					DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+")")
+				Else
+					Result = #True
+					PokeS(*lpProfileDir,ProfileRedir,-1,#PB_Unicode)
+					SetLastError_(0)
+					DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Unicode))
+				EndIf
 			Else
-				Result = #True
-				PokeS(*lpProfileDir,ProfileRedir,-1,#PB_Unicode)
-				SetLastError_(0)
-				DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Unicode))
+				Result = Original_GetUserProfileDirectoryW(hToken,*lpProfileDir,*lpcchSize)
 			EndIf
 		CompilerEndIf
 		ProcedureReturn Result
@@ -688,10 +697,9 @@ EndProcedure
 AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 51
-; FirstLine = 33
-; Folding = qAAg-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 16
+; Folding = qAA5-
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
