@@ -34,12 +34,19 @@ Structure MH_DATA
 	_MHX_Error._MHX_Error
 EndStructure
 
+Prototype PP_dbg(txt.s)
+Structure PP_PROC
+	dbg.PP_dbg
+EndStructure
+
 Structure EXT_DATA
 	Version.i
 	SubVersion.i
+	ProcessCnt.i
 	*PrgPath ; полный путь к программе
 	*DllPath ; полный путь к основной dll
 	*PrefsFile ; полный путь к файлу конфигурации PurePortableSimple (в том числе выбраном в MultiConfig)
+	PP.PP_PROC
 	MH.MH_DATA
 EndStructure
 
@@ -48,8 +55,8 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 33
-; FirstLine = 10
+; CursorPosition = 38
+; FirstLine = 18
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

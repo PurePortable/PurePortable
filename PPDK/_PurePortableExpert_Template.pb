@@ -14,7 +14,7 @@
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.11.0.0
 ;RES_DESCRIPTION PurePortableExpert
-;RES_COPYRIGHT (c) Smitis, 2017-2024
+;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.5
@@ -232,7 +232,7 @@ Procedure AttachProcedure()
 	CompilerIf #PORTABLE_SPECIAL_FOLDERS Or #PORTABLE_ENVIRONMENT_VARIABLES
 		;ProfileRedir = NormalizePath(PrgDir+"..")
 		ProfileRedir = PrgDirN
-		UserProfileDirectory = PrgDirN ; специально для GetUserProfileDirectory
+		UserProfileDirectory = ProfileRedir ; специально для GetUserProfileDirectory
 		AppDataRedir = PrgDirN
 		LocalAppDataRedir = PrgDirN
 		;LocalLowAppDataRedir = PrgDirN
@@ -299,9 +299,11 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = KwIOy
+; CursorPosition = 234
+; FirstLine = 95
+; Folding = KwIey
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
@@ -309,10 +311,10 @@ EndProcedure
 ; EnableExeConstant
 ; IncludeVersionInfo
 ; VersionField0 = 4.11.0.0
-; VersionField1 = 4.11.0.0
+; VersionField1 = 4.11.0.5
 ; VersionField3 = PurePortable
-; VersionField4 = 4.11.0.0
+; VersionField4 = 4.11.0.5
 ; VersionField5 = 4.11.0.0
 ; VersionField6 = PurePortableExpert
-; VersionField7 = 400.dll
-; VersionField9 = (c) Smitis, 2017-2024
+; VersionField7 = 411.dll
+; VersionField9 = (c) Smitis, 2017-2025

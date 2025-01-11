@@ -14,7 +14,7 @@
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.10.0.0
 ;RES_DESCRIPTION PurePortableExpert
-;RES_COPYRIGHT (c) Smitis, 2017-2024
+;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 410.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.10.0.32
@@ -310,4 +310,4 @@ EndProcedure
 ; VersionField5 = 4.10.0.0
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 400.dll
-; VersionField9 = (c) Smitis, 2017-2024
+; VersionField9 = (c) Smitis, 2017-2025

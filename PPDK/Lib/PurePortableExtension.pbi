@@ -3,6 +3,11 @@
 #MAX_PATH_EXTEND = 32767
 XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Extension.pbi"
+Global *EXT.EXT_DATA
+;;======================================================================================================================
+; Procedure dbg(txt.s)
+; 	*EXT\PP\dbg(txt)
+; EndProcedure
 ;;======================================================================================================================
 CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
 CompilerIf #DBG_EXTENSION And Not Defined(DBG_ALWAYS,#PB_Constant)
@@ -25,12 +30,24 @@ Global PrgDirN.s ; директория программы без "\" на ко�
 Global PrgName.s ; имя программы (без расширения)
 Global DllPath.s, DllName.s
 Global ExtPrefs.s ; файл конфигурации расширения
+
 ;;======================================================================================================================
 XIncludeFile "proc\CorrectPath.pbi"
 XIncludeFile "proc\CreatePath.pbi"
 XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 XIncludeFile "proc\Exist.pbi"
 XIncludeFile "proc\NormalizePath.pbi"
+;;======================================================================================================================
+UndefineMacro DoubleQuote
+Macro DoubleQuote
+	"
+EndMacro
+Macro MHX_HookApi(DllName,FuncName,flags=0)
+	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
+	Global Target_#FuncName
+	*EXT\MH\_MHX_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
+	;CompilerEndIf
+EndMacro
 ;;======================================================================================================================
 Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
 	Protected Result.s
@@ -51,7 +68,7 @@ EndProcedure
 ;;======================================================================================================================
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
-Global ProcessId
+;Global ProcessId
 
 Procedure ExtensionInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
@@ -61,7 +78,7 @@ Procedure ExtensionInitialization()
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
 	CompilerEndIf
-	ProcessId = GetCurrentProcessId_()
+	;ProcessId = GetCurrentProcessId_()
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
 	GetModuleFileName_(DllInstance,@buf,#MAX_PATH_EXTEND)
 	DllPath = PeekS(@buf)
@@ -79,17 +96,17 @@ ExtensionInitialization()
 ;;======================================================================================================================
 Declare ExtensionProcedure()
 ProcedureDLL PurePortableExtension(*PPD)
-	;*EXT = *PPD
-	
+	*EXT = *PPD
+	dbg("ATTACHPROCESS: "+DllPath+" ("+Str(*EXT\ProcessCnt)+")")
 	ExtensionProcedure()
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 79
-; FirstLine = 51
-; Folding = -
+; CursorPosition = 99
+; FirstLine = 67
+; Folding = --
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -8,7 +8,7 @@
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.11.0.6
 ;RES_DESCRIPTION PurePortableSimple Loader
-;RES_COPYRIGHT (c) Smitis, 2017-2024
+;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 400.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
@@ -66,4 +66,4 @@ EndProcedure
 ; VersionField5 = 4.11.0.0
 ; VersionField6 = PurePortableSimple Loader
 ; VersionField7 = PureSimpleLoader.dll
-; VersionField9 = (c) Smitis, 2017-2024
+; VersionField9 = (c) Smitis, 2017-2025

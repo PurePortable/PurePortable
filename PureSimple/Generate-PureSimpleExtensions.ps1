@@ -9,5 +9,6 @@ Import-Module "..\PPDK\Compile-ProxyDll.psm1" -Force -DisableNameChecking #-Erro
 Compile-ProxyDll-Start
 
 Compile-ProxyDll "PureExtensionIni" "PurePort" -RC "PureSimpleExtension" -IN "PurePortIni" -OF "PurePortIni" -FD "PurePortableSimpleExtension" -Dir32 $Dir32 -Dir64 $Dir64 -O "PurePortIni"
+Compile-ProxyDll "PureExtensionTest" "PurePort" -RC "PureSimpleExtension" -IN "PurePortTest" -OF "PurePortTest" -FD "PurePortableSimpleExtension" -Dir32 $Dir32 -Dir64 $Dir64 -O "PurePortTest"
 
 Compile-ProxyDll-Result

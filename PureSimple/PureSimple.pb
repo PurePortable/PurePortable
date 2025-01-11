@@ -6,14 +6,13 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.5
+;RES_VERSION 4.11.0.6
 ;RES_DESCRIPTION PurePortableSimple
-;RES_COPYRIGHT (c) Smitis, 2017-2024
+;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePort.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
-;PP_X32_COPYAS "P:\ProgramsA\FoxitPDFEditor12\PurePort.dll"
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
@@ -70,7 +69,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
 #DBG_CLEANUP = 1
-#DBG_ANY = 0
+#DBG_ANY = 1
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
 #DBGX_EXECUTE = 0 ; 1 - ShellExecute/CreateProcess, 2 - CreateProcess
@@ -307,6 +306,8 @@ Procedure CheckSpoofDate()
 	ProcedureReturn SpoofDateFlag	
 EndProcedure
 ;}
+;;----------------------------------------------------------------------------------------------------------------------
+Global ComputerName.s
 ;;======================================================================================================================
 Global PureSimplePrefs.s
 Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
@@ -508,9 +509,6 @@ Procedure AttachProcedure()
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
-		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
-		SpoofDateP = ReadPreferenceString("SpoofDate","")
-		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)
 		CompilerIf Defined(BLOCK_WININET,#PB_Constant)
 			BlockWinInetPermit = ReadPreferenceInteger("BlockWinInet",0)
@@ -587,7 +585,11 @@ Procedure AttachProcedure()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
 			v = RTrim(PreferenceKeyValue(),"\")
-			p = PreferencePath(v)
+			If v
+				p = PreferencePath(v)
+			Else
+				p = ""
+			EndIf
 			Select LCase(k)
 				Case "profile"
 					ProfileRedir = p
@@ -643,6 +645,20 @@ Procedure AttachProcedure()
 					EndIf
 			EndSelect
 		Wend
+	EndIf
+	;}
+	;{ Параметры перехвата функций
+	If PreferenceGroup("Functions") Or PreferenceGroup("Portable")
+		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
+		SpoofDateP = ReadPreferenceString("SpoofDate","")
+		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
+	EndIf
+	If PreferenceGroup("Functions")
+		UserProfileDirectory = ReadPreferenceString("UserProfileDirectory",ProfileRedir)
+		If UserProfileDirectory
+			UserProfileDirectory = PreferencePath(UserProfileDirectory)
+			CreatePath(UserProfileDirectory)
+		EndIf
 	EndIf
 	;}
 	;{ Перенаправление переменных среды
@@ -832,7 +848,25 @@ Procedure AttachProcedure()
 				If PurePortableExtension
 					If ExtData\Version = 0 ; надо инициализировать структуру
 						ExtData\Version = 1
+						ExtData\SubVersion = 0
+						ExtData\ProcessCnt = ProcessCnt
+						ExtData\PrgPath = @PrgPath
+						ExtData\DllPath = @DllPath
 						ExtData\PrefsFile = @PureSimplePrefs
+						ExtData\PP\dbg = @dbg()
+						ExtData\MH\MH_Initialize = @MH_Initialize()
+						ExtData\MH\MH_CreateHook = @MH_CreateHook()
+						ExtData\MH\MH_CreateHookApi = @MH_CreateHookApi()
+						ExtData\MH\MH_CreateHookApiEx = @MH_CreateHookApiEx()
+						ExtData\MH\MH_EnableHook = @MH_EnableHook()
+						ExtData\MH\MH_DisableHook = @MH_DisableHook()
+						ExtData\MH\MH_RemoveHook = @MH_RemoveHook()
+						ExtData\MH\MH_QueueEnableHook = @MH_QueueEnableHook()
+						ExtData\MH\MH_QueueDisableHook = @MH_QueueDisableHook()
+						ExtData\MH\MH_ApplyQueued = @MH_ApplyQueued()
+						ExtData\MH\MH_Uninitialize = @MH_Uninitialize()
+						ExtData\MH\_MHX_HookApi = @_MH_HookApi()
+						ExtData\MH\_MHX_Error = @_MH_Error()
 					EndIf
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
@@ -950,22 +984,22 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 30
-; FirstLine = 30
-; Folding = xHcA-LCCQ-
+; CursorPosition = 855
+; FirstLine = 284
+; Folding = 2Hcg-LCAo+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.5
+; VersionField0 = 4.11.0.6
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.5
+; VersionField5 = 4.11.0.6
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
-; VersionField9 = (c) Smitis, 2017-2024
+; VersionField9 = (c) Smitis, 2017-2025

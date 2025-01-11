@@ -10,7 +10,7 @@
 ;RES_VERSION 4.11.0.6
 ;RES_DESCRIPTION PurePortableSimpleExtension
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
-;RES_INTERNALNAME PurePortIni.dll
+;RES_INTERNALNAME PurePortExecute.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
@@ -186,84 +186,37 @@ Procedure IniCorrect(Section.s,Key.s,Base.s,Flags=0)
 EndProcedure
 ;}
 ;;======================================================================================================================
+Prototype CreateFile2(lpFileName,dwDesiredAccess,dwShareMode,dwCreationDisposition,pCreateExParams)
+Global Original_CreateFile2.CreateFile2
+Procedure Detour_CreateFile2(lpFileName,dwDesiredAccess,dwShareMode,dwCreationDisposition,pCreateExParams) ; всегда unicode?
+	dbg("CreateFile2: "+PeekS(lpFileName))
+	ProcedureReturn Original_CreateFile2(lpFileName,dwDesiredAccess,dwShareMode,dwCreationDisposition,pCreateExParams)
+EndProcedure
+Prototype CreateFile(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
+Global Original_CreateFileA.CreateFile
+Procedure Detour_CreateFileA(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
+	dbg("CreateFileA: "+PeekS(lpFileName,-1,#PB_Ascii))
+	ProcedureReturn Original_CreateFileA(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
+EndProcedure
+Global Original_CreateFileW.CreateFile
+Procedure Detour_CreateFileW(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
+	dbg("CreateFileW: "+PeekS(lpFileName))
+	ProcedureReturn Original_CreateFileW(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition,dwFlagsAndAttributes,hTemplateFile)
+EndProcedure
 
-Structure INIFILE
-	num.s
-	ini.s
-	cp.i
-EndStructure
-Global Dim Inis.INIFILE(0), iInis, nInis
+;;======================================================================================================================
 
 Procedure ExtensionProcedure()
-	Protected i, k.s, v.s, g.s, p.s
-	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
-	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
-		; Составляем список ini-файлов
-		If PreferenceGroup("IniFiles")
-			ExaminePreferenceKeys()
-			While NextPreferenceKey()
-				k = LCase(PreferenceKeyName())
-				v = PreferencePath()
-				;dbg("PurePortIni: "+v)
-				nInis+1
-				ReDim Inis(nInis)
-				Inis(nInis)\num = k
-				Inis(nInis)\ini = v
-			Wend
-		EndIf
-		; Перебираем все ini-файлы
-		For iInis=1 To nInis
-			IniNum = Inis(iInis)\num
-			IniFile = Inis(iInis)\ini
-			IniRead(IniFile)
-			DbgExt("PurePortIni: "+IniNum+" :: "+IniFile)
-			If PreferenceGroup(IniNum) ; общие данные для ini-файла
-			EndIf
-			IniPref = IniNum+":"
-			ExaminePreferenceGroups()
-			While NextPreferenceGroup()
-				IniGroup = PreferenceGroupName()
-				If Left(IniGroup,Len(IniPref)) = IniPref ; группа, имеющая отношение к ini-файлу
-					Select LCase(Mid(IniGroup,Len(IniPref)+1))
-						Case "correctpaths"
-							ExaminePreferenceKeys()
-							While NextPreferenceKey()
-								k = PreferenceKeyName()
-								v = PreferencePath()
-								i = FindString(k,"|")
-								If i
-									IniCorrect(Left(k,i-1),Mid(k,i+1),v)
-								Else
-									IniCorrectKey(k,v)
-								EndIf
-							Wend
-						Case "setpaths"
-							ExaminePreferenceKeys()
-							While NextPreferenceKey()
-								k = PreferenceKeyName()
-								v = PreferencePath(ExpandEnvironmentStrings(PreferenceKeyValue()))
-								i = FindString(k,"|")
-								If i
-									IniSet(Left(k,i-1),Mid(k,i+1),v)
-									CreatePath(v)
-								EndIf
-							Wend
-					EndSelect
-				EndIf
-			Wend
-			IniWrite()
-		Next
-		ClosePreferences()
-	EndIf
-	
-	ProcedureReturn 1
+	dbg("PurePort Extension Test")
+	MHX_HookApi(kernel32,CreateFileA)
+	MHX_HookApi(kernel32,CreateFileW)
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 189
-; FirstLine = 27
+; CursorPosition = 210
+; FirstLine = 37
 ; Folding = B+
 ; Optimizer
 ; EnableThread

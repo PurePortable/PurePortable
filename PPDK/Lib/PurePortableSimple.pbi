@@ -31,7 +31,7 @@ Global *EXT.EXT_DATA
 Macro EXT_MH_HookApi(DllName,FuncName,flags=0)
 	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
 	Global Target_#FuncName
-	_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
+	*EXT\MH\_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
 	;CompilerEndIf
 EndMacro
 
@@ -61,8 +61,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 29
-; FirstLine = 6
+; CursorPosition = 33
+; FirstLine = 11
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

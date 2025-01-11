@@ -698,8 +698,9 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 16
-; Folding = qAA5-
+; CursorPosition = 201
+; FirstLine = 68
+; Folding = qcA9-
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

@@ -55,7 +55,7 @@ DataSection
 EndDataSection
 
 ; Общие переменные
-Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess
+Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess, DllInstancesCnt
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
 Global PPTickCount.l, PPGUID.s
 Global ProcessMutexName.s, hProcessMutex, ProcessPipeName.s, hProcessPipe
@@ -71,7 +71,7 @@ Global PreferenceFile.s
 Global WinDir.s, SysDir.s, TempDir.s
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
-Global DbgDetach = 1
+Global DbgDetachMode = 1
 ; Инициализация общих переменных
 Declare GlobalInitialization()
 GlobalInitialization()
@@ -349,14 +349,14 @@ Procedure DecDllInstancesCnt()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, -1
 		!LOCK XADD DWORD [DllInstancesCnt], EAX
-		;!DEC EAX ; коррекция не нужна, для последнего процесса будет 1
-		;!MOV DWORD [v_ProcessNum], EAX
+		;!DEC EAX ; а здесь коррекция не нужна, для последнего процесса будет 1
+		!MOV DWORD [v_DllInstancesCnt], EAX
 		!RET
 	CompilerElse
 		!MOV RAX, -1
 		!LOCK XADD QWORD [DllInstancesCnt], RAX
-		;!DEC RAX ; коррекция не нужна, для последнего процесса будет 1
-		;!MOV QWORD [v_ProcessNum], RAX
+		;!DEC RAX ; а здесь коррекция не нужна, для последнего процесса будет 1
+		!MOV QWORD [v_DllInstancesCnt], RAX
 		!ADD RSP,40
 		!RET
 	CompilerEndIf
@@ -370,6 +370,7 @@ Procedure ExitProcedure()
 	If ExitProcedureIsComleted
 		ProcedureReturn
 	EndIf
+	DecDllInstancesCnt()
 	CompilerIf Defined(MIN_HOOK,#PB_Constant)
 		CompilerIf #MIN_HOOK
 			MH_Uninitialize()
@@ -397,20 +398,18 @@ ProcedureDLL.l DetachProcess(Instance)
 	If PrgIsValid
 		ExitProcedure()
 		CompilerIf #DBG_ALWAYS
-			Global DbgDetach
 			Protected Inst.s = Str(ProcessCnt)
 			If SingleProcess
 				Inst = "LAST"
 			EndIf
-			If DbgDetach
-				DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCntPrev)+"/"+Inst+")")
+			If DbgDetachMode
+				DbgAlways("DETACHPROCESS: "+DllPath+" ("+Str(ProcessCntPrev)+"/I:"+Str(DllInstancesCnt)+"/P:"+Inst+")")
 				DbgAlways("DETACHPROCESS: "+PrgPath)
 			EndIf
 		CompilerEndIf
 	Else
 		CompilerIf #DBG_ALWAYS
-			Global DbgDetach
-			If DbgDetach
+			If DbgDetachMode
 				DbgAlways("DETACHPROCESS: "+DllPath)
 				DbgAlways("DETACHPROCESS: "+PrgPath)
 			EndIf
@@ -429,19 +428,21 @@ Procedure IncDllInstancesCnt()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, 1
 		!LOCK XADD DWORD [DllInstancesCnt], EAX
-		!INC EAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
+		!INC EAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса станет 1
+		!MOV DWORD [v_DllInstancesCnt], EAX
 		!RET
 	CompilerElse
 		!MOV RAX, 1
 		!LOCK XADD QWORD [DllInstancesCnt], RAX
-		!INC RAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса будет 1
+		!INC RAX ; коррекция, так как сюда запишется предыдущее значение, для первого процесса станет 1
+		!MOV QWORD [v_DllInstancesCnt], RAX
 		!ADD RSP,40
 		!RET
 	CompilerEndIf
 EndProcedure
 
 ; Общая процедура при старте.
-; Нужна для совместимости с проек  тами, использующими CheckProgram (новые) и не использующие (старые).
+; Нужна для совместимости с проектами, использующими CheckProgram (новые) и не использующие (старые).
 Procedure StartProcedure()
 	CompilerIf Defined(PREFERENCES_FILENAME,#PB_Constant)
 		CompilerIf #PREFERENCES_FILENAME<>""
@@ -496,7 +497,7 @@ Procedure StartProcedure()
 	;CloseHandle_(hProcessMutex)
 	
 	;dbg("GUID: "+ProcessGUID+" TC: "+Str(ProcessTickCount))
-	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
+	DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
 EndProcedure
 
 CompilerIf Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant)
@@ -547,14 +548,15 @@ ProcedureDLL.l AttachProcess(Instance)
 	If SingleProcess
 		Inst = "FIRST"
 	EndIf
-	DbgAlways("ATTACHPROCESS: "+DllPath+" ("+Inst+")")
+	DbgAlways("ATTACHPROCESS: "+DllPath+" (I:"+Str(DllInstancesCnt)+"/P:"+Inst+")")
 	;DbgAlways("ATTACHPROCESS: Complete")
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1
+; CursorPosition = 499
+; FirstLine = 459
 ; Folding = u--
 ; EnableThread
 ; DisableDebugger

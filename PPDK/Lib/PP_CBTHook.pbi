@@ -26,8 +26,6 @@ CompilerEndIf
 Declare CheckTitle(nCode,Title.s)
 Global hCBTHook
 Procedure.l CBTProc(nCode,wParam,*lParam)
-	Global DbgDetach
-	Global ProcessNum
 	Protected Title.s = Space(64)
 	If nCode = #HCBT_DESTROYWND
 		;DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam))
@@ -38,17 +36,17 @@ Procedure.l CBTProc(nCode,wParam,*lParam)
 		If ct = #PORTABLE_CBTR_EXIT ; полное завершение работы программы
 			UnhookWindowsHookEx_(hCBTHook)
 			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
-				If DbgDetach
-					dbg("CBTHook: Exit: "+DllPath+" ("+Str(ProcessNum)+")")
+				If DbgDetachMode
+					dbg("CBTHook: Exit: "+DllPath+" (I:"+Str(DllInstancesCnt)+"/P:"+Str(ProcessCnt)+")")
 				EndIf
 			CompilerEndIf
 			ExitProcedure()
 			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
-				If DbgDetach
+				If DbgDetachMode
 					dbg("CBTHook: Exit: "+PrgPath)
 				EndIf
 			CompilerEndIf
-			ProcedureReturn ;CallNextHookEx_(#Null,nCode,wParam,*lParam)
+			ProcedureReturn CallNextHookEx_(#Null,nCode,wParam,*lParam)
 		EndIf
 		CompilerIf #PORTABLE_REGISTRY
 			If ct = #PORTABLE_CBTR_SAVECFG ; только сохранение конфигурации
@@ -73,7 +71,7 @@ AddInitProcedure(_InitCBTHook)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; CursorPosition = 44
-; FirstLine = 18
+; FirstLine = 34
 ; Folding = -
 ; EnableAsm
 ; DisableDebugger
