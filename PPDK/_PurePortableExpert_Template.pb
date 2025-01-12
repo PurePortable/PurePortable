@@ -17,7 +17,7 @@
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.11.0.5
+;RES_PRODUCTVERSION 4.11.0.6
 ;PP_X32_COPYAS "P:\PurePortable\proxy32.dll"
 ;PP_X64_COPYAS "P:\PurePortable\proxy64.dll"
 ;PP_CLEAN 2
@@ -301,8 +301,6 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 234
-; FirstLine = 95
 ; Folding = KwIey
 ; Optimizer
 ; EnableThread

@@ -256,14 +256,14 @@ Procedure ExtensionProcedure()
 		ClosePreferences()
 	EndIf
 	
-	ProcedureReturn 1
+	ProcedureReturn #PP_EXT_ALLOW_UNLOAD
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 189
-; FirstLine = 27
+; CursorPosition = 258
+; FirstLine = 84
 ; Folding = B+
 ; Optimizer
 ; EnableThread

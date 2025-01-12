@@ -1,5 +1,9 @@
 ﻿;;======================================================================================================================
 
+#PP_EXT_ALLOW_UNLOAD = 1 ; Разрешить выгрузку расширения
+
+;;======================================================================================================================
+
 CompilerIf Not Defined(MAX_PATH_EXTEND,#PB_Constant) : #MAX_PATH_EXTEND = 32767 : CompilerEndIf
 
 Prototype MH_Initialize()
@@ -18,6 +22,7 @@ Prototype _MHX_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.
 Prototype.s _MHX_Error(ErrorNum)
 
 Structure MH_DATA
+	cbSize.i ; reserved
 	MH_Initialize.MH_Initialize
 	MH_CreateHook.MH_CreateHook
 	MH_CreateHookApi.MH_CreateHookApi
@@ -36,12 +41,18 @@ EndStructure
 
 Prototype PP_dbg(txt.s)
 Structure PP_PROC
+	cbSize.i ; reserved
 	dbg.PP_dbg
 EndStructure
 
-Structure EXT_DATA
+Structure EXT_VER
 	Version.i
 	SubVersion.i
+EndStructure
+
+Structure EXT_DATA
+	*Version
+	*Reserved
 	ProcessCnt.i
 	*PrgPath ; полный путь к программе
 	*DllPath ; полный путь к основной dll
@@ -55,8 +66,8 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 38
-; FirstLine = 18
+; CursorPosition = 24
+; FirstLine = 21
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

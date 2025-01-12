@@ -38,6 +38,10 @@ XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 XIncludeFile "proc\Exist.pbi"
 XIncludeFile "proc\NormalizePath.pbi"
 ;;======================================================================================================================
+EnumerationBinary MH_HOOKAPI
+	#MH_HOOKAPI_NOCHECKRESULT
+	#MH_HOOKAPI_INIT
+EndEnumeration
 UndefineMacro DoubleQuote
 Macro DoubleQuote
 	"
@@ -104,8 +108,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 99
-; FirstLine = 67
+; CursorPosition = 43
+; FirstLine = 22
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

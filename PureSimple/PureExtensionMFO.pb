@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortableSimple Extention
+; PurePortableSimple Extention MFO
 ; Расширение для мониторинга файловых операций.
 ;;======================================================================================================================
 
@@ -167,6 +167,7 @@ EndProcedure
 ;;======================================================================================================================
 
 Procedure ExtensionProcedure()
+	DbgExt("PurePortableSimple Extention MFO")
 	MHX_HookApi(kernel32,GetFullPathNameA)
 	MHX_HookApi(kernel32,GetFullPathNameW)
 	MHX_HookApi(kernel32,FindFirstFileA)
@@ -194,7 +195,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 2
+; CursorPosition = 169
+; FirstLine = 160
 ; Folding = ----
 ; Optimizer
 ; EnableThread
