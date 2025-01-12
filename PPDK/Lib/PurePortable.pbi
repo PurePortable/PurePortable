@@ -497,7 +497,7 @@ Procedure StartProcedure()
 	;CloseHandle_(hProcessMutex)
 	
 	;dbg("GUID: "+ProcessGUID+" TC: "+Str(ProcessTickCount))
-	DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
+	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
 EndProcedure
 
 CompilerIf Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant)
@@ -505,8 +505,10 @@ CompilerIf Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant)
 CompilerEndIf
 
 Prototype InitProcProto()
+DeclareImport(kernel32,_GetModuleHandleExW@12,GetModuleHandleExW,GetModuleHandleEx_(dwFlags.l,*lpModuleName,*phModule))
 ProcedureDLL.l AttachProcess(Instance)
 	DbgAlways("ATTACHPROCESS: "+PrgPath)
+	Protected hDll
 	If GetFileVersionInfo(PrgPath,"InternalName") = "rundll"
 		;PrgIsValid = 0
 		DbgAlways("ATTACHPROCESS: "+DllPath)
@@ -531,6 +533,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	CompilerEndIf
 
 	PrgIsValid = 1
+	GetModuleHandleEx_(#GET_MODULE_HANDLE_EX_FLAG_PIN,@DllPath,@hDll) ; запретить выгрузку из памяти https://www.manhunter.ru/assembler/1950_kak_zaschitit_dll_ot_vigruzki_cherez_freelibrary.html
 	
 	Protected i, InitProc.InitProcProto
 	For i=1 To ArraySize(ModuleInitProcedures())
@@ -555,8 +558,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 499
-; FirstLine = 459
+; CursorPosition = 534
+; FirstLine = 490
 ; Folding = u--
 ; EnableThread
 ; DisableDebugger
