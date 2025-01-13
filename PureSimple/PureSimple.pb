@@ -848,7 +848,6 @@ Procedure AttachProcedure()
 				If PurePortableExtension
 					If ExtData\Version = 0 ; надо инициализировать структуру
 						ExtData\Version = 1
-						ExtData\SubVersion = 0
 						ExtData\ProcessCnt = ProcessCnt
 						ExtData\PrgPath = @PrgPath
 						ExtData\DllPath = @DllPath
@@ -984,10 +983,10 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 855
-; FirstLine = 284
+; CursorPosition = 850
+; FirstLine = 282
 ; Folding = 2Hcg-LCAo+
 ; Optimizer
 ; EnableThread

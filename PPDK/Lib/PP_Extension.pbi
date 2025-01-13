@@ -51,8 +51,8 @@ Structure EXT_VER
 EndStructure
 
 Structure EXT_DATA
-	*Version
-	*Reserved
+	Version.i
+	Reserved.i
 	ProcessCnt.i
 	*PrgPath ; полный путь к программе
 	*DllPath ; полный путь к основной dll
@@ -66,8 +66,8 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 24
-; FirstLine = 21
+; CursorPosition = 54
+; FirstLine = 31
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
