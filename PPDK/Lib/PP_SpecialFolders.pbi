@@ -14,7 +14,6 @@ Global DocumentsRedir.s
 Global CommonAppDataRedir.s
 Global CommonDocumentsRedir.s
 Global TempRedir.s
-Global UserProfileDirectory.s ; специально для GetUserProfileDirectory
 
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf Not Defined(DETOUR_SHFOLDER,#PB_Constant) : #DETOUR_SHFOLDER = 0 : CompilerEndIf
@@ -587,6 +586,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectoryw
 CompilerIf #DETOUR_USERENV
+	Global GetUserProfileDirectoryMode = 1 ; управление GetUserProfileDirectory
 	Prototype.l GetUserProfileDirectory(hToken,lpProfileDir,lpcchSize)
 	Global Original_GetUserProfileDirectoryA.GetUserProfileDirectory
 	Procedure.l Detour_GetUserProfileDirectoryA(hToken,*lpProfileDir,*lpcchSize.Long)
@@ -597,7 +597,7 @@ CompilerIf #DETOUR_USERENV
 			DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Ascii))
 			DbgSpec("GetUserProfileDirectoryA: RESULT: "+Str(Result)+" ERROR: "+Str(GetLastError_()))
 		CompilerElse
-			If UserProfileDirectory
+			If GetUserProfileDirectoryMode
 				If *lpcchSize
 					*lpcchSize\l = ProfileDirSize
 				EndIf
@@ -626,7 +626,7 @@ CompilerIf #DETOUR_USERENV
 			DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Unicode))
 			DbgSpec("GetUserProfileDirectoryW: RESULT: "+Str(Result)+" ERROR: "+Str(GetLastError_()))
 		CompilerElse
-			If UserProfileDirectory
+			If GetUserProfileDirectoryMode
 				If *lpcchSize
 					*lpcchSize\l = ProfileDirSize
 				EndIf
@@ -697,9 +697,9 @@ EndProcedure
 AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 201
-; FirstLine = 68
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 588
+; FirstLine = 246
 ; Folding = qcA9-
 ; EnableAsm
 ; DisableDebugger

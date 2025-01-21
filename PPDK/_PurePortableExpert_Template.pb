@@ -232,7 +232,6 @@ Procedure AttachProcedure()
 	CompilerIf #PORTABLE_SPECIAL_FOLDERS Or #PORTABLE_ENVIRONMENT_VARIABLES
 		;ProfileRedir = NormalizePath(PrgDir+"..")
 		ProfileRedir = PrgDirN
-		UserProfileDirectory = ProfileRedir ; специально для GetUserProfileDirectory
 		AppDataRedir = PrgDirN
 		LocalAppDataRedir = PrgDirN
 		;LocalLowAppDataRedir = PrgDirN
@@ -299,9 +298,11 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = KwIey
+; CursorPosition = 243
+; FirstLine = 95
+; Folding = KwIOy
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll

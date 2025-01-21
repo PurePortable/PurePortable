@@ -506,6 +506,7 @@ Procedure AttachProcedure()
 			EndIf
 		CompilerEndIf
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
+		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
@@ -526,6 +527,9 @@ Procedure AttachProcedure()
 		If p <> ""
 			SetCurrentDirectory(PreferencePath(p))
 		EndIf
+		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
+		SpoofDateP = ReadPreferenceString("SpoofDate","")
+		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -645,20 +649,6 @@ Procedure AttachProcedure()
 					EndIf
 			EndSelect
 		Wend
-	EndIf
-	;}
-	;{ Параметры перехвата функций
-	If PreferenceGroup("Functions") Or PreferenceGroup("Portable")
-		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
-		SpoofDateP = ReadPreferenceString("SpoofDate","")
-		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
-	EndIf
-	If PreferenceGroup("Functions")
-		UserProfileDirectory = ReadPreferenceString("UserProfileDirectory",ProfileRedir)
-		If UserProfileDirectory
-			UserProfileDirectory = PreferencePath(UserProfileDirectory)
-			CreatePath(UserProfileDirectory)
-		EndIf
 	EndIf
 	;}
 	;{ Перенаправление переменных среды
@@ -985,9 +975,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 850
-; FirstLine = 282
-; Folding = 2Hcg-LCAo+
+; CursorPosition = 510
+; FirstLine = 247
+; Folding = 2HcgPIKCU-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
