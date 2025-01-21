@@ -45,11 +45,6 @@ Structure PP_PROC
 	dbg.PP_dbg
 EndStructure
 
-Structure EXT_VER
-	Version.i
-	SubVersion.i
-EndStructure
-
 Structure EXT_DATA
 	Version.i
 	Reserved.i
@@ -66,8 +61,8 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 54
-; FirstLine = 31
+; CursorPosition = 47
+; FirstLine = 26
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
