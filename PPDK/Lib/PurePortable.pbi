@@ -558,9 +558,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 534
-; FirstLine = 490
-; Folding = u--
+; Folding = OB9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

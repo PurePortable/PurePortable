@@ -219,7 +219,7 @@ Procedure CheckProgram()
 	; Макросы ValidateProgram* при N=2 вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
 	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
-	;ValidateProgramName(1,"program") ; Проверка по имени, та ли программа запущена
+	;ValidateProgramName(1,"program",1) ; Проверка по имени, та ли программа запущена
 EndProcedure
 ;;======================================================================================================================
 ; Действия выполняемые при запуске программы.
@@ -298,10 +298,10 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 243
-; FirstLine = 95
+; CursorPosition = 221
+; FirstLine = 80
 ; Folding = KwIOy
 ; Optimizer
 ; EnableThread
