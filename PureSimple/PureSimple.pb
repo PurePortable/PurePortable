@@ -366,12 +366,12 @@ Procedure CheckProgram()
 					Select LCase(k)
 						Case "reaction" ; пропускаем
 						Case "programname","programfilename"
-							If _ValidateProgramL(PrgName,v,1)
+							If CompareWithList(PrgName,v,1)
 								MultiConfigPrefs = Mid(Group,8)
 								Break 2
 							EndIf
 						Default
-							If _ValidateProgramL(GetFileVersionInfo(PrgPath,k),v,1)
+							If CompareWithList(GetFileVersionInfo(PrgPath,k),v,1)
 								MultiConfigPrefs = Mid(Group,8)
 								Break 2
 							EndIf
@@ -403,14 +403,14 @@ Procedure CheckProgram()
 				v = PreferenceKeyValue()
 				Select LCase(k)
 					Case "programname","programfilename"
-						If _ValidateProgramL(PrgName,v,1)
+						If CompareWithList(PrgName,v,1)
 							InvalidProgram = 0
 							Break
 						EndIf
 					Case "reaction"
 						InvalidReaction = Val(v)
 					Default ; остальные это ресурсы VersionInfo
-						If _ValidateProgramL(GetFileVersionInfo(PrgPath,k),v,1)
+						If CompareWithList(GetFileVersionInfo(PrgPath,k),v,1)
 							InvalidProgram = 0
 							Break
 						EndIf
@@ -975,7 +975,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = 2HcgPICAQ-
+; CursorPosition = 412
+; FirstLine = 240
+; Folding = 2HcgPoDAQ-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

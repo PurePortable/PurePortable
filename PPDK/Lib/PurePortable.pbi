@@ -97,6 +97,7 @@ XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Logging.pbi"
 XIncludeFile "PP_Subroutines.pbi"
 XIncludeFile "PP_Subroutines2.pbi"
+XIncludeFile "PP_ValidateProgram.pbi"
 ;;======================================================================================================================
 CompilerIf Not Defined(PORTABLE_CLEANUP,#PB_Constant) : #PORTABLE_CLEANUP = 0 : CompilerEndIf
 CompilerIf Not Defined(DBG_CLEANUP,#PB_Constant) : #DBG_CLEANUP = 0 : CompilerEndIf
@@ -556,7 +557,7 @@ ProcedureDLL.l AttachProcess(Instance)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
 ; Folding = OB9
 ; EnableThread

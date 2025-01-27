@@ -211,15 +211,21 @@ CompilerEndIf
 ; В этом случае нет необходимости делать проверку в AttachProcedure.
 ; Процедура должна вернуть #INVALID_PROGRAM (1), если проверка не пройдена или #VALID_PROGRAM (0), если проверка пройдена.
 ; По умолчанию возвращается #VALID_PROGRAM (0).
+; При #PORTABLE_CHECK_PROGRAM=0 (по умолчанию, для совместимости) эта проверка должна осуществляться из AttachProcedure.
 Procedure CheckProgram()
 	; Первый параметр макросов:
-	; 0 - Не проверять.
-	; 1 - Проверить, если программа не та, завершить неправильный процесс.
-	; 2 - Проверить, если программа не та, не проводить инициализацию хуков. Программа запустится как обычно.
-	; Макросы ValidateProgram* при N=2 вставят ProcedureReturn #INVALID_PROGRAM автоматически.
-	;ValidateProgram(1,"InternalName","program") ; Проверка, та ли программа запущена
-	;ValidateProgram(1,"ProductName","program") ; Проверка, та ли программа запущена
-	;ValidateProgramName(1,"program",1) ; Проверка по имени, та ли программа запущена
+	; #VALIDATE_PROGRAM_OFF (0) - Не проверять.
+	; #VALIDATE_PROGRAM_TERMINATE (1) - Проверить, если программа не та, завершить неправильный процесс.
+	; #VALIDATE_PROGRAM_CONTINUE (2) - Проверить, если программа не та, не проводить инициализацию хуков. Программа запустится как обычно.
+	; Третий параметр макросов:
+	; #COMPARE_WITH_EXACT (0) - Точное сравнение.
+	; #COMPARE_WITH_BEGIN (1) - Должно совпасть начало (по умолчанию).
+	; #COMPARE_WITH_END (-1) - Должен совпасть конец.
+	; Макросы ValidateProgram* при первом параметре = #VALIDATE_PROGRAM_CONTINUE (2) вставят ProcedureReturn #INVALID_PROGRAM автоматически.
+	; Регистр символов при сравнении макросами игнорируется.
+	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"InternalName","program,#COMPARE_WITH_BEGIN") ; Проверка, та ли программа запущена
+	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"ProductName","program,#COMPARE_WITH_BEGIN") ; Проверка, та ли программа запущена
+	;ValidateProgramName(#VALIDATE_PROGRAM_TERMINATE,"ProgramName",#COMPARE_WITH_BEGIN) ; Проверка по имени, та ли программа запущена
 EndProcedure
 ;;======================================================================================================================
 ; Действия выполняемые при запуске программы.
@@ -298,10 +304,8 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 221
-; FirstLine = 80
 ; Folding = KwIOy
 ; Optimizer
 ; EnableThread
