@@ -55,7 +55,7 @@ DataSection
 EndDataSection
 
 ; Общие переменные
-Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess, DllInstancesCnt
+Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess, FirstProcess, LastProcess, DllInstancesCnt
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
 Global PPTickCount.l, PPGUID.s
 Global ProcessMutexName.s, hProcessMutex, ProcessPipeName.s, hProcessPipe
@@ -294,7 +294,7 @@ CompilerEndIf
 
 ;;======================================================================================================================
 ; Инициализация глобальных переменных, счётчика процесса и пр.
-; Описывается здесь, так только здесь определены все нужные параметры компиляции.
+; Описывается здесь, так как только здесь определены все нужные параметры компиляции (костанты).
 ; А вызывается в начале перед остальными модулями, так как переменные требуются везде.
 Procedure GlobalInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
@@ -384,6 +384,7 @@ Procedure ExitProcedure()
 	ProcessCntPrev = ProcessCnt
 	GetNamedPipeHandleState_(hProcessPipe,#Null,@ProcessCnt,#Null,#Null,#Null,0)
 	SingleProcess = Bool(ProcessCnt=1)
+	LastProcess = SingleProcess
 	CloseHandle_(hProcessPipe)
 	;ReleaseMutex_(hProcessMutex)
 	;CloseHandle_(hProcessMutex)
@@ -467,6 +468,7 @@ Procedure StartProcedure()
 			LoggingFile = PrgDir+PrgName+".log"
 		CompilerEndIf
 	CompilerEndIf
+	; Самый первый раз генерируем GUID, на основе которого будут создаваться уникальные имена.
 	If IncDllInstancesCnt() = 1 And PeekI(?DllInitComplete) = 0
 		PokeL(?TickCount,GetTickCount_())
 		UuidCreate_(?bGUID)
@@ -490,6 +492,7 @@ Procedure StartProcedure()
 		; https://learn.microsoft.com/ru-ru/windows/win32/api/winbase/nf-winbase-getnamedpipehandlestatew
 		GetNamedPipeHandleState_(hProcessPipe,#Null,@ProcessCnt,#Null,#Null,#Null,0)
 		SingleProcess = Bool(ProcessCnt=1)
+		FirstProcess = SingleProcess
 	Else
 		dbg("CreateNamedPipe: «"+ProcessPipeName+"»")
 		dbg("CreateNamedPipe: "+GetLastErrorStr())
@@ -556,10 +559,19 @@ ProcedureDLL.l AttachProcess(Instance)
 	;DbgAlways("ATTACHPROCESS: Complete")
 EndProcedure
 ;;======================================================================================================================
+CompilerIf #PB_Compiler_IsMainFile
+	Procedure AttachProcedure()
+	EndProcedure
+	Procedure DetachProcedure()
+	EndProcedure
+CompilerEndIf
+;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = OB9
+; CursorPosition = 561
+; FirstLine = 521
+; Folding = O--
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
