@@ -18,8 +18,8 @@
 ;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.6
-;PP_X32_COPYAS "P:\PurePortable\proxy32.dll"
-;PP_X64_COPYAS "P:\PurePortable\proxy64.dll"
+;PP_X32_COPYAS "..\..\Programs\proxy32.dll"
+;PP_X64_COPYAS "..\..\Programs\proxy64.dll"
 ;PP_CLEAN 2
 
 EnableExplicit
@@ -98,13 +98,11 @@ XIncludeFile "PurePortableCustom.pbi"
 #BLOCK_CONSOLE = 0
 #DBG_BLOCK_CONSOLE = 0
 ;}
-;{ Управление сохранением конфигурации
-#CFG_SAVE_ON_CLOSE = 0 ; Сохранять настройки при RegCloseKey (может вызвать замедление). 1 - сохранять всегда, 2 - управление через переменную CfgSaveOnClose
-;}
 ;{ Некоторые дополнительные процедуры
 #PROC_GETVERSIONINFO = 1 ; Получение информации о файле
-#PROC_CORRECTPATH = 0 ; Процедуры коррекции локальных путей. 1: если не найдено, возвращает пустую строку, 2: если не найдено, возвращает прежнее значение.
-#PROC_CORRECTCFGPATH = 0 ; Если используется, должна быть установлена #PROC_CORRECTPATH
+#PROC_CORRECTPATH = 0
+#PROC_CORRECTCFGPATH = 0
+#PROC_ICFG = 0 ; макросы и процедуры для работы с массивами виртуального реестра
 ;#PROC_GUID2S = 0 ; Преобразование GUID/CLSID в строку вида {4AABE186-2666-4663-9E3E-5DFD6EAAAB60}
 ;}
 #INCLUDE_MIN_HOOK = 0 ; Принудительное включение MinHook
@@ -182,7 +180,7 @@ CompilerIf #PORTABLE_CBT_HOOK
 	; #PORTABLE_CBTR_EXIT если это закрытие главного окна программы. В этом случае принудительно будет выполнена процедура DetachProcess,
 	; при этом при реальном выполнении DetachProcess никаких действий повторно произведено не будет.
 	; #PORTABLE_CBTR_SAVECFG если требуется только сохранение реестра, например, при закрытии окна настроек.
-	; 0 если никаких действий не требуется.
+	; #PORTABLE_CBTR_NONE (0) если никаких действий не требуется.
 	Procedure CheckTitle(nCode,Title.s)
 		;;-------------------         1         2         3         4         5         6         7         8         9
 		;;-------------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -223,8 +221,8 @@ Procedure CheckProgram()
 	; #COMPARE_WITH_END (-1) - Должен совпасть конец.
 	; Макросы ValidateProgram* при первом параметре = #VALIDATE_PROGRAM_CONTINUE (2) вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	; Регистр символов при сравнении макросами игнорируется.
-	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"InternalName","program,#COMPARE_WITH_BEGIN") ; Проверка, та ли программа запущена
-	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"ProductName","program,#COMPARE_WITH_BEGIN") ; Проверка, та ли программа запущена
+	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"InternalName","program",#COMPARE_WITH_BEGIN) ; Проверка, та ли программа запущена
+	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"ProductName","program",#COMPARE_WITH_BEGIN) ; Проверка, та ли программа запущена
 	;ValidateProgramName(#VALIDATE_PROGRAM_TERMINATE,"ProgramName",#COMPARE_WITH_BEGIN) ; Проверка по имени, та ли программа запущена
 EndProcedure
 ;;======================================================================================================================
@@ -276,6 +274,7 @@ Procedure AttachProcedure()
 		;If NewPath
 		;	CorrectPath(NewPath,PrgDirN,#CORRECTPATH_FROM_DEEP|#CORRECTPATH_FORWARD_SLASH)
 		;EndIf
+		; Для использования CorrectCfgPath установить #PROC_CORRECTCFGPATH=1
 		;CorrectCfgPath(SettingsKey,"lastdatabasepath",PrgDirN,#CORRECTPATH_FORWARD_SLASH)
 	CompilerEndIf
 	;}
@@ -304,9 +303,9 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = KwIOy
+; Folding = KYEn6
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
@@ -314,9 +313,9 @@ EndProcedure
 ; EnableExeConstant
 ; IncludeVersionInfo
 ; VersionField0 = 4.11.0.0
-; VersionField1 = 4.11.0.5
+; VersionField1 = 4.11.0.6
 ; VersionField3 = PurePortable
-; VersionField4 = 4.11.0.5
+; VersionField4 = 4.11.0.6
 ; VersionField5 = 4.11.0.0
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 411.dll
