@@ -309,40 +309,45 @@ CompilerElse
 	Global RegistryShlwapiPermit = 0
 CompilerEndIf
 CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_KERNELBASE
+	Global RegistryDll2.s = "advapi32"
 	Global RegistryDll.s = "kernelbase"
 CompilerElse
-	Global RegistryDll.s = "advapi32"
+	Global RegistryDll2.s = "advapi32"
+	Global RegistryDll.s = RegistryDll2
 CompilerEndIf
 Procedure _InitRegistryHooks()
 	If RegistryPermit
-		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll,RegCreateKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll,RegCreateKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		If OSMajorVersion <= 7
+			RegistryDll = RegistryDll2
+		EndIf
+		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll2,RegCreateKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll2,RegCreateKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGCREATEKEYEX : MH_HookApiD(RegistryDll,RegCreateKeyExA) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGCREATEKEYEX : MH_HookApiD(RegistryDll,RegCreateKeyExW) : CompilerEndIf
-		CompilerIf #DETOUR_REGCREATEKEYTRANSACTED : MH_HookApiD(RegistryDll,RegCreateKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGCREATEKEYTRANSACTED : MH_HookApiD(RegistryDll,RegCreateKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
-		CompilerIf #DETOUR_REGOPENKEY : MH_HookApiD(RegistryDll,RegOpenKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGOPENKEY : MH_HookApiD(RegistryDll,RegOpenKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGCREATEKEYTRANSACTED : MH_HookApiD(RegistryDll2,RegCreateKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGCREATEKEYTRANSACTED : MH_HookApiD(RegistryDll2,RegCreateKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGOPENKEY : MH_HookApiD(RegistryDll2,RegOpenKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGOPENKEY : MH_HookApiD(RegistryDll2,RegOpenKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGOPENKEYEX : MH_HookApiD(RegistryDll,RegOpenKeyExA) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGOPENKEYEX : MH_HookApiD(RegistryDll,RegOpenKeyExW) : CompilerEndIf
-		CompilerIf #DETOUR_REGOPENKEYTRANSACTED : MH_HookApiD(RegistryDll,RegOpenKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGOPENKEYTRANSACTED : MH_HookApiD(RegistryDll,RegOpenKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
-		CompilerIf #DETOUR_REGDELETEKEY: MH_HookApiD(RegistryDll,RegDeleteKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGDELETEKEY: MH_HookApiD(RegistryDll,RegDeleteKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGOPENKEYTRANSACTED : MH_HookApiD(RegistryDll2,RegOpenKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGOPENKEYTRANSACTED : MH_HookApiD(RegistryDll2,RegOpenKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGDELETEKEY: MH_HookApiD(RegistryDll2,RegDeleteKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGDELETEKEY: MH_HookApiD(RegistryDll2,RegDeleteKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGDELETETREE : MH_HookApiD(RegistryDll,RegDeleteTreeA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGDELETETREE : MH_HookApiD(RegistryDll,RegDeleteTreeW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; Vista, 2008
 		CompilerIf #DETOUR_REGDELETEKEYEX : MH_HookApiD(RegistryDll,RegDeleteKeyExA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGDELETEKEYEX : MH_HookApiD(RegistryDll,RegDeleteKeyExW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; XP64, 2003SP1, 2008
-		CompilerIf #DETOUR_REGDELETEKEYTRANSACTED : MH_HookApiD(RegistryDll,RegDeleteKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGDELETEKEYTRANSACTED : MH_HookApiD(RegistryDll,RegDeleteKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGDELETEKEYTRANSACTED : MH_HookApiD(RegistryDll2,RegDeleteKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGDELETEKEYTRANSACTED : MH_HookApiD(RegistryDll2,RegDeleteKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGDELETEKEYVALUE : MH_HookApiD(RegistryDll,RegDeleteKeyValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGDELETEKEYVALUE : MH_HookApiD(RegistryDll,RegDeleteKeyValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; Vista, 2008
-		CompilerIf #DETOUR_REGQUERYVALUE : MH_HookApiD(RegistryDll,RegQueryValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGQUERYVALUE : MH_HookApiD(RegistryDll,RegQueryValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGQUERYVALUE : MH_HookApiD(RegistryDll2,RegQueryValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGQUERYVALUE : MH_HookApiD(RegistryDll2,RegQueryValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGGETVALUE : MH_HookApiD(RegistryDll,RegGetValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGGETVALUE : MH_HookApiD(RegistryDll,RegGetValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; XP64, 2003SP1, Vista, 2008
-		CompilerIf #DETOUR_REGSETVALUE : MH_HookApiD(RegistryDll,RegSetValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
-		CompilerIf #DETOUR_REGSETVALUE : MH_HookApiD(RegistryDll,RegSetValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
+		CompilerIf #DETOUR_REGSETVALUE : MH_HookApiD(RegistryDll2,RegSetValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGSETVALUE : MH_HookApiD(RegistryDll2,RegSetValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGSETKEYVALUE : MH_HookApiD(RegistryDll,RegSetKeyValueA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32, kernelbase
 		CompilerIf #DETOUR_REGSETKEYVALUE : MH_HookApiD(RegistryDll,RegSetKeyValueW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; Vista, 2008
 		If RegistryShlwapiPermit
@@ -368,9 +373,9 @@ EndProcedure
 AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 320
-; FirstLine = 155
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 317
+; FirstLine = 151
 ; Folding = jjz-0
 ; EnableAsm
 ; DisableDebugger
