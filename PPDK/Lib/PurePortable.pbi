@@ -401,7 +401,7 @@ ProcedureDLL.l DetachProcess(Instance)
 		ExitProcedure()
 		CompilerIf #DBG_ALWAYS
 			Protected Inst.s = Str(ProcessCnt)
-			If SingleProcess
+			If LastProcess
 				Inst = "LAST"
 			EndIf
 			If DbgDetachMode
@@ -552,7 +552,7 @@ ProcedureDLL.l AttachProcess(Instance)
 		CompilerEndIf
 	CompilerEndIf
 	Protected Inst.s = Str(ProcessCnt)
-	If SingleProcess
+	If FirstProcess
 		Inst = "FIRST"
 	EndIf
 	DbgAlways("ATTACHPROCESS: "+DllPath+" (I:"+Str(DllInstancesCnt)+"/P:"+Inst+")")
@@ -569,8 +569,8 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 561
-; FirstLine = 521
+; CursorPosition = 403
+; FirstLine = 368
 ; Folding = O--
 ; EnableThread
 ; DisableDebugger
