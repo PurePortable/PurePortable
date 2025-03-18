@@ -36,8 +36,12 @@ Procedure.l CBTProc(nCode,wParam,*lParam)
 		If ct = #PORTABLE_CBTR_EXIT ; полное завершение работы программы
 			UnhookWindowsHookEx_(hCBTHook)
 			CompilerIf #DBG_CBT_HOOK_ALWAYS Or #DBG_CBT_HOOK
+				Protected Inst.s = Str(ProcessCnt)
+				If LastProcess
+					Inst = "LAST"
+				EndIf
 				If DbgDetachMode
-					dbg("CBTHook: Exit: "+DllPath+" (I:"+Str(DllInstancesCnt)+"/P:"+Str(ProcessCnt)+")")
+					dbg("CBTHook: Exit: "+DllPath+" (I:"+Str(DllInstancesCnt)+"/P:"+Inst+")")
 				EndIf
 			CompilerEndIf
 			ExitProcedure()
@@ -69,10 +73,8 @@ EndProcedure
 AddInitProcedure(_InitCBTHook)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 44
-; FirstLine = 34
-; Folding = -
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = y
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
