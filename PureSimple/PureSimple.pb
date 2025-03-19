@@ -573,6 +573,14 @@ Procedure AttachProcedure()
 		EndIf
 	CompilerEndIf
 	;}
+	;{ Запуск приложений
+	If SingleProcess And PreferenceGroup("RunFromAttachProcess")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
+		Wend
+	EndIf		
+	;}
 	;{ Перенаправление специальных папок
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
 		v = Trim(ReadPreferenceString("AllDirs",""),"\")
@@ -870,14 +878,6 @@ Procedure AttachProcedure()
 	EndIf
 	FreeMemory(*PurePortableExtensionNameA)
 	;}
-	;{ Запуск приложений
-	If SingleProcess And PreferenceGroup("RunFromAttachProcess")
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
-		Wend
-	EndIf		
-	;}
 	ClosePreferences()
 EndProcedure
 
@@ -975,8 +975,6 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 412
-; FirstLine = 240
 ; Folding = 2HcgPoDAQ-
 ; Optimizer
 ; EnableThread
