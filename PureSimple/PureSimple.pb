@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.6
+;RES_VERSION 4.11.0.7
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePort.dll
@@ -973,20 +973,20 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = 2HcgPoDAQ-
+; Folding = 2HcgPICAQ-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.6
+; VersionField0 = 4.11.0.7
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.6
+; VersionField5 = 4.11.0.7
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2025

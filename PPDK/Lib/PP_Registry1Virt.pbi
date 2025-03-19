@@ -338,7 +338,6 @@ EndProcedure
 ; и помещает размер данных, в байтах, в переменную, на которую указывает lpcbData.
 ; Это позволяет приложению выбрать лучший способ выделения памяти для данных значения ключа.
 ; Если данные имеют тип REG_SZ, REG_MULTI_SZ или REG_EXPAND_SZ, тогда cbData содержит размер с учетом нулевого завершающего символа.
-
 Procedure.l GetDataW(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,rrfFlags=0)
 	Protected i, cbData.l, dwType.l, cbDataReq.l
 	If hKey
