@@ -574,7 +574,7 @@ Procedure AttachProcedure()
 	CompilerEndIf
 	;}
 	;{ Запуск приложений
-	If SingleProcess And PreferenceGroup("RunFromAttachProcess")
+	If FirstProcess And PreferenceGroup("RunFromAttachProcess")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
@@ -895,7 +895,7 @@ Procedure DetachProcedure()
 		ProcedureReturn 1
 	EndIf
 	
-	If SingleProcess
+	If LastProcess
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -973,7 +973,7 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
 ; Folding = 2HcgPoDAQ-
 ; Optimizer
