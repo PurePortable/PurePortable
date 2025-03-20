@@ -52,6 +52,7 @@ Structure EXT_DATA
 	*PrgPath ; полный путь к программе
 	*DllPath ; полный путь к основной dll
 	*PrefsFile ; полный путь к файлу конфигурации PurePortableSimple (в том числе выбраном в MultiConfig)
+	*CallBack ; Передача данных в основную dll
 	PP.PP_PROC
 	MH.MH_DATA
 EndStructure
@@ -61,7 +62,7 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 47
+; CursorPosition = 54
 ; FirstLine = 26
 ; EnableThread
 ; DisableDebugger
