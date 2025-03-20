@@ -316,7 +316,9 @@ CompilerEndIf
 Procedure _InitRegistryHooks()
 	If RegistryPermit
 		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll,RegCreateKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
+		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll,RegCreateKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGCREATEKEYEX : MH_HookApiD(RegistryDll,RegCreateKeyExA) : CompilerEndIf ; advapi32, kernelbase
+		CompilerIf #DETOUR_REGCREATEKEYEX : MH_HookApiD(RegistryDll,RegCreateKeyExW) : CompilerEndIf
 		CompilerIf #DETOUR_REGCREATEKEYTRANSACTED : MH_HookApiD(RegistryDll,RegCreateKeyTransactedA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
 		CompilerIf #DETOUR_REGCREATEKEYTRANSACTED : MH_HookApiD(RegistryDll,RegCreateKeyTransactedW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGOPENKEY : MH_HookApiD(RegistryDll,RegOpenKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
@@ -367,8 +369,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 55
-; FirstLine = 52
 ; Folding = jjz-0
 ; EnableAsm
 ; DisableDebugger
