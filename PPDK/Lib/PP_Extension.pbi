@@ -52,7 +52,8 @@ Structure EXT_DATA
 	AllowDbg.i ; разрешить вывод отладочных сообщений
 	*PrgPath ; полный путь к программе
 	*DllPath ; полный путь к основной dll
-	*PrefsFile ; полный путь к файлу конфигурации PurePortableSimple (в том числе выбраном в MultiConfig)
+	*PrefsFile ; полный путь к файлу конфигурации PurePortableSimple (в том числе выбранном в MultiConfig)
+	*Parameters ; параметры передаваемые через PurePort.ini
 	*CallBack ; Передача данных в основную dll
 	PP.PP_PROC
 	MH.MH_DATA
@@ -63,7 +64,8 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 12
+; CursorPosition = 47
+; FirstLine = 28
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -840,35 +840,36 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			;k = PreferenceKeyName()
-			;v = PreferenceKeyValue()
 			LoadableLibrary = PreferencePath(PreferenceKeyName())
 			;dbg("ATTACHPROCESS: EXT: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
 				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
 				If PurePortableExtension
-					If ExtData\Version = 0 ; надо инициализировать структуру
-						ExtData\Version = 1
-						ExtData\ProcessCnt = ProcessCnt
-						ExtData\AllowDbg = DbgExtensions
-						ExtData\PrgPath = @PrgPath
-						ExtData\DllPath = @DllPath
-						ExtData\PrefsFile = @PureSimplePrefs
-						ExtData\PP\dbg = @dbg()
-						ExtData\MH\MH_Initialize = @MH_Initialize()
-						ExtData\MH\MH_CreateHook = @MH_CreateHook()
-						ExtData\MH\MH_CreateHookApi = @MH_CreateHookApi()
-						ExtData\MH\MH_CreateHookApiEx = @MH_CreateHookApiEx()
-						ExtData\MH\MH_EnableHook = @MH_EnableHook()
-						ExtData\MH\MH_DisableHook = @MH_DisableHook()
-						ExtData\MH\MH_RemoveHook = @MH_RemoveHook()
-						ExtData\MH\MH_QueueEnableHook = @MH_QueueEnableHook()
-						ExtData\MH\MH_QueueDisableHook = @MH_QueueDisableHook()
-						ExtData\MH\MH_ApplyQueued = @MH_ApplyQueued()
-						ExtData\MH\MH_Uninitialize = @MH_Uninitialize()
-						ExtData\MH\_MH_HookApi = @_MH_HookApi()
-						ExtData\MH\_MH_Error = @_MH_Error()
-					EndIf
+					v = PreferenceKeyValue()
+					i = AllocateMemory(StringByteLength(v)+2)
+					PokeS(i,v)
+					ExtData\Version = 1
+					ExtData\ProcessCnt = ProcessCnt
+					ExtData\AllowDbg = DbgExtensions
+					ExtData\PrgPath = @PrgPath
+					ExtData\DllPath = @DllPath
+					ExtData\PrefsFile = @PureSimplePrefs
+					ExtData\Parameters = i
+					ExtData\PP\dbg = @dbg()
+					ExtData\MH\MH_Initialize = @MH_Initialize()
+					ExtData\MH\MH_CreateHook = @MH_CreateHook()
+					ExtData\MH\MH_CreateHookApi = @MH_CreateHookApi()
+					ExtData\MH\MH_CreateHookApiEx = @MH_CreateHookApiEx()
+					ExtData\MH\MH_EnableHook = @MH_EnableHook()
+					ExtData\MH\MH_DisableHook = @MH_DisableHook()
+					ExtData\MH\MH_RemoveHook = @MH_RemoveHook()
+					ExtData\MH\MH_QueueEnableHook = @MH_QueueEnableHook()
+					ExtData\MH\MH_QueueDisableHook = @MH_QueueDisableHook()
+					ExtData\MH\MH_ApplyQueued = @MH_ApplyQueued()
+					ExtData\MH\MH_Uninitialize = @MH_Uninitialize()
+					ExtData\MH\_MH_HookApi = @_MH_HookApi()
+					ExtData\MH\_MH_Error = @_MH_Error()
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
 					i = PurePortableExtension(@ExtData)
@@ -979,9 +980,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 852
-; FirstLine = 325
-; Folding = 2HcgPICEY-
+; CursorPosition = 857
+; FirstLine = 333
+; Folding = 2HcgPISEY-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
