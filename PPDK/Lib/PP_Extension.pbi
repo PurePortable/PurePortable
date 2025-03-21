@@ -18,8 +18,8 @@ Prototype MH_QueueDisableHook(*pTarget)
 Prototype MH_ApplyQueued()
 Prototype MH_Uninitialize()
 Prototype MH_StatusToString(Status)
-Prototype _MHX_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.Integer,flags=0)
-Prototype.s _MHX_Error(ErrorNum)
+Prototype _MH_HookApi(pszModule.s,pszProcName.s,*pDetour,*ppOriginal,*ppTarget.Integer,flags=0)
+Prototype.s _MH_Error(ErrorNum)
 
 Structure MH_DATA
 	cbSize.i ; reserved
@@ -35,8 +35,8 @@ Structure MH_DATA
 	MH_ApplyQueued.MH_ApplyQueued
 	MH_Uninitialize.MH_Uninitialize
 	; функции PP
-	_MHX_HookApi._MHX_HookApi
-	_MHX_Error._MHX_Error
+	_MH_HookApi._MH_HookApi
+	_MH_Error._MH_Error
 EndStructure
 
 Prototype PP_dbg(txt.s)

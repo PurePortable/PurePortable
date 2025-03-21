@@ -46,10 +46,10 @@ UndefineMacro DoubleQuote
 Macro DoubleQuote
 	"
 EndMacro
-Macro MHX_HookApi(DllName,FuncName,flags=0)
+Macro MH_HookApi(DllName,FuncName,flags=0)
 	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
 	Global Target_#FuncName
-	*EXT\MH\_MHX_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
+	*EXT\MH\_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
 	;CompilerEndIf
 EndMacro
 ;;======================================================================================================================

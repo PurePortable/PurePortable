@@ -862,8 +862,8 @@ Procedure AttachProcedure()
 						ExtData\MH\MH_QueueDisableHook = @MH_QueueDisableHook()
 						ExtData\MH\MH_ApplyQueued = @MH_ApplyQueued()
 						ExtData\MH\MH_Uninitialize = @MH_Uninitialize()
-						ExtData\MH\_MHX_HookApi = @_MH_HookApi()
-						ExtData\MH\_MHX_Error = @_MH_Error()
+						ExtData\MH\_MH_HookApi = @_MH_HookApi()
+						ExtData\MH\_MH_Error = @_MH_Error()
 					EndIf
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
