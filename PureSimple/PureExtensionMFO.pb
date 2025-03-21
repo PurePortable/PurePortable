@@ -20,7 +20,6 @@
 EnableExplicit
 IncludePath "..\PPDK\Lib"
 
-#DBG_EXTENSION = 0
 XIncludeFile "PurePortableExtension.pbi"
 ;;----------------------------------------------------------------------------------------------------------------------
 Procedure.s PeekSZ(*MemoryBuffer,Length=-1,Format=#PB_Unicode)
@@ -195,8 +194,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 169
-; FirstLine = 160
+; CursorPosition = 22
+; FirstLine = 10
 ; Folding = ----
 ; Optimizer
 ; EnableThread

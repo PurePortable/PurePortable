@@ -10,19 +10,12 @@ Global *EXT.EXT_DATA
 ; EndProcedure
 ;;======================================================================================================================
 CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
-CompilerIf #DBG_EXTENSION And Not Defined(DBG_ALWAYS,#PB_Constant)
-	#DBG_ALWAYS = 1
-CompilerEndIf
-CompilerIf #DBG_EXTENSION
-	Global DbgExtMode = #DBG_EXTENSION
-	Procedure DbgExt(txt.s)
-		If DbgExtMode
-			dbg(txt)
-		EndIf
-	EndProcedure
-CompilerElse
-	Macro DbgExt(txt) : EndMacro
-CompilerEndIf
+Global DbgExtMode
+Procedure DbgExt(txt.s)
+	If DbgExtMode
+		dbg(txt)
+	EndIf
+EndProcedure
 ;;======================================================================================================================
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
@@ -101,15 +94,16 @@ ExtensionInitialization()
 Declare ExtensionProcedure()
 ProcedureDLL PurePortableExtension(*PPD)
 	*EXT = *PPD
-	dbg("ATTACHPROCESS: "+DllPath+" ("+Str(*EXT\ProcessCnt)+")")
+	DbgExtMode = *EXT\AllowDbg
+	DbgExt("EXTENSION: "+DllPath)
 	ExtensionProcedure()
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 43
-; FirstLine = 22
+; CursorPosition = 97
+; FirstLine = 67
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

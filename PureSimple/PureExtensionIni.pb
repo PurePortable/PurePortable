@@ -20,7 +20,6 @@
 EnableExplicit
 IncludePath "..\PPDK\Lib"
 
-#DBG_EXTENSION = 0
 XIncludeFile "PurePortableExtension.pbi"
 
 ;;======================================================================================================================
@@ -262,9 +261,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 258
-; FirstLine = 84
-; Folding = B+
+; CursorPosition = 22
+; Folding = F+
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll

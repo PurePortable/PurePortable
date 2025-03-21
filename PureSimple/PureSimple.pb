@@ -13,6 +13,7 @@
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
+;PP_X32_COPYAS "..\..\Test\HelpScribble\PurePort.dll"
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
@@ -317,6 +318,7 @@ Global DbgSpecMode
 Global DbgEnvMode
 Global DbgAnyMode
 Global DbgDetach
+Global DbgExtensions
 ;;----------------------------------------------------------------------------------------------------------------------
 Procedure _OpenPreference(Prefs.s)
 	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
@@ -544,6 +546,7 @@ Procedure AttachProcedure()
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
 		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
 		DbgDetach = ReadPreferenceInteger("Detach",1)
+		DbgExtensions = ReadPreferenceInteger("Extensions",1)
 	EndIf
 	;}
 	;{ Создание папок
@@ -847,6 +850,7 @@ Procedure AttachProcedure()
 					If ExtData\Version = 0 ; надо инициализировать структуру
 						ExtData\Version = 1
 						ExtData\ProcessCnt = ProcessCnt
+						ExtData\AllowDbg = DbgExtensions
 						ExtData\PrgPath = @PrgPath
 						ExtData\DllPath = @DllPath
 						ExtData\PrefsFile = @PureSimplePrefs
@@ -975,7 +979,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = 2HcgPICAQ-
+; CursorPosition = 852
+; FirstLine = 325
+; Folding = 2HcgPICEY-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

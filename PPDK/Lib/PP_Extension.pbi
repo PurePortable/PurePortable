@@ -49,6 +49,7 @@ Structure EXT_DATA
 	Version.i
 	Reserved.i
 	ProcessCnt.i
+	AllowDbg.i ; разрешить вывод отладочных сообщений
 	*PrgPath ; полный путь к программе
 	*DllPath ; полный путь к основной dll
 	*PrefsFile ; полный путь к файлу конфигурации PurePortableSimple (в том числе выбраном в MultiConfig)
@@ -62,8 +63,7 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 54
-; FirstLine = 26
+; CursorPosition = 12
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
