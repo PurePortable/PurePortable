@@ -45,12 +45,32 @@
 
 $RetCode = 0
 
+. "$PSScriptRoot\Compile-ProxyDll-Settings.ps1"
+$Compiler32list = @($Compiler32)
+$Compiler64list = @($Compiler64)
 $Compiler32 = ""
 $Compiler64 = ""
-$CorrectExportC = ".\PPCorrectExportC.exe"
-
-. "$PSScriptRoot\Compile-ProxyDll-Settings.ps1"
-
+foreach ($exe in $Compiler32list) {
+  if ($Compiler32 -eq "") {
+    if ($exe.Substring(0,2) -eq "..") { # Относительный путь
+      $exe = "$PSScriptRoot\$exe"
+      $exe
+    }
+    if (Test-Path $exe) {
+      $Compiler32 = $exe
+    }
+  }
+}
+foreach ($exe in $Compiler64list) {
+  if ($Compiler64 -eq "") {
+    if ($exe.Substring(0,2) -eq "..") { # Относительный путь
+      $exe = "$PSScriptRoot\$exe"
+    }
+    if (Test-Path $exe) {
+      $Compiler64 = $exe
+    }
+  }
+}
 if ($Compiler32 -eq "" -or $Compiler64 -eq "") {
   Write-Error "The compiler was not found"
   exit
