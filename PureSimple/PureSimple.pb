@@ -13,7 +13,6 @@
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
-;PP_X32_COPYAS "..\..\Test\HelpScribble\PurePort.dll"
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
