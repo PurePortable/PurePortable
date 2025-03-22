@@ -23,6 +23,7 @@ Global PrgDirN.s ; директория программы без "\" на ко�
 Global PrgName.s ; имя программы (без расширения)
 Global DllPath.s, DllName.s
 Global ExtPrefs.s ; файл конфигурации расширения
+Global PureSimplePrefs.s
 
 ;;======================================================================================================================
 XIncludeFile "proc\CorrectPath.pbi"
@@ -95,6 +96,7 @@ Procedure ExtensionInitialization()
 	Else ;If FileExist(ExtPrefs+".ini")
 		ExtPrefs+".ini"
 	EndIf
+	PureSimplePrefs = PeekS(*EXT\PrefsFile)
 EndProcedure
 ExtensionInitialization()
 ;;======================================================================================================================
@@ -109,8 +111,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 97
-; FirstLine = 67
+; CursorPosition = 71
+; FirstLine = 40
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

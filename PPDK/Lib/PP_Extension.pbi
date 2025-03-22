@@ -64,8 +64,8 @@ Prototype PurePortableExtension(*ExtData.EXT_DATA) ; прототип экспо
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 47
-; FirstLine = 28
+; CursorPosition = 54
+; FirstLine = 26
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
