@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.6
+;RES_VERSION 4.11.0.7
 ;RES_DESCRIPTION PurePortableSimpleExtension
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortExecute.dll
@@ -21,13 +21,6 @@ EnableExplicit
 IncludePath "..\PPDK\Lib"
 
 XIncludeFile "PurePortableExtension.pbi"
-;;----------------------------------------------------------------------------------------------------------------------
-Procedure.s PeekSZ(*MemoryBuffer,Length=-1,Format=#PB_Unicode)
-	If *MemoryBuffer
-		ProcedureReturn PeekS(*MemoryBuffer,Length,Format)
-	EndIf
-	ProcedureReturn ""
-EndProcedure
 ;;======================================================================================================================
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfullpathnamew
 Prototype GetFullPathName(lpFileName,nBufferLength,lpBuffer,*lpFilePart)
@@ -194,8 +187,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 22
-; FirstLine = 10
+; CursorPosition = 23
 ; Folding = ----
 ; Optimizer
 ; EnableThread

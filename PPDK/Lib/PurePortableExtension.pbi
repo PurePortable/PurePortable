@@ -63,6 +63,13 @@ Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование о
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
+Procedure.s PeekSZ(*MemoryBuffer,Length=-1,Format=#PB_Unicode)
+	If *MemoryBuffer
+		ProcedureReturn PeekS(*MemoryBuffer,Length,Format)
+	EndIf
+	ProcedureReturn ""
+EndProcedure
+;;======================================================================================================================
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global ProcessId
