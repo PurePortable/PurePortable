@@ -102,7 +102,7 @@ Declare ExtensionProcedure()
 ProcedureDLL PurePortableExtension(*ExtData,*ExtParam)
 	*EXT = *ExtData
 	DbgExtMode = *EXT\AllowDbg
-	DbgExt("ATTACHPROCESS: "+DllPath)
+	DbgExt("EXTENSION: "+DllPath)
 	PureSimplePrefs = PeekS(*EXT\PrefsFile)
 	ExtensionProcedure()
 	ProcedureReturn 0
@@ -117,7 +117,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 114
+; CursorPosition = 104
 ; FirstLine = 82
 ; Folding = --
 ; EnableThread
