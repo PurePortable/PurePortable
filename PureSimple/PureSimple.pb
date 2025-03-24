@@ -309,8 +309,9 @@ EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Global ComputerName.s
 ;;======================================================================================================================
-Global PureSimplePrefs.s
-Global PureSimplePrev.s ; предыдущий конфиг при MultiConfig
+Global PureSimplePrefs.s ; основной файл конфигурации
+Global PureSimplePrefsExt.s ; расширение основного файла конфигурации
+Global PureSimplePrev.s ; предыдущий файл конфигурации при MultiConfig
 Global ExtData.EXT_DATA
 Global DbgRegMode
 Global DbgSpecMode
@@ -355,6 +356,7 @@ Procedure CheckProgram()
 	ElseIf FileExist(PrgDir+"PurePort.ini")
 		PureSimplePrefs = PrgDir+"PurePort.ini"
 	EndIf
+	PureSimplePrefsExt = GetExtensionPart(PureSimplePrefs)
 	_OpenPreference(PureSimplePrefs) ; текущая группа будет Portable
 	;}
 	;{ Мультиконфиг
@@ -368,7 +370,7 @@ Procedure CheckProgram()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					v= PreferenceKeyValue()
+					v = PreferenceKeyValue()
 					Select LCase(k)
 						Case "reaction" ; пропускаем
 						Case "programname","programfilename"
@@ -386,10 +388,15 @@ Procedure CheckProgram()
 			EndIf
 		Wend
 		If MultiConfigPrefs ; была обнаружена подходящая группа "Config:"
+			If GetExtensionPart(MultiConfigPrefs) = ""
+				MultiConfigPrefs + PureSimplePrefsExt
+			EndIf
 			MultiConfigPrefs = PreferencePath(MultiConfigPrefs)
 			ClosePreferences()
 			PureSimplePrefs = MultiConfigPrefs ; другой файл конфигурации
 			_OpenPreference(PureSimplePrefs)
+			; При отсутствующем PureSimplePrefs процедура _OpenPreference выполняет TerminateProcess
+			; В случае изменения этого поведения (продолжение работы) вернуть предыдущий файл.
 		EndIf
 	EndIf
 	;}
@@ -979,8 +986,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 15
-; Folding = 2HcgPUEAQ+
+; Folding = 2HcgPUEAA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
