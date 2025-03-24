@@ -22,18 +22,12 @@ XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 ;Global DbgAttach
 Global DbgDetach
 
+#IHELPFUL_INIT = 1
+#IMINHOOK_INIT = 1
 XIncludeFile "PP_Extension.pbi"
-
 ;;======================================================================================================================
 
 Global *EXT.EXT_DATA
-
-Macro EXT_MH_HookApi(DllName,FuncName,flags=0)
-	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
-	Global Target_#FuncName
-	*EXT\MH\_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
-	;CompilerEndIf
-EndMacro
 
 ;;======================================================================================================================
 Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
@@ -61,8 +55,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 33
-; FirstLine = 11
+; CursorPosition = 27
+; FirstLine = 20
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

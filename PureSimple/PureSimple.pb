@@ -317,7 +317,12 @@ Global DbgSpecMode
 Global DbgEnvMode
 Global DbgAnyMode
 Global DbgDetach
-Global DbgExtensions
+Global DbgExtMode
+Procedure DbgExt(txt.s)
+	If DbgExtMode
+		dbg(txt)
+	EndIf
+EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Procedure _OpenPreference(Prefs.s)
 	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
@@ -545,7 +550,7 @@ Procedure AttachProcedure()
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
 		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
 		DbgDetach = ReadPreferenceInteger("Detach",1)
-		DbgExtensions = ReadPreferenceInteger("Extensions",1)
+		DbgExtMode = ReadPreferenceInteger("Extensions",1)
 	EndIf
 	;}
 	;{ Создание папок
@@ -836,47 +841,42 @@ Procedure AttachProcedure()
 	Protected PurePortableExtension.PurePortableExtension
 	Protected *PurePortableExtensionNameA = Ascii("PurePortableExtension")
 	If PreferenceGroup("Extensions")
+		ExtData\Version = 1
+		ExtData\ProcessCnt = ProcessCnt
+		ExtData\AllowDbg = DbgExtMode
+		ExtData\PrgPath = @PrgPath
+		ExtData\DllPath = @DllPath
+		ExtData\PrefsFile = @PureSimplePrefs
+		ExtData\HF = ?IHelpful
+		ExtData\MH = ?IMinHook
+		Protected *ExtParam.EXT_PARAM
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			;k = PreferenceKeyName()
-			LoadableLibrary = PreferencePath(PreferenceKeyName())
-			;dbg("ATTACHPROCESS: EXT: "+LoadableLibrary)
+			k = PreferenceKeyName()
+			If GetExtensionPart(k) = ""
+				k + ".dll"
+			EndIf
+			LoadableLibrary = PreferencePath(k)
+			DbgExt("ATTACHPROCESS: EXT: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
+				DbgExt("ATTACHPROCESS: EXT ADDR: "+hLoadableLibrary)
 				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
 				If PurePortableExtension
+					DbgExt("ATTACHPROCESS: EXT FUNC: "+PurePortableExtension)
+					*ExtParam = AllocateStructure(EXT_PARAM)
+					*ExtParam\Version = 1
 					v = PreferenceKeyValue()
-					i = AllocateMemory(StringByteLength(v)+2)
-					PokeS(i,v)
-					ExtData\Version = 1
-					ExtData\ProcessCnt = ProcessCnt
-					ExtData\AllowDbg = DbgExtensions
-					ExtData\PrgPath = @PrgPath
-					ExtData\DllPath = @DllPath
-					ExtData\PrefsFile = @PureSimplePrefs
-					ExtData\Parameters = i
-					ExtData\PP\dbg = @dbg()
-					ExtData\MH\MH_Initialize = @MH_Initialize()
-					ExtData\MH\MH_CreateHook = @MH_CreateHook()
-					ExtData\MH\MH_CreateHookApi = @MH_CreateHookApi()
-					ExtData\MH\MH_CreateHookApiEx = @MH_CreateHookApiEx()
-					ExtData\MH\MH_EnableHook = @MH_EnableHook()
-					ExtData\MH\MH_DisableHook = @MH_DisableHook()
-					ExtData\MH\MH_RemoveHook = @MH_RemoveHook()
-					ExtData\MH\MH_QueueEnableHook = @MH_QueueEnableHook()
-					ExtData\MH\MH_QueueDisableHook = @MH_QueueDisableHook()
-					ExtData\MH\MH_ApplyQueued = @MH_ApplyQueued()
-					ExtData\MH\MH_Uninitialize = @MH_Uninitialize()
-					ExtData\MH\_MH_HookApi = @_MH_HookApi()
-					ExtData\MH\_MH_Error = @_MH_Error()
+					*ExtParam\Parameters = AllocateMemory(StringByteLength(v)+2)
+					PokeS(*ExtParam\Parameters,v)
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
-					i = PurePortableExtension(@ExtData)
+					i = PurePortableExtension(@ExtData,*ExtParam)
 					If i = 1
 						FreeLibrary_(hLoadableLibrary)
 					EndIf
 				EndIf
-				;dbg("ATTACHPROCESS: EXT: OK")
+				;DbgExt("ATTACHPROCESS: EXT: OK")
 			EndIf
 		Wend
 	EndIf
@@ -979,9 +979,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 857
-; FirstLine = 333
-; Folding = 2HcgPISEY-
+; CursorPosition = 15
+; Folding = 2HcgPUEAQ+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

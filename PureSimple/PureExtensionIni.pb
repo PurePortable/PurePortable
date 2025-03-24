@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.6
+;RES_VERSION 4.11.0.7
 ;RES_DESCRIPTION PurePortableSimpleExtension
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortIni.dll
@@ -194,86 +194,88 @@ EndStructure
 Global Dim Inis.INIFILE(0), iInis, nInis
 
 Procedure ExtensionProcedure()
-	Protected i, k.s, v.s, g.s, p.s
-	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
-	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
-		; Составляем список ini-файлов
-		If PreferenceGroup("IniFiles")
-			ExaminePreferenceKeys()
-			While NextPreferenceKey()
-				k = LCase(PreferenceKeyName())
-				v = PreferencePath()
-				;dbg("PurePortIni: "+v)
-				nInis+1
-				ReDim Inis(nInis)
-				Inis(nInis)\num = k
-				Inis(nInis)\ini = v
-			Wend
-		EndIf
-		; Перебираем все ini-файлы
-		For iInis=1 To nInis
-			IniNum = Inis(iInis)\num
-			IniFile = Inis(iInis)\ini
-			IniRead(IniFile)
-			DbgExt("PurePortIni: "+IniNum+" :: "+IniFile)
-			If PreferenceGroup(IniNum) ; общие данные для ini-файла
-			EndIf
-			IniPref = IniNum+":"
-			ExaminePreferenceGroups()
-			While NextPreferenceGroup()
-				IniGroup = PreferenceGroupName()
-				If Left(IniGroup,Len(IniPref)) = IniPref ; группа, имеющая отношение к ini-файлу
-					Select LCase(Mid(IniGroup,Len(IniPref)+1))
-						Case "correctpaths"
-							ExaminePreferenceKeys()
-							While NextPreferenceKey()
-								k = PreferenceKeyName()
-								v = PreferencePath()
-								i = FindString(k,"|")
-								If i
-									IniCorrect(Left(k,i-1),Mid(k,i+1),v)
-								Else
-									IniCorrectKey(k,v)
-								EndIf
-							Wend
-						Case "setpaths"
-							ExaminePreferenceKeys()
-							While NextPreferenceKey()
-								k = PreferenceKeyName()
-								v = PreferencePath(ExpandEnvironmentStrings(PreferenceKeyValue()))
-								i = FindString(k,"|")
-								If i
-									IniSet(Left(k,i-1),Mid(k,i+1),v)
-									CreatePath(v)
-								EndIf
-							Wend
-					EndSelect
-				EndIf
-			Wend
-			IniWrite()
-		Next
-		ClosePreferences()
-	EndIf
-	
+	DbgExt("PurePortableSimple Extention INI")
+; 	Protected i, k.s, v.s, g.s, p.s
+; 	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
+; 	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
+; 		; Составляем список ini-файлов
+; 		If PreferenceGroup("IniFiles")
+; 			ExaminePreferenceKeys()
+; 			While NextPreferenceKey()
+; 				k = LCase(PreferenceKeyName())
+; 				v = PreferencePath()
+; 				;dbg("PurePortIni: "+v)
+; 				nInis+1
+; 				ReDim Inis(nInis)
+; 				Inis(nInis)\num = k
+; 				Inis(nInis)\ini = v
+; 			Wend
+; 		EndIf
+; 		; Перебираем все ini-файлы
+; 		For iInis=1 To nInis
+; 			IniNum = Inis(iInis)\num
+; 			IniFile = Inis(iInis)\ini
+; 			IniRead(IniFile)
+; 			DbgExt("PurePortIni: "+IniNum+" :: "+IniFile)
+; 			If PreferenceGroup(IniNum) ; общие данные для ini-файла
+; 			EndIf
+; 			IniPref = IniNum+":"
+; 			ExaminePreferenceGroups()
+; 			While NextPreferenceGroup()
+; 				IniGroup = PreferenceGroupName()
+; 				If Left(IniGroup,Len(IniPref)) = IniPref ; группа, имеющая отношение к ini-файлу
+; 					Select LCase(Mid(IniGroup,Len(IniPref)+1))
+; 						Case "correctpaths"
+; 							ExaminePreferenceKeys()
+; 							While NextPreferenceKey()
+; 								k = PreferenceKeyName()
+; 								v = PreferencePath()
+; 								i = FindString(k,"|")
+; 								If i
+; 									IniCorrect(Left(k,i-1),Mid(k,i+1),v)
+; 								Else
+; 									IniCorrectKey(k,v)
+; 								EndIf
+; 							Wend
+; 						Case "setpaths"
+; 							ExaminePreferenceKeys()
+; 							While NextPreferenceKey()
+; 								k = PreferenceKeyName()
+; 								v = PreferencePath(ExpandEnvironmentStrings(PreferenceKeyValue()))
+; 								i = FindString(k,"|")
+; 								If i
+; 									IniSet(Left(k,i-1),Mid(k,i+1),v)
+; 									CreatePath(v)
+; 								EndIf
+; 							Wend
+; 					EndSelect
+; 				EndIf
+; 			Wend
+; 			IniWrite()
+; 		Next
+; 		ClosePreferences()
+; 	EndIf
+; 	
 	ProcedureReturn #PP_EXT_ALLOW_UNLOAD
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 22
-; Folding = F+
+; CursorPosition = 16
+; FirstLine = 9
+; Folding = B+
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.31
+; VersionField0 = 4.11.0.7
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.31
+; VersionField5 = 4.11.0.7
 ; VersionField6 = PurePortableSimpleExtension
 ; VersionField7 = PurePortIni.dll
 ; VersionField9 = (c) Smitis, 2017-2025

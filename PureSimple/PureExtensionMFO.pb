@@ -185,9 +185,11 @@ Procedure ExtensionProcedure()
 EndProcedure
 ;;======================================================================================================================
 
+;;======================================================================================================================
+
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 23
+; CursorPosition = 16
 ; Folding = ----
 ; Optimizer
 ; EnableThread
@@ -195,11 +197,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.31
+; VersionField0 = 4.11.0.7
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.31
+; VersionField5 = 4.11.0.7
 ; VersionField6 = PurePortableSimpleExtension
-; VersionField7 = PurePortIni.dll
+; VersionField7 = PurePortExecute.dll
 ; VersionField9 = (c) Smitis, 2017-2025

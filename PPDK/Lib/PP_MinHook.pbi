@@ -187,8 +187,8 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 170
-; FirstLine = 103
+; CursorPosition = 184
+; FirstLine = 109
 ; Folding = -z
 ; DisableDebugger
 ; EnableExeConstant

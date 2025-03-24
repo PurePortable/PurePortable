@@ -1,19 +1,18 @@
 ﻿
 ;;======================================================================================================================
 #MAX_PATH_EXTEND = 32767
-XIncludeFile "PP_Debug.pbi"
+;XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Extension.pbi"
 Global *EXT.EXT_DATA
 ;;======================================================================================================================
-; Procedure dbg(txt.s)
-; 	*EXT\PP\dbg(txt)
-; EndProcedure
-;;======================================================================================================================
-CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
+;Procedure dbg(txt.s="") : OutputDebugString_("PORT: "+txt) : EndProcedure
+Procedure dbg(txt.s="") : *EXT\HF\dbg(txt) : EndProcedure
+;CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
 Global DbgExtMode
 Procedure DbgExt(txt.s)
 	If DbgExtMode
-		dbg(txt)
+		;dbg(txt)
+		*EXT\HF\dbg(txt)
 	EndIf
 EndProcedure
 ;;======================================================================================================================
@@ -73,7 +72,7 @@ EndProcedure
 ;;======================================================================================================================
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
-;Global ProcessId
+Global ProcessId
 
 Procedure ExtensionInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
@@ -96,23 +95,30 @@ Procedure ExtensionInitialization()
 	Else ;If FileExist(ExtPrefs+".ini")
 		ExtPrefs+".ini"
 	EndIf
-	PureSimplePrefs = PeekS(*EXT\PrefsFile)
 EndProcedure
 ExtensionInitialization()
 ;;======================================================================================================================
 Declare ExtensionProcedure()
-ProcedureDLL PurePortableExtension(*PPD)
-	*EXT = *PPD
+ProcedureDLL PurePortableExtension(*ExtData,*ExtParam)
+	*EXT = *ExtData
 	DbgExtMode = *EXT\AllowDbg
-	DbgExt("EXTENSION: "+DllPath)
+	DbgExt("ATTACHPROCESS: "+DllPath)
+	PureSimplePrefs = PeekS(*EXT\PrefsFile)
 	ExtensionProcedure()
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
+; ProcedureDLL.l AttachProcess(Instance)
+; EndProcedure
+;;======================================================================================================================
+ProcedureDLL.l DetachProcess(Instance)
+	DbgExt("EXTENSION UNLOAD: "+DllPath)
+EndProcedure
+;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 71
-; FirstLine = 40
+; CursorPosition = 114
+; FirstLine = 82
 ; Folding = --
 ; EnableThread
 ; DisableDebugger
