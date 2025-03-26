@@ -5,31 +5,31 @@
 ;PP_SILENT 1
 ;PP_BACKUP 0
 ;PP_PUREPORTABLE 1
-;RES_VERSION 1.0.1.002
-;RES_PRODUCTVERSION 1.0.1.0
-;RES_DESCRIPTION PureBasic Pre/Post Processor Correct Export
-;RES_COPYRIGHT (c) Smitis, 2020-2024
+;RES_VERSION 1.0.2.0
+;RES_PRODUCTVERSION 1.0.2.0
+;RES_DESCRIPTION PurePortable correct export
+;RES_COPYRIGHT (c) Smitis, 2020-2025
 ;RES_INTERNALNAME PPCorrectExport
 ;PP_ENABLETHREAD 0
 ;PP_OPTIMIZER 0
 
-Macro PrintT : PrintN : EndMacro
-
-;;----------------------------------------------------------------------------------------------------------------------
-
 EnableExplicit
 OpenConsole()
+
+;;----------------------------------------------------------------------------------------------------------------------
+Macro PrintT : PrintN : EndMacro
+;;----------------------------------------------------------------------------------------------------------------------
 
 Declare CorrectExport(BinFile.s)
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
 Define BinFile.s = ProgramParameter()
-CorrectExport(BinFile)
 PrintN("CorrectExport: "+BinFile)
 If FileSize(BinFile) < 0 ; Файл не найден
 	End 1
 EndIf
+CorrectExport(BinFile)
 
 End
 
@@ -111,8 +111,10 @@ EndProcedure
 ; Поэтому пришлось изменять имена не только конфликтных функций, но и похожих.
 
 Procedure CorrectExport(BinFile.s)
-	Static FuncList1.s = ";CreateThre__;CreateThre__pool;CreateThre__poolCleanupGroup;CreateThre__poolIo;CreateThre__poolTimer;CreateThre__poolWait;CreateThre__poolWork;FlushFileBuffe__;OpenFi__;OpenFi__ById;OpenFi__MappingA;OpenFi__MappingW;ReadFi__;ReadFi__Ex;ReadFi__Scatter;ResumeThre__;CloseWind__;CloseWind__Station;CopyIma__;CreateMe__;CreatePopupMe__;GetActiveWind__;IsMe__;IsWind__;IsWind__Enabled;IsWind__Unicode;IsWind__Visible;SetActiveWind__;AlphaBle__;CreateToolb__;"
-	Static FuncList2.s = ";CreateThread;CreateThreadpool;CreateThreadpoolCleanupGroup;CreateThreadpoolIo;CreateThreadpoolTimer;CreateThreadpoolWait;CreateThreadpoolWork;FlushFileBuffers;OpenFile;OpenFileById;OpenFileMappingA;OpenFileMappingW;ReadFile;ReadFileEx;ReadFileScatter;ResumeThread;CloseWindow;CloseWindowStation;CopyImage;CreateMenu;CreatePopupMenu;GetActiveWindow;IsMenu;IsWindow;IsWindowEnabled;IsWindowUnicode;IsWindowVisible;SetActiveWindow;AlphaBlend;CreateToolbar;"
+	;Static FuncList1.s = ";CreateThre__;CreateThre__pool;CreateThre__poolCleanupGroup;CreateThre__poolIo;CreateThre__poolTimer;CreateThre__poolWait;CreateThre__poolWork;FlushFileBuffe__;OpenFi__;OpenFi__ById;OpenFi__MappingA;OpenFi__MappingW;ReadFi__;ReadFi__Ex;ReadFi__Scatter;ResumeThre__;CloseWind__;CloseWind__Station;CopyIma__;CreateMe__;CreatePopupMe__;GetActiveWind__;IsMe__;IsWind__;IsWind__Enabled;IsWind__Unicode;IsWind__Visible;SetActiveWind__;AlphaBle__;CreateToolba_;"
+	;Static FuncList2.s = ";CreateThread;CreateThreadpool;CreateThreadpoolCleanupGroup;CreateThreadpoolIo;CreateThreadpoolTimer;CreateThreadpoolWait;CreateThreadpoolWork;FlushFileBuffers;OpenFile;OpenFileById;OpenFileMappingA;OpenFileMappingW;ReadFile;ReadFileEx;ReadFileScatter;ResumeThread;CloseWindow;CloseWindowStation;CopyImage;CreateMenu;CreatePopupMenu;GetActiveWindow;IsMenu;IsWindow;IsWindowEnabled;IsWindowUnicode;IsWindowVisible;SetActiveWindow;AlphaBlend;CreateToolbar;"
+	Static FuncList1.s = ";CreateThre__;FlushFileBuffe__;OpenFi__;ReadFi__;ResumeThre__;CloseWind__;CopyIma__;CreateMe__;CreatePopupMe__;GetActiveWind__;IsMe__;IsWind__;SetActiveWind__;AlphaBle__;CreateToolb__;"
+	Static FuncList2.s = ";CreateThread;FlushFileBuffers;OpenFile;ReadFile;ResumeThread;CloseWindow;CopyImage;CreateMenu;CreatePopupMenu;GetActiveWindow;IsMenu;IsWindow;SetActiveWindow;AlphaBlend;CreateToolbar;"
 	Protected n
 	Protected *FileBase.IMAGE_DOS_HEADER ; *FileBase = *DosHdr
 	Protected *NtHdr32.IMAGE_NT_HEADERS32
@@ -169,7 +171,7 @@ Procedure CorrectExport(BinFile.s)
 						If n
 							FuncName2 = Trim(Left(FuncName2,n-1))
 						EndIf
-						;PrintT(FuncName1+" -> "+FuncName2)
+						PrintN("  "+FuncName1+" -> "+FuncName2)
 						PokeS(*AddressOfName,FuncName2,-1,#PB_Ascii)
 						;PrintT("RENAME EXPORT FUNCTION: "+FuncName1+" -> "+FuncName2)
 					EndIf
@@ -205,8 +207,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Console
-; CursorPosition = 115
-; FirstLine = 90
+; CursorPosition = 9
 ; Folding = -
 ; Optimizer
 ; EnableThread
@@ -214,10 +215,10 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 1.0.1.002
-; VersionField1 = 1.0.1.0
-; VersionField4 = 1.0.1.0
-; VersionField5 = 1.0.1.002
-; VersionField6 = PureBasic Pre/Post Processor Correct Export
+; VersionField0 = 1.0.2.0
+; VersionField1 = 1.0.2.0
+; VersionField4 = 1.0.2.0
+; VersionField5 = 1.0.2.0
+; VersionField6 = PurePortable correct export
 ; VersionField7 = PPCorrectExport
-; VersionField9 = (c) Smitis, 2020-2024
+; VersionField9 = (c) Smitis, 2020-2025
