@@ -25,8 +25,9 @@ Declare CorrectExport(BinFile.s)
 ;;----------------------------------------------------------------------------------------------------------------------
 
 Define BinFile.s = ProgramParameter()
-PrintN("CorrectExport: "+BinFile)
+PrintN("PurePortable correct export: "+BinFile)
 If FileSize(BinFile) < 0 ; Файл не найден
+	PrintN("ERROR: File not found!")
 	End 1
 EndIf
 CorrectExport(BinFile)
@@ -125,7 +126,6 @@ Procedure CorrectExport(BinFile.s)
 	Protected Is64, PSize, Changed
 	Protected hFile, hFileMapping, *BaseAddress.IMAGE_DOS_HEADER
 	
-	;PrintT(BinFile)
 	hFile = CreateFile_(@BinFile,#GENERIC_READ|#GENERIC_WRITE,#FILE_SHARE_READ|#FILE_SHARE_WRITE,#Null,#OPEN_EXISTING,#FILE_ATTRIBUTE_NORMAL,0)
 	If hFile
 		;FileSize = GetFileSize_(hFile,#Null)
@@ -173,7 +173,6 @@ Procedure CorrectExport(BinFile.s)
 						EndIf
 						PrintN("  "+FuncName1+" -> "+FuncName2)
 						PokeS(*AddressOfName,FuncName2,-1,#PB_Ascii)
-						;PrintT("RENAME EXPORT FUNCTION: "+FuncName1+" -> "+FuncName2)
 					EndIf
 					*AddressOfNames+4
 				Next
@@ -207,7 +206,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Console
-; CursorPosition = 9
+; CursorPosition = 175
+; FirstLine = 153
 ; Folding = -
 ; Optimizer
 ; EnableThread
