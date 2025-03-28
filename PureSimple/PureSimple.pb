@@ -389,7 +389,7 @@ Procedure CheckProgram()
 		Wend
 		If MultiConfigPrefs ; была обнаружена подходящая группа "Config:"
 			If GetExtensionPart(MultiConfigPrefs) = ""
-				MultiConfigPrefs + PureSimplePrefsExt
+				MultiConfigPrefs + "." + PureSimplePrefsExt
 			EndIf
 			MultiConfigPrefs = PreferencePath(MultiConfigPrefs)
 			ClosePreferences()
