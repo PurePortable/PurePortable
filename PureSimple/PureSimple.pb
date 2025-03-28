@@ -557,7 +557,7 @@ Procedure AttachProcedure()
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
 		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
 		DbgDetach = ReadPreferenceInteger("Detach",1)
-		DbgExtMode = ReadPreferenceInteger("Extensions",1)
+		DbgExtMode = ReadPreferenceInteger("Extensions",0)
 	EndIf
 	;}
 	;{ Создание папок
