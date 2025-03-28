@@ -171,8 +171,8 @@ Get-Content -Lit $RcFile -Enc Unicode | foreach {
 # Компиляция x32
 if ($x32 -or ((-not $x32) -and (-not $x64))) {
   Write-Host ""
-  if ($Dir32) {
-    $SubDir = $Dir32
+  if ($OutDir32) {
+    $SubDir = $OutDir32
     if (-not (Test-Path $SubDir -Type Container)) {
       New-Item $SubDir -Type Directory | Out-Null
     }
@@ -190,8 +190,8 @@ if ($x32 -or ((-not $x32) -and (-not $x64))) {
 # Компиляция x64
 if ($x64 -or ((-not $x32) -and (-not $x64))) {
   Write-Host ""
-  if ($Dir64) {
-    $SubDir = $Dir64
+  if ($OutDir64) {
+    $SubDir = $OutDir64
     if (-not (Test-Path $SubDir -Type Container)) {
       New-Item $SubDir -Type Directory | Out-Null
     }
