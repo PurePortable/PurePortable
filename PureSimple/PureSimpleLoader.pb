@@ -26,7 +26,7 @@ IncludePath "..\PPDK\Lib"
 
 XIncludeFile "PurePortableLoader.pbi"
 ;;======================================================================================================================
-Procedure.l AttachProcess(Instance)
+ProcedureDLL.l AttachProcess(Instance)
 	DisableThreadLibraryCalls_(Instance)
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		Protected PurePortDll.s = "PurePort32.dll"
@@ -39,20 +39,17 @@ Procedure.l AttachProcess(Instance)
 		PurePortDll = PrgDir+"PurePort.dll"
 	EndIf
 	LoadLibrary_(@PurePortDll)
-	;PPInitialization
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
-;Procedure.s DetachProcess()
-;
-;	PPFinish
+;ProcedureDll.s DetachProcess()
 ;EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 45
-; FirstLine = 15
+; CursorPosition = 41
+; FirstLine = 12
 ; Folding = -
 ; Optimizer
 ; EnableThread
