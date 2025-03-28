@@ -33,10 +33,10 @@
   [switch] $x64
   ,
   [Parameter(Mandatory=$false)]
-  [string] $Dir32
+  [Alias('Dir32')] [string] $OutDir32
   ,
   [Parameter(Mandatory=$false)]
-  [string] $Dir64
+  [Alias('Dir64')] [string] $OutDir64
   ,
   [Parameter(Mandatory=$false)]
   [Alias('CE')] [switch] $CorrectExport
