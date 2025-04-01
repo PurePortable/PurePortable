@@ -111,8 +111,8 @@ XIncludeFile "PurePortable.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 CompilerIf #PORTABLE_SPECIAL_FOLDERS
-	Procedure.s CheckRFID(rfid)
-; 		If CompareMemory(rfid,?FOLDERID_ProgramFiles,16)
+	Procedure.s CheckKFID(kfid)
+; 		If CompareMemory(kfid,?FOLDERID_ProgramFiles,16)
 ; 			ProcedureReturn ProfileRedir
 ; 		EndIf
  		ProcedureReturn ""
@@ -303,9 +303,9 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = KYEn6
+; Folding = KcEn6
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll

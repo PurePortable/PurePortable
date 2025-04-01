@@ -63,30 +63,30 @@ CompilerElse
 CompilerEndIf
 CompilerIf #DBG_SPECIAL_FOLDERS And (#PROXY_DLL_COMPATIBILITY=0 Or #PROXY_DLL_COMPATIBILITY>5)
 	XIncludeFile "Proc\guid2s.pbi"
-	Procedure DbgRfid(func.s,rfid,path.s="")
+	Procedure DbgKfid(func.s,kfid,path.s="")
 		If DbgSpecMode
 			If path : path = ": «"+path+"»" : EndIf
-			If CompareMemory(rfid,?FOLDERID_Profile,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (Profile)"+path)
-			ElseIf CompareMemory(rfid,?FOLDERID_RoamingAppData,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (AppData)"+path)
-			ElseIf CompareMemory(rfid,?FOLDERID_LocalAppData,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (LocalAppData)"+path)
-			ElseIf CompareMemory(rfid,?FOLDERID_LocalLowAppData,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (LocalLowAppData)"+path)
-			ElseIf CompareMemory(rfid,?FOLDERID_Documents,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (Documents)"+path)
-			ElseIf CompareMemory(rfid,?FOLDERID_ProgramData,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (CommonAppData)"+path)
-			ElseIf CompareMemory(rfid,?FOLDERID_PublicDocuments,16)
-				DbgSpec(func+": "+guid2s(rfid)+" (CommonDocuments)"+path)
+			If CompareMemory(kfid,?FOLDERID_Profile,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (Profile)"+path)
+			ElseIf CompareMemory(kfid,?FOLDERID_RoamingAppData,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (AppData)"+path)
+			ElseIf CompareMemory(kfid,?FOLDERID_LocalAppData,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (LocalAppData)"+path)
+			ElseIf CompareMemory(kfid,?FOLDERID_LocalLowAppData,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (LocalLowAppData)"+path)
+			ElseIf CompareMemory(kfid,?FOLDERID_Documents,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (Documents)"+path)
+			ElseIf CompareMemory(kfid,?FOLDERID_ProgramData,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (CommonAppData)"+path)
+			ElseIf CompareMemory(kfid,?FOLDERID_PublicDocuments,16)
+				DbgSpec(func+": "+guid2s(kfid)+" (CommonDocuments)"+path)
 			Else
-				DbgSpec(func+": "+guid2s(rfid)+path)
+				DbgSpec(func+": "+guid2s(kfid)+path)
 			EndIf
 		EndIf
 	EndProcedure
 CompilerElse
-	Macro DbgRfid(func,rfid,path="") : EndMacro
+	Macro DbgKfid(func,kfid,path="") : EndMacro
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 #CSIDL_ID_MASK = ~#CSIDL_FLAG_MASK
@@ -120,42 +120,43 @@ CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH Or #DETOUR_SHGETFOLDERPATHEX Or #DETOUR_SHGETKNOWNFOLDERIDLIST
-	Declare.s CheckRFID(rfid)
-	Procedure.s rfid2path(rfid)
-		If CompareMemory(rfid,?FOLDERID_Profile,16) And ProfileRedir
-			DbgSpec("rfid2path: "+ProfileRedir)
+	Declare.s CheckKFID(kfid)
+	Macro CheckRFID : CheckKFID : EndMacro
+	Procedure.s kfid2path(kfid)
+		If CompareMemory(kfid,?FOLDERID_Profile,16) And ProfileRedir
+			DbgSpec("kfid2path: "+ProfileRedir)
 			ProcedureReturn ProfileRedir
 		EndIf
-		If CompareMemory(rfid,?FOLDERID_RoamingAppData,16) And AppDataRedir
-			DbgSpec("rfid2path: "+AppDataRedir)
+		If CompareMemory(kfid,?FOLDERID_RoamingAppData,16) And AppDataRedir
+			DbgSpec("kfid2path: "+AppDataRedir)
 			ProcedureReturn AppDataRedir
 		EndIf
-		If CompareMemory(rfid,?FOLDERID_LocalAppData,16) And LocalAppDataRedir
-			DbgSpec("rfid2path: "+LocalAppDataRedir)
+		If CompareMemory(kfid,?FOLDERID_LocalAppData,16) And LocalAppDataRedir
+			DbgSpec("kfid2path: "+LocalAppDataRedir)
 			ProcedureReturn LocalAppDataRedir
 		EndIf
-		If CompareMemory(rfid,?FOLDERID_LocalLowAppData,16) And LocalLowAppDataRedir
-			DbgSpec("rfid2path: "+LocalLowAppDataRedir)
+		If CompareMemory(kfid,?FOLDERID_LocalLowAppData,16) And LocalLowAppDataRedir
+			DbgSpec("kfid2path: "+LocalLowAppDataRedir)
 			ProcedureReturn LocalLowAppDataRedir
 		EndIf
-		If CompareMemory(rfid,?FOLDERID_Documents,16) And DocumentsRedir
-			DbgSpec("rfid2path: "+DocumentsRedir)
+		If CompareMemory(kfid,?FOLDERID_Documents,16) And DocumentsRedir
+			DbgSpec("kfid2path: "+DocumentsRedir)
 			ProcedureReturn DocumentsRedir
 		EndIf
-		If CompareMemory(rfid,?FOLDERID_ProgramData,16) And CommonAppDataRedir
-			DbgSpec("rfid2path: "+CommonAppDataRedir)
+		If CompareMemory(kfid,?FOLDERID_ProgramData,16) And CommonAppDataRedir
+			DbgSpec("kfid2path: "+CommonAppDataRedir)
 			ProcedureReturn CommonAppDataRedir
 		EndIf
-		If CompareMemory(rfid,?FOLDERID_PublicDocuments,16) And CommonDocumentsRedir
-			DbgSpec("rfid2path: "+CommonDocumentsRedir)
+		If CompareMemory(kfid,?FOLDERID_PublicDocuments,16) And CommonDocumentsRedir
+			DbgSpec("kfid2path: "+CommonDocumentsRedir)
 			ProcedureReturn CommonDocumentsRedir
 		EndIf
 		CompilerIf #DBG_SPECIAL_FOLDERS
-			Protected path.s = CheckRFID(rfid)
-			DbgSpec("CheckRFID: "+path)
+			Protected path.s = CheckKFID(kfid)
+			DbgSpec("CheckKFID: "+path)
 			ProcedureReturn path
 		CompilerElse
-			ProcedureReturn CheckRFID(rfid)
+			ProcedureReturn CheckKFID(kfid)
 		CompilerEndIf
 	EndProcedure
 	;{ Folder Id Guids
@@ -203,24 +204,24 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH
 	; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemalloc
 	; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemfree
 	; https://www.purebasic.fr/english/viewtopic.php?f=5&t=5517
-	Prototype.l SHGetKnownFolderPath(rfid,dwFlags.l,hToken,*ppszPath.Integer)
+	Prototype.l SHGetKnownFolderPath(kfid,dwFlags.l,hToken,*ppszPath.Integer)
 	Global Original_SHGetKnownFolderPath.SHGetKnownFolderPath
-	Procedure.l Detour_SHGetKnownFolderPath(rfid,dwFlags,hToken,*ppszPath.Integer)
+	Procedure.l Detour_SHGetKnownFolderPath(kfid,dwFlags,hToken,*ppszPath.Integer)
 		Protected Result
 		CompilerIf Not #PORTABLE
-			DbgRfid("SHGetKnownFolderPath",rfid)
-			Result = Original_SHGetKnownFolderPath(rfid,dwFlags,hToken,*ppszPath)
+			DbgKfid("SHGetKnownFolderPath",kfid)
+			Result = Original_SHGetKnownFolderPath(kfid,dwFlags,hToken,*ppszPath)
 		CompilerElse
-			DbgRfid("SHGetKnownFolderPath",rfid)
-			Protected FolderPath.s = rfid2path(rfid)
+			DbgKfid("SHGetKnownFolderPath",kfid)
+			Protected FolderPath.s = kfid2path(kfid)
 			If FolderPath
-				;DbgRfid("SHGetKnownFolderPath",rfid,FolderPath)
+				;DbgKfid("SHGetKnownFolderPath",kfid,FolderPath)
 				*ppszPath\i = CoTaskMemAlloc_(Len(FolderPath)*2+2)
 				;*ppszPath\i = CoTaskMemAlloc_(StringByteLength(FolderPath)+2,#PB_Unicode)
 				PokeS(*ppszPath\i,FolderPath)
 				Result = #S_OK
 			Else
-				Result = Original_SHGetKnownFolderPath(rfid,dwFlags,hToken,*ppszPath)
+				Result = Original_SHGetKnownFolderPath(kfid,dwFlags,hToken,*ppszPath)
 			EndIf
 		CompilerEndIf
 		ProcedureReturn Result
@@ -233,20 +234,20 @@ CompilerIf #DETOUR_SHGETFOLDERPATHEX
 	; Returns S_OK if successful, or an error value otherwise.
 	Prototype.l SHGetFolderPathEx(hwnd,csidl,hToken,dwFlags.l,*pszPath)
 	Global Original_SHGetFolderPathEx.SHGetFolderPathEx
-	Procedure.l Detour_SHGetFolderPathEx(rfid,dwFlags,hToken,*pszPath,cchPath)
+	Procedure.l Detour_SHGetFolderPathEx(kfid,dwFlags,hToken,*pszPath,cchPath)
 		Protected Result
 		CompilerIf Not #PORTABLE
-			Result = Original_SHGetFolderPathEx(rfid,dwFlags,hToken,*pszPath,cchPath)
-			DbgRfid("SHGetFolderPathEx",rfid,PeekSZ(*pszPath))
+			Result = Original_SHGetFolderPathEx(kfid,dwFlags,hToken,*pszPath,cchPath)
+			DbgKfid("SHGetFolderPathEx",kfid,PeekSZ(*pszPath))
 		CompilerElse
-			DbgRfid("SHGetFolderPathEx",rfid)
-			Protected FolderPath.s = rfid2path(rfid)
+			DbgKfid("SHGetFolderPathEx",kfid)
+			Protected FolderPath.s = kfid2path(kfid)
 			If FolderPath
-				;DbgRfid("SHGetFolderPathEx",rfid,FolderPath)
+				;DbgKfid("SHGetFolderPathEx",kfid,FolderPath)
 				If Len(FolderPath)>(cchPath-1)
 					DbgSpec("pathlen="+Str(Len(FolderPath))+" cchPath="+Str(cchPath))
 					Result = $8007007A
-					DbgRfid("SHGetFolderPathEx",rfid,"ERROR")
+					DbgKfid("SHGetFolderPathEx",kfid,"ERROR")
 				Else
 					Result = #S_OK
 				EndIf
@@ -254,7 +255,7 @@ CompilerIf #DETOUR_SHGETFOLDERPATHEX
 					PokeS(*pszPath,FolderPath,cchPath-1,#PB_Unicode)
 				EndIf
 			Else
-				Result = Original_SHGetFolderPathEx(rfid,dwFlags,hToken,*pszPath,cchPath)
+				Result = Original_SHGetFolderPathEx(kfid,dwFlags,hToken,*pszPath,cchPath)
 			EndIf
 		CompilerEndIf
 		ProcedureReturn Result
@@ -265,22 +266,22 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST
 	; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderidlist
 	; https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shilcreatefrompath
 	; ASK: Как правильно действовать в режиме ansi?
-	Prototype.l SHGetKnownFolderIDList(rfid,dwFlags,hToken,*ppidl)
+	Prototype.l SHGetKnownFolderIDList(kfid,dwFlags,hToken,*ppidl)
 	Global Original_SHGetKnownFolderIDList.SHGetKnownFolderIDList
-	Procedure.l Detour_SHGetKnownFolderIDList(rfid,dwFlags,hToken,*ppidl)
+	Procedure.l Detour_SHGetKnownFolderIDList(kfid,dwFlags,hToken,*ppidl)
 		Protected Result
-		DbgRfid("SHGetKnownFolderIDList ("+Hex(*ppidl)+")",rfid)
+		DbgKfid("SHGetKnownFolderIDList ("+Hex(*ppidl)+")",kfid)
 		CompilerIf Not #PORTABLE
-			Result = Original_SHGetKnownFolderIDList(rfid,dwFlags,hToken,*ppidl)
+			Result = Original_SHGetKnownFolderIDList(kfid,dwFlags,hToken,*ppidl)
 		CompilerElse
 			Protected rgfInOut
-			Protected FolderPath.s = rfid2path(rfid)
+			Protected FolderPath.s = kfid2path(kfid)
 			If FolderPath
-				;DbgRfid("SHGetKnownFolderIDList ("+Hex(*ppidl)+")",rfid,FolderPath)
+				;DbgKfid("SHGetKnownFolderIDList ("+Hex(*ppidl)+")",kfid,FolderPath)
 				Result = SHILCreateFromPath_(@FolderPath,*ppidl,@rgfInOut)
 				DbgSpec("SHILCreateFromPath: Result: $"+Hex(Result)+" ("+Str(Result)+")")
 			Else
-				Result = Original_SHGetKnownFolderIDList(rfid,dwFlags,hToken,*ppidl)
+				Result = Original_SHGetKnownFolderIDList(kfid,dwFlags,hToken,*ppidl)
 			EndIf
 		CompilerEndIf
 		ProcedureReturn Result
@@ -698,9 +699,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 588
-; FirstLine = 246
-; Folding = qcA9-
+; Folding = qBAA+
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

@@ -101,16 +101,16 @@ XIncludeFile "PurePortableCustom.pbi"
 XIncludeFile "PurePortableSimple.pbi"
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
-Structure RFID_DATA
-	rfid.GUID
+Structure KFID_DATA
+	kfid.GUID
 	path.s
 EndStructure
-Global Dim RFIDs.RFID_DATA(1), nRFIDs
-Procedure.s CheckRFID(rfid) ; Принимается указатель на rfid
+Global Dim KFIDs.KFID_DATA(1), nKFIDs
+Procedure.s CheckKFID(kfid) ; Принимается указатель на KnownFolderID
 	Protected i
-	For i=1 To nRFIDs
-		If CompareMemory(rfid,@RFIDs(i)\rfid,16)
-			ProcedureReturn RFIDs(i)\path
+	For i=1 To nKFIDs
+		If CompareMemory(kfid,@KFIDs(i)\kfid,16)
+			ProcedureReturn KFIDs(i)\path
 		EndIf
 	Next
 	ProcedureReturn ""
@@ -643,18 +643,18 @@ Procedure AttachProcedure()
 					CreatePath(p)
 				Default
 					Protected id.s = k
-					Protected rfid.GUID
+					Protected kfid.GUID
 					; https://learn.microsoft.com/en-us/windows/win32/shell/guidfromstring
-					; Пытаемся распознать ключ как RFID (GUID в скобках {} или без)
+					; Пытаемся распознать ключ как KnownFolderID (KFID) (GUID в скобках {} или без)
 					; или CSIDL (число dec или hex в формате C)
 					If Left(k,1)="{"
 						id = Mid(id,2)
 					EndIf
-					If s2guid(id,@rfid)
-						nRFIDs+1
-						ReDim RFIDs(nRFIDs)
-						CopyMemory(@rfid,@RFIDs(nRFIDs)\rfid,16)
-						RFIDs(nRFIDs)\path = p
+					If s2guid(id,@kfid)
+						nKFIDs+1
+						ReDim KFIDs(nKFIDs)
+						CopyMemory(@kfid,@KFIDs(nKFIDs)\kfid,16)
+						KFIDs(nKFIDs)\path = p
 						CreatePath(p)
 					Else
 						If Left(k,2)="0x" ; HEX CSIDL
