@@ -100,6 +100,18 @@ XIncludeFile "PurePortableCustom.pbi"
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
 XIncludeFile "PurePortableSimple.pbi"
 ;;======================================================================================================================
+Global DbgRegMode
+Global DbgSpecMode
+Global DbgEnvMode
+Global DbgAnyMode
+Global DbgDetach
+Global DbgExtMode
+Procedure DbgExt(txt.s)
+	If DbgExtMode
+		dbg(txt)
+	EndIf
+EndProcedure
+;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure KFID_DATA
 	kfid.GUID
@@ -307,23 +319,12 @@ Procedure CheckSpoofDate()
 EndProcedure
 ;}
 ;;----------------------------------------------------------------------------------------------------------------------
-Global ComputerName.s
+;Global ComputerName.s
 ;;======================================================================================================================
 Global PureSimplePrefs.s ; основной файл конфигурации
 Global PureSimplePrefsExt.s ; расширение основного файла конфигурации
 Global PureSimplePrev.s ; предыдущий файл конфигурации при MultiConfig
 Global ExtData.EXT_DATA
-Global DbgRegMode
-Global DbgSpecMode
-Global DbgEnvMode
-Global DbgAnyMode
-Global DbgDetach
-Global DbgExtMode
-Procedure DbgExt(txt.s)
-	If DbgExtMode
-		dbg(txt)
-	EndIf
-EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Procedure _OpenPreference(Prefs.s)
 	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
