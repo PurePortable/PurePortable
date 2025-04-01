@@ -213,6 +213,42 @@ CompilerIf #PORTABLE_ENTRYPOINT
 CompilerEndIf
 ;}
 ;;======================================================================================================================
+;{ Перехват CLSIDFromProgID 
+; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromprogid
+; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromprogidex
+#PORTABLE_CORRECTCLSID = 1
+CompilerIf #PORTABLE_CORRECTCLSID
+	Global CorrectCLSID
+	Prototype CLSIDFromProgID(*szProgID,*ClsId.CLSID)
+	Global Original_CLSIDFromProgID.CLSIDFromProgID
+	Procedure Detour_CLSIDFromProgID(*szProgID,*ClsId.CLSID)
+		Protected Result
+		Protected ProgID.s = PeekS(*szProgID)
+		dbg("CLSIDFromProgID: "+ProgID)
+		Protected CLSID.s = GetCfgS(ProgID+"\CLSID","")
+		If CLSID
+			dbg("CLSIDFromProgID (CLSID): " + CLSID)
+			GUIDFromString(@CLSID,*ClsId)
+			ProcedureReturn #S_OK
+		EndIf
+		ProcedureReturn Original_CLSIDFromProgID(*szProgID,*ClsId)
+	EndProcedure
+	Global Original_CLSIDFromProgIDEx.CLSIDFromProgID
+	Procedure Detour_CLSIDFromProgIDEx(*szProgID,*ClsId.CLSID)
+		Protected Result
+		Protected ProgID.s = PeekS(*szProgID)
+		dbg("CLSIDFromProgIDEx: "+ProgID)
+		Protected CLSID.s = GetCfgS(ProgID+"\CLSID","")
+		If CLSID
+			dbg("CLSIDFromProgIDEx (CLSID): " + CLSID)
+			GUIDFromString(@CLSID,*ClsId)
+			ProcedureReturn #S_OK
+		EndIf
+		ProcedureReturn Original_CLSIDFromProgIDEx(*szProgID,*ClsId)
+	EndProcedure
+CompilerEndIf
+;}
+;;======================================================================================================================
 ;{ Перехват VolumeSerialNumber
 Global VolumeSerialNumber
 Prototype GetVolumeInformation(*RootPathName,*VolumeNameBuffer,nVolumeNameSize,*VolumeSerialNumber.LONG,*MaximumComponentLength,*FileSystemFlags,*FileSystemNameBuffer,nFileSystemNameSize)
@@ -544,6 +580,9 @@ Procedure AttachProcedure()
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
+		CompilerIf #PORTABLE_CORRECTCLSID
+			CorrectCLSID = ReadPreferenceInteger("CorrectCLSID",0)
+		CompilerEndIf
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -831,6 +870,14 @@ Procedure AttachProcedure()
 		EndIf
 	EndIf
 	;}
+	;{ Установка хуков для COM
+	CompilerIf #PORTABLE_CORRECTCLSID
+		If CorrectCLSID
+			MH_HookApi(ole32,CLSIDFromProgID)
+			MH_HookApi(ole32,CLSIDFromProgIDEx)
+		EndIf
+	CompilerEndIf
+	;}
 	;{ Загрузка сторонных библиотек
 	Protected LoadableLibrary.s, hLoadableLibrary
 	If PreferenceGroup("LoadLibrary")
@@ -987,7 +1034,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = 2HcgPUEAA+
+; CursorPosition = 69
+; FirstLine = 117
+; Folding = lAyAHAiAAh
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
