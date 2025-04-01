@@ -1,15 +1,8 @@
 ﻿; Преобразование строки в GUID
 
 Prototype GUIDFromString(*psz,*pguid)
+Global GUIDFromString.GUIDFromString = GetProcAddress_(LoadLibrary_("shell32.dll"),704)
 Procedure s2guid(guid.s,*guid.GUID)
-	Static GUIDFromString.GUIDFromString
-	Static hDll
-	If hDll = 0
-		hDll = LoadLibrary_("shell32.dll")
-	EndIf
-	If GUIDFromString = 0
-		GUIDFromString = GetProcAddress_(hDll,704)
-	EndIf
 	ProcedureReturn GUIDFromString(@guid,*guid)
 EndProcedure
 
@@ -26,3 +19,10 @@ EndProcedure
 ; 	*guid\Data4[6] = Val("$"+Mid(guid,34,2))
 ; 	*guid\Data4[7] = Val("$"+Mid(guid,36,2))
 ; EndProcedure
+
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 5
+; Folding = -
+; EnableThread
+; DisableDebugger
+; EnableExeConstant
