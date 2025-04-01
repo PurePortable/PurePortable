@@ -121,7 +121,7 @@ CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH Or #DETOUR_SHGETFOLDERPATHEX Or #DETOUR_SHGETKNOWNFOLDERIDLIST
 	Declare.s CheckKFID(kfid)
-	Macro CheckRFID : CheckKFID : EndMacro
+	Macro CheckRFID : CheckKFID : EndMacro ; для совместимости
 	Procedure.s kfid2path(kfid)
 		If CompareMemory(kfid,?FOLDERID_Profile,16) And ProfileRedir
 			DbgSpec("kfid2path: "+ProfileRedir)
