@@ -269,12 +269,12 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 			!JNE @f
 			!MOV EAX, FuncAsciiName_#FuncName
 			!PUSH EAX
-			!MOV EAX, hDll_#DllName
+			!MOV EAX, v_hDll_#DllName
 			!PUSH EAX
 			!CALL [v__InitProxyFunc]
 			!MOV DWORD [v_Trampoline_#FuncName], EAX
 			!@@:
-			!JMP [EAX] ;!JMP [v_Trampoline_#FuncName]
+			!JMP DWORD [EAX] ;!JMP [v_Trampoline_#FuncName]
 		CompilerElse
 			!MOV RAX, QWORD [v_Trampoline_#FuncName]
 			!AND RAX, RAX
@@ -285,7 +285,7 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 			!PUSH R9
 			!MOV RDX, FuncAsciiName_#FuncName
 			!PUSH RDX
-			!MOV RCX, hDll_#DllName
+			!MOV RCX, v_hDll_#DllName
 			!PUSH RCX
 			!CALL [v__InitProxyFunc]
 			!MOV QWORD [v_Trampoline_#FuncName], RAX
@@ -295,7 +295,49 @@ Macro DeclareProxyFuncDelay(DllName,FuncName)
 			!POP RCX
 			!@@:
 			!ADD RSP,40
-			!JMP [RAX] ;!JMP [v_Trampoline_#FuncName]
+			!JMP QWORD [RAX] ;!JMP [v_Trampoline_#FuncName]
+		CompilerEndIf
+		!FuncAsciiName_#FuncName DB SingleQuote#FuncName#SingleQuote, 0
+	EndProcedure
+EndMacro
+
+Macro DeclareProxyConflictFuncDelay(DllName,FuncName,ConflictFuncName,Compat=0)
+	Global Trampoline_#FuncName
+	ProcedureDLL ConflictFuncName()
+		DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
+		CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+			!MOV EAX, DWORD [v_Trampoline_#FuncName]
+			!AND EAX, EAX
+			!JNE @f
+			!MOV EAX, FuncAsciiName_#FuncName
+			!PUSH EAX
+			!MOV EAX, v_hDll_#DllName
+			!PUSH EAX
+			!CALL [v__InitProxyFunc]
+			!MOV DWORD [v_Trampoline_#FuncName], EAX
+			!@@:
+			!JMP DWORD [EAX] ;!JMP [v_Trampoline_#FuncName]
+		CompilerElse
+			!MOV RAX, QWORD [v_Trampoline_#FuncName]
+			!AND RAX, RAX
+			!JNE @f
+			!PUSH RCX
+			!PUSH RDX
+			!PUSH R8
+			!PUSH R9
+			!MOV RDX, FuncAsciiName_#FuncName
+			!PUSH RDX
+			!MOV RCX, v_hDll_#DllName
+			!PUSH RCX
+			!CALL [v__InitProxyFunc]
+			!MOV QWORD [v_Trampoline_#FuncName], RAX
+			!POP R9
+			!POP R8
+			!POP RDX
+			!POP RCX
+			!@@:
+			!ADD RSP,40
+			!JMP QWORD [RAX] ;!JMP [v_Trampoline_#FuncName]
 		CompilerEndIf
 		!FuncAsciiName_#FuncName DB SingleQuote#FuncName#SingleQuote, 0
 	EndProcedure
@@ -328,10 +370,8 @@ EndProcedure
 Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассемблера
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 34
-; FirstLine = 6
-; Folding = -wF9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = -AAg
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
