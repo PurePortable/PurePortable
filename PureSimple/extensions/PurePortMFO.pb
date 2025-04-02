@@ -8,9 +8,9 @@
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.11.0.7
-;RES_DESCRIPTION PurePortableSimpleExtension
+;RES_DESCRIPTION Monitoring file operations
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
-;RES_INTERNALNAME PurePortExecute.dll
+;RES_INTERNALNAME PurePortMFO.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
@@ -18,7 +18,7 @@
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\PPDK\Lib"
+IncludePath "..\..\PPDK\Lib"
 
 XIncludeFile "PurePortableExtension.pbi"
 ;;======================================================================================================================
@@ -159,7 +159,7 @@ EndProcedure
 ;;======================================================================================================================
 
 Procedure ExtensionProcedure()
-	DbgExt("PurePortableSimple Extention MFO")
+	DbgExt("EXTENSION: Monitoring file operations")
 	MH_HookApi(kernel32,GetFullPathNameA)
 	MH_HookApi(kernel32,GetFullPathNameW)
 	MH_HookApi(kernel32,FindFirstFileA)
@@ -189,7 +189,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 16
+; CursorPosition = 161
+; FirstLine = 154
 ; Folding = ----
 ; Optimizer
 ; EnableThread

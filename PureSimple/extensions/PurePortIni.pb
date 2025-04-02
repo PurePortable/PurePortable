@@ -8,7 +8,7 @@
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.11.0.7
-;RES_DESCRIPTION PurePortableSimpleExtension
+;RES_DESCRIPTION Work with ini-files
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortIni.dll
 ;RES_PRODUCTNAME PurePortable
@@ -18,7 +18,7 @@
 ;PP_CLEAN 2
 
 EnableExplicit
-IncludePath "..\PPDK\Lib"
+IncludePath "..\..\PPDK\Lib"
 
 XIncludeFile "PurePortableExtension.pbi"
 
@@ -194,7 +194,7 @@ EndStructure
 Global Dim Inis.INIFILE(0), iInis, nInis
 
 Procedure ExtensionProcedure()
-	DbgExt("PurePortableSimple Extention INI")
+	DbgExt("EXTENSION: Correction ini-files")
 	Protected i, k.s, v.s, g.s, p.s
 	Protected IniNum.s, IniFile.s, IniPref.s, IniGroup.s
 	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
@@ -262,8 +262,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 237
-; FirstLine = 30
+; CursorPosition = 196
+; FirstLine = 33
 ; Folding = B+
 ; Optimizer
 ; EnableThread
