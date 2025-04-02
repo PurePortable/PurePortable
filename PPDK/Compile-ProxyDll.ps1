@@ -135,10 +135,13 @@ Get-Content -Lit $SrcFile -Enc UTF8 | foreach {
 
 # Имя файла ресурсов. По умолчанию имя исходного файла с расширением .rc
 if ($RC) {
-  $RcFile = "$RC.rc"
+  $RcFile = "$RC"
 }
 else {
-  $RcFile = "$Src.rc"
+  $RcFile = "$Src"
+}
+if ([System.IO.Path]::GetExtension($RC) -eq "") {
+  $RcFile = "$RcFile.rc"
 }
 # Параметры для файла ресурсов
 if (-not $PSBoundParameters.ContainsKey('InternalName')) {

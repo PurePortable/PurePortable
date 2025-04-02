@@ -156,12 +156,15 @@ function Compile-ProxyDll {
 	}
 
 	# Имя файла ресурсов. По умолчанию имя исходного файла с расширением .rc
-	if ($RC) {
-		$RcFile = "$RC.rc"
-	}
-	else {
-		$RcFile = "$Src.rc"
-	}
+  if ($RC) {
+    $RcFile = "$RC"
+  }
+  else {
+    $RcFile = "$Src"
+  }
+  if ([System.IO.Path]::GetExtension($RC) -eq "") {
+    $RcFile = "$RcFile.rc"
+  }
 	# Параметры для файла ресурсов
 	if (-not $PSBoundParameters.ContainsKey('InternalName')) {
 		$InternalName = $Proxy
