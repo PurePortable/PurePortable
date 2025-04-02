@@ -216,8 +216,8 @@ CompilerEndIf
 ;{ Перехват CLSIDFromProgID 
 ; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromprogid
 ; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromprogidex
-#PORTABLE_CORRECTCLSID = 1
-CompilerIf #PORTABLE_CORRECTCLSID
+#PORTABLE_CORRECTCLSID = 0
+CompilerIf #PORTABLE_REGISTRY And #PORTABLE_CORRECTCLSID
 	Global CorrectCLSID
 	Prototype CLSIDFromProgID(*szProgID,*ClsId.CLSID)
 	Global Original_CLSIDFromProgID.CLSIDFromProgID
@@ -580,7 +580,7 @@ Procedure AttachProcedure()
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
-		CompilerIf #PORTABLE_CORRECTCLSID
+		CompilerIf #PORTABLE_REGISTRY And #PORTABLE_CORRECTCLSID
 			CorrectCLSID = ReadPreferenceInteger("CorrectCLSID",0)
 		CompilerEndIf
 	EndIf
@@ -871,7 +871,7 @@ Procedure AttachProcedure()
 	EndIf
 	;}
 	;{ Установка хуков для COM
-	CompilerIf #PORTABLE_CORRECTCLSID
+	CompilerIf #PORTABLE_REGISTRY And #PORTABLE_CORRECTCLSID
 		If CorrectCLSID
 			MH_HookApi(ole32,CLSIDFromProgID)
 			MH_HookApi(ole32,CLSIDFromProgIDEx)
@@ -1034,9 +1034,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 69
-; FirstLine = 117
-; Folding = lAyAHAiAAh
+; CursorPosition = 241
+; FirstLine = 88
+; Folding = lAyAHAiCAh
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
