@@ -9,8 +9,9 @@ $RcFile = "$PSScriptRoot\PureSimpleExtension.rc"
 Import-Module "$PSScriptRoot\..\PPDK\Compile-ProxyDll.psm1" -Force -DisableNameChecking #-ErrorAction SilentlyContinue
 Compile-ProxyDll-Start
 @(
-  @{ Name="PurePortIni"; Descr="PurePortableSimpleExtension: Modify configs (ini, xml, json)" }
-  @{ Name="PurePortMFO"; Descr="PurePortableSimpleExtension: Monitoring File Operations" }
+  @{ Name="PurePortIni";   Descr="PurePortableSimpleExtension: Correction config files (ini, xml, json)" }
+  @{ Name="PurePortMFO";   Descr="PurePortableSimpleExtension: Monitoring File Operations" }
+  @{ Name="PurePortFonts"; Descr="PurePortableSimpleExtension: Load additional fonts" }
 
 ) | foreach { Compile-ProxyDll $_.Name "PurePort" -RC $RcFile -IN $_.Name -OF $_.Name -FD $_.Descr -Dir32 $Dir32 -Dir64 $Dir64 -O $_.Name }
 
