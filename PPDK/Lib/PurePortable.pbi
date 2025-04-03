@@ -88,8 +88,10 @@ Macro AddInitProcedure(Proc) : AddArrayI(ModuleInitProcedures(),@Proc()) : EndMa
 ; Некоторые процедуры
 Declare InitProcedure()
 Declare ExitProcedure()
-Declare AttachProcedure()
-Declare DetachProcedure()
+CompilerIf #PB_Compiler_ExecutableFormat = #PB_Compiler_DLL
+	Declare AttachProcedure()
+	Declare DetachProcedure()
+CompilerEndIf
 
 ;;======================================================================================================================
 XIncludeFile "PurePortableCustom.pbi"
@@ -389,9 +391,11 @@ Procedure ExitProcedure()
 	;ReleaseMutex_(hProcessMutex)
 	;CloseHandle_(hProcessMutex)
 	
-	If DetachProcedure() = 0
-		DetachCleanup
-	EndIf
+	CompilerIf #PB_Compiler_ExecutableFormat = #PB_Compiler_DLL
+		If DetachProcedure() = 0
+			DetachCleanup
+		EndIf
+	CompilerEndIf
 	
 	ExitProcedureIsComleted = #True
 EndProcedure
@@ -518,22 +522,24 @@ ProcedureDLL.l AttachProcess(Instance)
 		DbgAlways("ATTACHPROCESS: "+DllPath)
 		ProcedureReturn
 	EndIf
-	CompilerIf #PORTABLE_CHECK_PROGRAM
-		If CheckProgram() = #INVALID_PROGRAM
-			;PrgIsValid = 0
-			DbgAlways("ATTACHPROCESS: "+DllPath)
-			ProcedureReturn
-		EndIf
-		StartProcedure()
-		AttachProcedure()
-	CompilerElse
-		; Для совместимости - когда нет CheckProgram, проверка осуществляется в AttachProcedure.
-		StartProcedure()
-		If AttachProcedure() = #INVALID_PROGRAM
-			;PrgIsValid = 0
-			DbgAlways("ATTACHPROCESS: "+DllPath)
-			ProcedureReturn
-		EndIf
+	CompilerIf #PB_Compiler_ExecutableFormat = #PB_Compiler_DLL
+		CompilerIf #PORTABLE_CHECK_PROGRAM
+			If CheckProgram() = #INVALID_PROGRAM
+				;PrgIsValid = 0
+				DbgAlways("ATTACHPROCESS: "+DllPath)
+				ProcedureReturn
+			EndIf
+			StartProcedure()
+			AttachProcedure()
+		CompilerElse
+			; Для совместимости - когда нет CheckProgram, проверка осуществляется в AttachProcedure.
+			StartProcedure()
+			If AttachProcedure() = #INVALID_PROGRAM
+				;PrgIsValid = 0
+				DbgAlways("ATTACHPROCESS: "+DllPath)
+				ProcedureReturn
+			EndIf
+		CompilerEndIf
 	CompilerEndIf
 
 	PrgIsValid = 1
@@ -569,8 +575,8 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 403
-; FirstLine = 368
+; CursorPosition = 532
+; FirstLine = 504
 ; Folding = O--
 ; EnableThread
 ; DisableDebugger
