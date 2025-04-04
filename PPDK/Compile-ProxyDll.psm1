@@ -201,7 +201,7 @@ function Compile-ProxyDll {
 		if ($Dir32) {
 			$SubDir = $Dir32
 			if (-not (Test-Path $SubDir -Type Container)) {
-				New-Item $SubDir -Type Directory
+				New-Item $SubDir -Type Directory | Out-Null
 			}
 		}
 		$CompileOutput = (& $Compiler32 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp")
@@ -231,7 +231,7 @@ function Compile-ProxyDll {
 		if ($Dir64) {
 			$SubDir = $Dir64
 			if (-not (Test-Path $SubDir -Type Container)) {
-				New-Item $SubDir -Type Directory
+				New-Item $SubDir -Type Directory | Out-Null
 			}
 		}
 		$CompileOutput = (& $Compiler64 /dll /optimizer /thread /output "$SubDir\$OutFile" /resource "$RcTmp" "$SrcTmp")
