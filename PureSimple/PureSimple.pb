@@ -69,6 +69,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
 #DBG_CLEANUP = 1
+#DBG_EXECUTEDLL = 1
 #DBG_ANY = 1
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
@@ -106,6 +107,7 @@ Global DbgEnvMode
 Global DbgAnyMode
 Global DbgDetach
 Global DbgExtMode
+Global DbgExecMode
 Procedure DbgExt(txt.s)
 	If DbgExtMode
 		dbg(txt)
@@ -591,6 +593,7 @@ Procedure AttachProcedure()
 	DbgEnvMode = 0
 	DbgAnyMode = 0
 	DbgDetach = 1
+	DbgExecMode = 0
 	If PreferenceGroup("Debug")
 		DbgRegMode = ReadPreferenceInteger("Registry",0)
 		DbgSpecMode = ReadPreferenceInteger("SpecialFolders",0)
@@ -598,6 +601,7 @@ Procedure AttachProcedure()
 		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
 		DbgDetach = ReadPreferenceInteger("Detach",1)
 		DbgExtMode = ReadPreferenceInteger("Extensions",0)
+		DbgExecMode = ReadPreferenceInteger("RunFrom",0)
 	EndIf
 	;}
 	;{ Создание папок
@@ -1034,9 +1038,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 241
-; FirstLine = 88
-; Folding = lAyAHAiCAh
+; CursorPosition = 603
+; FirstLine = 156
+; Folding = lAyAHAikAw
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

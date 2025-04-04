@@ -79,6 +79,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
 #DBG_CLEANUP = 0
+#DBG_EXECUTEDLL = 0
 #DBG_ANY = 0
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
@@ -305,6 +306,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 81
+; FirstLine = 48
 ; Folding = KcEn6
 ; Optimizer
 ; EnableThread
