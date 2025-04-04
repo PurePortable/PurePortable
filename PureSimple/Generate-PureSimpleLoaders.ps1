@@ -1,5 +1,4 @@
-﻿
-$Dir32 = "$PSScriptRoot\bin\x32\loaders"
+﻿$Dir32 = "$PSScriptRoot\bin\x32\loaders"
 $Dir64 = "$PSScriptRoot\bin\x64\loaders"
 
 Import-Module "..\PPDK\Compile-ProxyDll.psm1" -Force -DisableNameChecking #-ErrorAction SilentlyContinue
