@@ -17,7 +17,7 @@
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 411.dll
 ;RES_PRODUCTNAME PurePortable
-;RES_PRODUCTVERSION 4.11.0.6
+;RES_PRODUCTVERSION 4.11.0.7
 ;PP_X32_COPYAS "..\..\Programs\proxy32.dll"
 ;PP_X64_COPYAS "..\..\Programs\proxy64.dll"
 ;PP_CLEAN 2
@@ -61,7 +61,11 @@ XIncludeFile "PurePortableCustom.pbi"
 #DETOUR_ENVIRONMENT_CRT = "" ; msvcrt
 ;}
 #PORTABLE_PROFILE_STRINGS = 0
+;{ Управление хуками PORTABLE_PROFILE_STRINGS
 #PROFILE_STRINGS_FILENAME = "PurePortable"
+#DETOUR_PRIVATEPROFILESTRING = 1
+#DETOUR_PROFILESTRING = 1
+;}
 #PORTABLE_CBT_HOOK = 0 ; Хук для отслеживания закрытия окон для сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
 
@@ -306,9 +310,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 81
-; FirstLine = 48
-; Folding = KcEn6
+; Folding = AwLOy
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
