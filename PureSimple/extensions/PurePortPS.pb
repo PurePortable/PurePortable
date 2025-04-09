@@ -25,6 +25,7 @@
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
+;PP_X64_COPYAS "P:\PRGW\.ModBus\ModScan\PurePortPS.dll"
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
@@ -35,7 +36,7 @@ XIncludeFile "PurePortableExtension.pbi"
 
 ;;======================================================================================================================
 Global IniFileName.s
-Global *IniFileNameA
+;Global *IniFileNameA
 Global DefaultFileName.s
 Global *DefaultFileNameA
 Structure SUBST
@@ -360,17 +361,43 @@ Procedure ExtensionProcedure()
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
 		If PreferenceGroup(#EXT_SECTION_MAIN)
 			DbgProfMode = ReadPreferenceInteger("Debug",0) | DbgExtMode
-			DefaultFileName = NormalizePPath(ReadPreferenceString("Default",""))
-			IniFileName = NormalizePPath(ReadPreferenceString("IniFile",""))
+			DefaultFileName = ReadPreferenceString("Default","")
+			IniFileName = NormalizePPath(ReadPreferenceString("IniFile",DefaultFileName))
+			DefaultFileName = NormalizePPath(DefaultFileName)
 		EndIf
 		If PreferenceGroup(#EXT_SECTION_FILES)
 		EndIf
 	EndIf
-	;ProfileStringFileName = PrgDir+PrgName+#PORTABLE_PROFILE_STRINGS_FILEEXT
-	;*ProfileStringFileNameA = Ascii(ProfileStringFileName)
-	;If DefaultFileName
-	;	*DefaultFileNameA = Ascii(DefaultFileName)
-	;EndIf
+	
+	MH_HookApi(kernel32,GetPrivateProfileSectionA)
+	MH_HookApi(kernel32,GetPrivateProfileSectionW)
+	MH_HookApi(kernel32,GetPrivateProfileSectionNamesA)
+	MH_HookApi(kernel32,GetPrivateProfileSectionNamesW)
+	MH_HookApi(kernel32,GetPrivateProfileStringA)
+	MH_HookApi(kernel32,GetPrivateProfileStringW)
+	MH_HookApi(kernel32,GetPrivateProfileStructA)
+	MH_HookApi(kernel32,GetPrivateProfileStructW)
+	MH_HookApi(kernel32,GetPrivateProfileIntA)
+	MH_HookApi(kernel32,GetPrivateProfileIntW)
+
+	MH_HookApi(kernel32,GetProfileSectionA)
+	MH_HookApi(kernel32,GetProfileSectionW)
+	MH_HookApi(kernel32,GetProfileStringA)
+	MH_HookApi(kernel32,GetProfileStringW)
+	MH_HookApi(kernel32,GetProfileIntA)
+	MH_HookApi(kernel32,GetProfileIntW)
+
+	MH_HookApi(kernel32,WritePrivateProfileSectionA)
+	MH_HookApi(kernel32,WritePrivateProfileSectionW)
+	MH_HookApi(kernel32,WritePrivateProfileStringA)
+	MH_HookApi(kernel32,WritePrivateProfileStringW)
+	MH_HookApi(kernel32,WritePrivateProfileStructA)
+	MH_HookApi(kernel32,WritePrivateProfileStructW)
+
+	MH_HookApi(kernel32,WriteProfileSectionA)
+	MH_HookApi(kernel32,WriteProfileSectionW)
+	MH_HookApi(kernel32,WriteProfileStringA)
+	MH_HookApi(kernel32,WriteProfileStringW)
 	
 	ClosePreferences()
 EndProcedure
@@ -393,10 +420,10 @@ Procedure.s CheckIni(IniFile.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 362
-; FirstLine = 345
+; CursorPosition = 38
+; FirstLine = 27
 ; Folding = -----
 ; Optimizer
 ; EnableThread
@@ -409,6 +436,6 @@ EndProcedure
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
 ; VersionField5 = 4.11.0.7
-; VersionField6 = PurePortableSimpleExtension
-; VersionField7 = PurePortExecute.dll
+; VersionField6 = Monitoring file operations
+; VersionField7 = PurePortMFO.dll
 ; VersionField9 = (c) Smitis, 2017-2025

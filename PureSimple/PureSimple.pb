@@ -905,12 +905,12 @@ Procedure AttachProcedure()
 	If PreferenceGroup("Extensions")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
+			v = PreferenceKeyValue()
 			k = PreferenceKeyName()
 			DbgExt("ATTACHPROCESS: EXT: "+k)
 			If GetExtensionPart(k) = ""
 				k + ".dll"
 			EndIf
-			v = PreferenceKeyValue()
 			LoadableLibrary = NormalizePPath(k)
 			nExtFiles+1
 			ReDim ExtFiles(nExtFiles)
@@ -937,7 +937,7 @@ Procedure AttachProcedure()
 		ExtData\MH = ?IMinHook
 		; Перечисляем расширения
 		For iExtFile=1 To nExtFiles
-			LoadableLibrary = ExtFiles(i)\File
+			LoadableLibrary = ExtFiles(iExtFile)\File
 			DbgExt("ATTACHPROCESS: EXT FILE: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
@@ -1056,9 +1056,11 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = AAAAAAgAAA-
+; CursorPosition = 31
+; FirstLine = 142
+; Folding = AAAAAAgAAM-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
