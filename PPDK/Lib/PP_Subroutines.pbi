@@ -250,12 +250,13 @@ Procedure.s GetLastErrorStr(Error=0)
 		ProcedureReturn StrU(Error)+": "+Result
 	EndIf
 EndProcedure
-;;======================================================================================================================
-Procedure PPErrorMessage(Msg.s,Error=-1)
-	If Error<>-1
-		Msg + #CR$+GetLastErrorStr(Error)
-	EndIf
+;;----------------------------------------------------------------------------------------------------------------------
+Procedure PPErrorMessage(Msg.s,Error)
 	MessageBox_(0,Msg,"PurePortable ("+StrU(ProcessID)+")",#MB_ICONERROR)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+Procedure PPLastErrorMessage(Msg.s)
+	PPErrorMessage(Msg,GetLastError_())
 EndProcedure
 ;;======================================================================================================================
 
@@ -307,9 +308,9 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 274
-; FirstLine = 99
-; Folding = 59PAA+
+; CursorPosition = 254
+; FirstLine = 88
+; Folding = 59PA59
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

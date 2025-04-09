@@ -145,7 +145,7 @@ EndProcedure
 Procedure _IAT_Module(*ModuleData.MODULE_DATA,ModuleName.s,fSystem=1)
 	*ModuleData\ImageBase = LoadDll(ModuleName,fSystem)
 	If *ModuleData\ImageBase = #Null
-		PPErrorMessage("Failed load dll"+#CR$+ModuleName)
+		PPErrorLastMessage("Failed load dll"+#CR$+ModuleName)
 		;RaiseError(#ERROR_DLL_INIT_FAILED)
 		TerminateProcess_(GetCurrentProcess_(),0)
 	EndIf

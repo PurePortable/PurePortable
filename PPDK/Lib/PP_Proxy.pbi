@@ -173,7 +173,7 @@ Procedure.i LoadDll(DllName.s,fSystem=1)
 	;Protected hDll = LoadLibraryEx_(@DllFull,#Null,0) ; #LOAD_LIBRARY_SEARCH_SYSTEM32
 	Protected hDll = LoadLibrary_(@DllFull)
 	If hDll = 0
-		PPErrorMessage("Failed load original dll:"+#LF$+DllName)
+		PPLastErrorMessage("Failed load original dll:"+#LF$+DllName)
 		;RaiseError(#ERROR_DLL_INIT_FAILED)
 		TerminateProcess_(GetCurrentProcess_(),0)
 	EndIf
@@ -355,7 +355,7 @@ Procedure.i _InitProxyFunc(hDll,*AsciiFuncName)
 	If Not ProcAddr
 		DbgProxyError("InitProxyFunc: "+PeekS(*AsciiFuncName,-1,#PB_Ascii)+" ERROR "+Str(GetLastError_()))
 		If ProxyErrorMode
-			PPErrorMessage("Error init proxy function "+PeekS(*AsciiFuncName,-1,#PB_Ascii))
+			PPLastErrorMessage("Error init proxy function "+PeekS(*AsciiFuncName,-1,#PB_Ascii))
 			If ProxyErrorMode=2
 				;RaiseError(#ERROR_DLL_INIT_FAILED)
 				TerminateProcess_(GetCurrentProcess_(),0)

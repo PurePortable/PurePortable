@@ -157,7 +157,7 @@ Procedure _MH_HookApi(sModule.s,sProcName.s,*pDetour,*ppOriginal,*ppTarget.Integ
 				;ErrorText.s = PeekS(MH_StatusToString(MH_Status),#PB_Ascii)
 				DbgMinHookError("MINHOOK ENABLE: "+sModule+"."+sProcName+" ERROR: "+ErrorText)
 				If MinHookErrorMode And (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
-					PPErrorMessage("Error enable hook "+sModule+"."+sProcName+#CR$+ErrorText)
+					PPLastErrorMessage("Error enable hook "+sModule+"."+sProcName+#CR$+ErrorText)
 					If MinHookErrorMode = 2
 						;RaiseError(#ERROR_DLL_INIT_FAILED)
 						TerminateProcess_(GetCurrentProcess_(),0)
@@ -171,7 +171,7 @@ Procedure _MH_HookApi(sModule.s,sProcName.s,*pDetour,*ppOriginal,*ppTarget.Integ
 		DbgMinHookError("MINHOOK CREATE: "+sModule+"."+sProcName+" ERROR: "+ErrorText)
 		If (flags & #MH_HOOKAPI_NOCHECKRESULT) = 0
 			If MinHookErrorMode
-				PPErrorMessage("Error create hook "+sModule+"."+sProcName+#CR$+ErrorText)
+				PPLastErrorMessage("Error create hook "+sModule+"."+sProcName+#CR$+ErrorText)
 				If MinHookErrorMode = 2
 					;RaiseError(#ERROR_DLL_INIT_FAILED)
 					TerminateProcess_(GetCurrentProcess_(),0)
