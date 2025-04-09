@@ -1,9 +1,12 @@
 ﻿
 ;;======================================================================================================================
+#PUREPORTABLEEXTENSION = 1
+#MIN_HOOK = 1 ; Так как испоьзуется MinHookInterface, избежать включения MinHook
+;;======================================================================================================================
 #MAX_PATH_EXTEND = 32767
 ;XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Extension.pbi"
-Global *EXT.EXT_DATA
+Global *EXT.EXTDATA
 ;;======================================================================================================================
 ;Procedure dbg(txt.s="") : OutputDebugString_("PORT: "+txt) : EndProcedure
 Procedure dbg(txt.s="") : *EXT\HF\dbg(txt) : EndProcedure
@@ -117,8 +120,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 104
-; FirstLine = 82
+; CursorPosition = 3
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

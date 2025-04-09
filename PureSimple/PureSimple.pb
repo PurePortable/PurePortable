@@ -362,7 +362,7 @@ EndProcedure
 Global PureSimplePrefs.s ; основной файл конфигурации
 Global PureSimplePrefsExt.s ; расширение основного файла конфигурации
 Global PureSimplePrev.s ; предыдущий файл конфигурации при MultiConfig
-Global ExtData.EXT_DATA
+Global ExtData.EXTDATA
 ;;----------------------------------------------------------------------------------------------------------------------
 Procedure _OpenPreference(Prefs.s)
 	If OpenPreferences(Prefs,#PB_Preference_NoSpace) = 0
@@ -493,6 +493,11 @@ Procedure CheckProgram()
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Действия выполняемые при запуске программы.
+Structure EXTFILEDATA
+	File.s
+	Params.s
+EndStructure
+Global Dim ExtFiles.EXTFILEDATA(0), nExtFiles, iExtFile
 Procedure AttachProcedure()
 	Protected i, j
 	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
@@ -897,10 +902,32 @@ Procedure AttachProcedure()
 		Wend
 	EndIf
 	;}
-	;{ Загрузка расширений
-	Protected PurePortableExtension.PurePortableExtension
-	Protected *PurePortableExtensionNameA = Ascii("PurePortableExtension")
+	;{ Поиск расширений
 	If PreferenceGroup("Extensions")
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			DbgExt("ATTACHPROCESS: EXT: "+k)
+			If GetExtensionPart(k) = ""
+				k + ".dll"
+			EndIf
+			v = PreferenceKeyValue()
+			LoadableLibrary = PreferencePath(k)
+			nExtFiles+1
+			ReDim ExtFiles(nExtFiles)
+			ExtFiles(nExtFiles)\File = LoadableLibrary
+			ExtFiles(nExtFiles)\Params = v
+		Wend
+	EndIf
+	;}
+	ClosePreferences()
+	; Зарершающие операции с закрытым файлом конфигурации!
+	;{ Загрузка расширений
+	If nExtFiles
+		Protected PurePortableExtension.PurePortableExtension
+		Protected *PurePortableExtensionNameA = Ascii("PurePortableExtension")
+		Protected *ExtParam.EXTPARAM
+		; Общие данные для всех расширений
 		ExtData\Version = 1
 		ExtData\ProcessCnt = ProcessCnt
 		ExtData\AllowDbg = DbgExtMode
@@ -909,40 +936,33 @@ Procedure AttachProcedure()
 		ExtData\PrefsFile = @PureSimplePrefs
 		ExtData\HF = ?IHelpful
 		ExtData\MH = ?IMinHook
-		Protected *ExtParam.EXT_PARAM
-		ExaminePreferenceKeys()
-		While NextPreferenceKey()
-			k = PreferenceKeyName()
-			If GetExtensionPart(k) = ""
-				k + ".dll"
-			EndIf
-			LoadableLibrary = PreferencePath(k)
-			DbgExt("ATTACHPROCESS: EXT: "+LoadableLibrary)
+		; Перечисляем расширения
+		For iExtFile=1 To nExtFiles
+			LoadableLibrary = ExtFiles(i)\File
+			DbgExt("ATTACHPROCESS: EXT FILE: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
 				DbgExt("ATTACHPROCESS: EXT ADDR: "+hLoadableLibrary)
 				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
 				If PurePortableExtension
 					DbgExt("ATTACHPROCESS: EXT FUNC: "+PurePortableExtension)
-					*ExtParam = AllocateStructure(EXT_PARAM)
+					; Персональные данные расширения
+					*ExtParam = AllocateStructure(EXTPARAM)
 					*ExtParam\Version = 1
-					v = PreferenceKeyValue()
-					*ExtParam\Parameters = AllocateMemory(StringByteLength(v)+2)
-					PokeS(*ExtParam\Parameters,v)
+					*ExtParam\Parameters = @ExtFiles(iExtFile)\Params
 					; Код возврата:
 					; 1 - Выгрузить dll после завершения
 					i = PurePortableExtension(@ExtData,*ExtParam)
 					If i = 1
-						FreeLibrary_(hLoadableLibrary)
+						FreeLibrary_(hLoadableLibrary) ; ASK: Не работает?
 					EndIf
 				EndIf
 				;DbgExt("ATTACHPROCESS: EXT: OK")
 			EndIf
-		Wend
+		Next
+		FreeMemory(*PurePortableExtensionNameA)
 	EndIf
-	FreeMemory(*PurePortableExtensionNameA)
 	;}
-	ClosePreferences()
 EndProcedure
 
 ;;======================================================================================================================
@@ -1039,9 +1059,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 603
-; FirstLine = 156
-; Folding = lAyAHAikAw
+; CursorPosition = 905
+; FirstLine = 107
+; Folding = lAyAEAgAAM-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

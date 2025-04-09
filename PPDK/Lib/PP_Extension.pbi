@@ -9,7 +9,7 @@ CompilerIf Not Defined(MAX_PATH_EXTEND,#PB_Constant) : #MAX_PATH_EXTEND = 32767 
 XIncludeFile "PP_HelpfulInterface.pbi"
 XIncludeFile "PP_MinHookInterface.pbi"
 
-Structure EXT_DATA
+Structure EXTDATA
 	Version.i
 	Reserved.i
 	ProcessCnt.i
@@ -23,18 +23,18 @@ Structure EXT_DATA
 	*MH.IMinHook ; Интерфейс к MinHook
 EndStructure
 
-Structure EXT_PARAM
+Structure EXTPARAM
 	Version.i
 	Reserved.i
 	*Parameters ; Указатель на строку параметров в секции [Extensions]
 EndStructure
 
-Prototype PurePortableExtension(*ExtData.EXT_DATA,*ExtParam.EXT_PARAM) ; прототип экспортируемой функции
+Prototype PurePortableExtension(*ExtData.EXTDATA,*ExtParam.EXTPARAM) ; прототип экспортируемой функции
 
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 8
+; CursorPosition = 31
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
