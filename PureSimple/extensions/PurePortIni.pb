@@ -203,7 +203,7 @@ Procedure ExtensionProcedure()
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				k = LCase(PreferenceKeyName())
-				v = PreferencePath()
+				v = NormalizePPath(PreferenceKeyValue())
 				;dbg("PurePortIni: "+v)
 				nInis+1
 				ReDim Inis(nInis)
@@ -229,7 +229,7 @@ Procedure ExtensionProcedure()
 							ExaminePreferenceKeys()
 							While NextPreferenceKey()
 								k = PreferenceKeyName()
-								v = PreferencePath()
+								v = NormalizePPath(PreferenceKeyValue())
 								i = FindString(k,"|")
 								If i
 									IniCorrect(Left(k,i-1),Mid(k,i+1),v)
@@ -241,7 +241,7 @@ Procedure ExtensionProcedure()
 							ExaminePreferenceKeys()
 							While NextPreferenceKey()
 								k = PreferenceKeyName()
-								v = PreferencePath(ExpandEnvironmentStrings(PreferenceKeyValue()))
+								v = NormalizePPath(ExpandEnvironmentStrings(PreferenceKeyValue()))
 								i = FindString(k,"|")
 								If i
 									IniSet(Left(k,i-1),Mid(k,i+1),v)
@@ -262,8 +262,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 196
-; FirstLine = 33
+; CursorPosition = 243
+; FirstLine = 84
 ; Folding = B+
 ; Optimizer
 ; EnableThread

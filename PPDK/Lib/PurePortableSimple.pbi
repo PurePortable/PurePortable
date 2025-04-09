@@ -30,33 +30,22 @@ XIncludeFile "PP_Extension.pbi"
 Global *EXT.EXTDATA
 
 ;;======================================================================================================================
-Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
-	Protected Result.s
-	If Path=""
-		Path = PreferenceKeyValue()
-	EndIf
-	If Dir=""
-		Dir = PrgDirN
-	EndIf
-	;dbg("PreferencePath: <"+Path)
+Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование относительных путей
+	If Dir="" : Dir = PrgDirN : EndIf
 	Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
-	;Path = Trim(Trim(Path),Chr(34))
-	;dbg("PreferencePath: *"+Path)
 	If Path="."
 		Path = Dir
-	;ElseIf Path=".." Or Left(Path,2)=".\" Or Left(Path,3)="..\"
-	;	Path = Dir+"\"+Path
 	ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
 		Path = Dir+"\"+Path
 	EndIf
-	;dbg("PreferencePath: >"+NormalizePath(Path))
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 29
-; Folding = +
+; CursorPosition = 33
+; FirstLine = 8
+; Folding = -
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

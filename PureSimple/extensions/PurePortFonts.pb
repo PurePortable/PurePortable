@@ -37,19 +37,22 @@ CompilerElse
 CompilerEndIf
 ;;======================================================================================================================
 
+#EXT_SECTION_MAIN = "EXT:LoadFonts"
+;#EXT_SECTION_FILES = "EXT:LaodFonts."
+
 Procedure ExtensionProcedure()
 	DbgExt("EXTENTION: Load additional fonts")
 	
 	; Загрузка всех шрифтов из секции Fonts
 	
 	Protected r
-	If OpenPreferences(ExtPrefs,#PB_Preference_NoSpace)
+	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
 		Protected FontMask.s, FontDir.s, FontFile.s, Dir
-		If PreferenceGroup("Fonts")
+		If PreferenceGroup(#EXT_SECTION_MAIN)
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
-				FontMask = NormalizePath(PrgDir+PreferenceKeyName())
-				DbgExt("Enumeration fonts: "+FontMask)
+				FontMask = NormalizePath(PreferenceKeyName())
+				DbgExt("  Enumeration fonts: "+FontMask)
 				FontDir = GetPathPart(FontMask)
 				FontMask = GetFilePart(FontMask)
 				Dir = ExamineDirectory(#PB_Any,FontDir,FontMask)
@@ -57,7 +60,7 @@ Procedure ExtensionProcedure()
 					While NextDirectoryEntry(Dir)
 						If DirectoryEntryType(Dir) = #PB_DirectoryEntry_File
 							FontFile = FontDir+DirectoryEntryName(Dir)
-							DbgExt("Load font: "+FontFile)
+							DbgExt("  Load font: "+FontFile)
 							r = AddFontResourceEx(@FontFile,#FR_PRIVATE,0)
 							;DbgExt("Load font: "+r)
 						EndIf
@@ -72,7 +75,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 16
+; CursorPosition = 53
+; FirstLine = 33
 ; Folding = -
 ; Optimizer
 ; EnableThread

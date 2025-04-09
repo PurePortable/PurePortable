@@ -49,14 +49,8 @@ Macro MH_HookApi(DllName,FuncName,flags=0)
 	;CompilerEndIf
 EndMacro
 ;;======================================================================================================================
-Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
-	Protected Result.s
-	If Path=""
-		Path = PreferenceKeyValue()
-	EndIf
-	If Dir=""
-		Dir = PrgDirN
-	EndIf
+Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование относительных путей
+	If Dir="" : Dir = PrgDirN : EndIf
 	Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
 	If Path="."
 		Path = Dir
@@ -120,7 +114,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 3
+; CursorPosition = 52
+; FirstLine = 39
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

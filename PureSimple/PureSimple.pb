@@ -430,7 +430,7 @@ Procedure CheckProgram()
 			If GetExtensionPart(MultiConfigPrefs) = ""
 				MultiConfigPrefs + "." + PureSimplePrefsExt
 			EndIf
-			MultiConfigPrefs = PreferencePath(MultiConfigPrefs)
+			MultiConfigPrefs = NormalizePPath(MultiConfigPrefs)
 			ClosePreferences()
 			PureSimplePrefs = MultiConfigPrefs ; другой файл конфигурации
 			_OpenPreference(PureSimplePrefs)
@@ -528,8 +528,7 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			;v = PreferenceKeyValue()
-			p = PreferencePath()
+			p = NormalizePPath(PreferenceKeyValue())
 			If p
 				;CreatePath(p)
 				SetEnvironmentVariable(k,p)
@@ -550,14 +549,14 @@ Procedure AttachProcedure()
 				If GetExtensionPart(ConfigFile)=""
 					ConfigFile + #CONFIG_FILEEXT
 				EndIf
-				ConfigFile = PreferencePath(ConfigFile)
+				ConfigFile = NormalizePPath(ConfigFile)
 			EndIf
 			InitialFile = ReadPreferenceString("InitFile","")
 			If InitialFile
 				If GetExtensionPart(InitialFile)=""
 					InitialFile + #CONFIG_INITIALEXT
 				EndIf
-				InitialFile = PreferencePath(InitialFile)
+				InitialFile = NormalizePPath(InitialFile)
 			EndIf
 			If ReadPreferenceInteger("RegistryDll",0)=1
 				RegistryDll = "kernelbase"
@@ -583,7 +582,7 @@ Procedure AttachProcedure()
 		CompilerEndIf
 		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
-			SetCurrentDirectory(PreferencePath(p))
+			SetCurrentDirectory(NormalizePPath(p))
 		EndIf
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
@@ -613,7 +612,7 @@ Procedure AttachProcedure()
 	;{ Создание папок
 	If PreferenceGroup("CreateDirectories")
 		While NextPreferenceKey()
-			CreatePath(PreferencePath(PreferenceKeyName()))
+			CreatePath(NormalizePPath(PreferenceKeyName()))
 		Wend
 	EndIf
 	;}
@@ -649,7 +648,7 @@ Procedure AttachProcedure()
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
 		v = Trim(ReadPreferenceString("AllDirs",""),"\")
 		If v
-			p = PreferencePath(v)
+			p = NormalizePPath(v)
 			ProfileRedir = p
 			AppDataRedir = p
 			LocalAppDataRedir = p
@@ -662,7 +661,7 @@ Procedure AttachProcedure()
 			k = PreferenceKeyName()
 			v = RTrim(PreferenceKeyValue(),"\")
 			If v
-				p = PreferencePath(v)
+				p = NormalizePPath(v)
 			Else
 				p = ""
 			EndIf
@@ -729,7 +728,7 @@ Procedure AttachProcedure()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
 			v = PreferenceKeyValue()
-			p = PreferencePath()
+			p = NormalizePPath(v)
 			Select LCase(k) ; если значение не задано, для некоторых устанавливаем то же, что и для SpecialFolders.
 				Case "userprofile"
 					If p="" And ProfileRedir<>p : p = ProfileRedir : EndIf
@@ -787,7 +786,7 @@ Procedure AttachProcedure()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					p = PreferencePath()
+					p = NormalizePPath(PreferenceKeyValue())
 					i = FindString(k,"|")
 					If i
 						v = Mid(k,i+1)
@@ -803,7 +802,7 @@ Procedure AttachProcedure()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					p = PreferencePath()
+					p = NormalizePPath(PreferenceKeyValue()) ; ASK: Использовать как есть без нормализации?
 					i = FindString(k,"|")
 					If i
 						v = Mid(k,i+1)
@@ -893,7 +892,7 @@ Procedure AttachProcedure()
 	If PreferenceGroup("LoadLibrary")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			LoadableLibrary = PreferencePath(PreferenceKeyName())
+			LoadableLibrary = NormalizePPath(PreferenceKeyName())
 			dbg("ATTACHPROCESS: DLL: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
@@ -912,7 +911,7 @@ Procedure AttachProcedure()
 				k + ".dll"
 			EndIf
 			v = PreferenceKeyValue()
-			LoadableLibrary = PreferencePath(k)
+			LoadableLibrary = NormalizePPath(k)
 			nExtFiles+1
 			ReDim ExtFiles(nExtFiles)
 			ExtFiles(nExtFiles)\File = LoadableLibrary
@@ -1007,13 +1006,13 @@ Procedure DetachProcedure()
 				nClnDir = AddArrayS(ClnDirs(),PrgDirN)
 			EndIf
 			For iClnDir=1 To nClnDir
-				ClnDirs(iClnDir) = PreferencePath(ClnDirs(iClnDir))
+				ClnDirs(iClnDir) = NormalizePPath(ClnDirs(iClnDir))
 			Next
 			ClnDirs(0) = TempDir ; всегда разрешено во временной папке
 			If PreferenceGroup("Cleanup")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
-					CleanupItem = PreferencePath(PreferenceKeyName())
+					CleanupItem = NormalizePPath(PreferenceKeyName())
 					DbgCln("Cleanup: "+CleanupItem)
 					; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
 					Cleanup = 0
@@ -1059,9 +1058,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 905
-; FirstLine = 107
-; Folding = lAyAEAgAAM-
+; Folding = AAAAAAgAAA-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
