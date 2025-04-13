@@ -82,7 +82,6 @@ XIncludeFile "PurePortableCustom.pbi"
 #BLOCK_WININET = 1 ; wininet.dll
 #BLOCK_WINHTTP = 1 ; winhttp.dll
 #BLOCK_WINSOCKS = 2 ; по умолчанию будет ws2_32
-;#BLOCK_WINSOCKS2 = 1 ; ws2_32.dll
 #DBG_BLOCK_INTERNET = 0
 ;}
 ;{ Блокировка консоли
@@ -576,9 +575,9 @@ Procedure AttachProcedure()
 		CompilerEndIf
 		CompilerIf Defined(BLOCK_WINSOCKS,#PB_Constant)
 			BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
-			If BlockWinSocksPermit = 1 ; wsock32 иначе ws2_32, т.к. #BLOCK_WINSOCKS=2 
-				WinSocksDll = "wsock32"
-			EndIf
+			;If BlockWinSocksPermit = 1 ; wsock32 иначе ws2_32, т.к. #BLOCK_WINSOCKS=2 
+			;	WinSocksDll = "wsock32"
+			;EndIf
 		CompilerEndIf
 		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
@@ -1056,10 +1055,11 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 15
-; Folding = AAFAAAgAAM-
+; CursorPosition = 576
+; FirstLine = 153
+; Folding = ACFAAAgCAM-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

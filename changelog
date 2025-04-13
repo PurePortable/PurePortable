@@ -24,6 +24,7 @@
 (+) PureSimple: Переменная среды PP_PrgID и PID текущего процесса.
 (+) PureExtensions: PurePortFonts - Расширение для загрузки дополнительных шрифтов.
 (+) PureExtensions: PurePortIni - Добавлен перехват функций WinApi для работы с ini-файлами.
+(*) BlockInternet: Блокировка только WinSocks2, так как из 1 всё равно перенаправление.
 
 [4.11.0.7]
 Промежуточная beta-версия
