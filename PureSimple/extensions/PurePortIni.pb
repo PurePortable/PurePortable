@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.7
+;RES_VERSION 4.11.0.8
 ;RES_DESCRIPTION Work with ini-files
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortIni.dll
@@ -563,10 +563,10 @@ Procedure ExtensionProcedure()
 	FreeArray(IniData())
 	;}
 	
-	DbgProfMode = DbgExtMode
+	;DbgProfMode = DbgExtMode
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
 		If PreferenceGroup(#EXT_SECTION_MAIN)
-			DbgProfMode = ReadPreferenceInteger("Debug",0) | DbgExtMode
+			DbgProfMode = ReadPreferenceInteger("Debug",0) ; | DbgExtMode
 			DefaultFileName = ReadPreferenceString("Default","")
 			IniFileName = NormalizePPath(ReadPreferenceString("IniFile",DefaultFileName))
 			DefaultFileName = NormalizePPath(DefaultFileName)
@@ -668,7 +668,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 16
+; CursorPosition = 569
+; FirstLine = 93
 ; Folding = CAAAQg-
 ; Optimizer
 ; EnableThread
@@ -676,11 +677,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.7
+; VersionField0 = 4.11.0.8
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.7
+; VersionField5 = 4.11.0.8
 ; VersionField6 = Work with ini-files
 ; VersionField7 = PurePortIni.dll
 ; VersionField9 = (c) Smitis, 2017-2025

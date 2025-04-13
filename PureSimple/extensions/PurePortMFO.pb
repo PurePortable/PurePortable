@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.7
+;RES_VERSION 4.11.0.8
 ;RES_DESCRIPTION Monitoring file operations
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortMFO.dll
@@ -198,11 +198,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.7
+; VersionField0 = 4.11.0.8
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.7
+; VersionField5 = 4.11.0.8
 ; VersionField6 = PurePortableSimpleExtension
 ; VersionField7 = PurePortExecute.dll
 ; VersionField9 = (c) Smitis, 2017-2025
