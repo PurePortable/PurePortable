@@ -1057,9 +1057,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 576
-; FirstLine = 153
-; Folding = ACFAAAgCAM-
+; Folding = ACFAAAgAAA-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

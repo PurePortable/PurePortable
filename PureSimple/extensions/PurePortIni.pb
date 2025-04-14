@@ -10,9 +10,10 @@
 ;RES_VERSION 4.11.0.8
 ;RES_DESCRIPTION Work with ini-files
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
-;RES_INTERNALNAME PurePortIni.dll
+;RES_INTERNALNAME PurePortIni
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
+;PP_X32_COPYAS "P:\Lab\Programs\FastVideoCutterJoiner\PurePortIni.dll"
 ;PP_X32_COPYAS nul
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
@@ -24,8 +25,8 @@ XIncludeFile "PurePortableExtension.pbi"
 
 ;;======================================================================================================================
 ;{ Перехват процедур WinApi для работы с ini-файлами
-Global IniFileName.s
-;Global *IniFileNameA
+Global SubstFileName.s
+;Global *SubstFileNameA
 Global DefaultFileName.s
 Global *DefaultFileNameA
 Structure SUBST
@@ -342,9 +343,6 @@ EndProcedure
 ;}
 ;;======================================================================================================================
 ;{ Работа с ini-файлами
-Declare IniFileCorrectPaths(IniFile.s)
-Declare IniFileSetPaths(IniFile.s)
-
 Structure INIDATA
 	Section.s
 	SectionL.s
@@ -354,9 +352,10 @@ Structure INIDATA
 	Deleted.i
 	Plain.i
 EndStructure
+
 Global Dim IniData.INIDATA(0)
-Global IniFile.s,IniChanged,IniSize,IniCodepage
-Procedure IniRead(Ini.s)
+Global IniFile.s, IniChanged, IniSize, IniCodepage
+Procedure IniRead(Ini.s,CP=0)
 	;IniFile = PrgDir+Ini
 	IniFile = Ini
 	IniChanged = #False
@@ -505,13 +504,17 @@ Procedure IniCorrect(Section.s,Key.s,Base.s,Flags=0)
 	Next
 EndProcedure
 ;}
+Structure LISTFILES
+	Id.s
+	File.s
+EndStructure
+Global Dim ListFiles.LISTFILES(0), nListFiles
 ;;======================================================================================================================
 
 #EXT_SECTION_MAIN = "EXT:Ini"
-#EXT_SECTION_FILES = "EXT:Ini.Files"
 
 Procedure ExtensionProcedure()
-	DbgExt("EXTENSION: Work With ProfileStrings")
+	DbgExt("EXTENSION: Work with ini-files")
 	
 	If Not OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
 		DbgExt("Can't open preference file")
@@ -519,61 +522,95 @@ Procedure ExtensionProcedure()
 	EndIf
 	
 	;{ Коррекция ini-файлов
-	Protected x
-	ExaminePreferenceGroups()
-	Protected IniGroup.s, IniParams.s
-	While NextPreferenceGroup()
-		IniGroup = PreferenceGroupName()
-		; IniSetPaths:<ini-file>|<codepage>
-		; IniCorrectPaths:<ini-file>|<codepage>
-		; Записи
-		; section|key=value
-		If LCase(Left(IniGroup,16)) = "inicorrectpaths:"
-			DbgExt("  Section: "+IniGroup)
-			IniFile = Mid(IniGroup,17)
-			x = FindString(IniFile,"|")
-			If x
-				IniParams = Mid(IniFile,x+1)
-				IniFile = NormalizePPath(Left(IniFile,x-1))
-			EndIf
-			DbgExt("  IniCorrectPath: "+IniFile)
-			If FileExist(IniFile)
-				PreferenceGroup(IniGroup)
-				IniRead(IniFile)
-				IniFileCorrectPaths(IniFile)
-				IniWrite()
-			EndIf
-		ElseIf LCase(Left(IniGroup,12)) = "inisetpaths:"
-			DbgExt("  Section: "+IniGroup)
-			IniFile = Mid(IniGroup,13)
-			x = FindString(IniFile,"|")
-			If x
-				IniParams = Mid(IniFile,x+1)
-				IniFile = NormalizePPath(Left(IniFile,x-1))
-			EndIf
-			DbgExt("  IniSetPath: "+IniFile)
-			If FileExist(IniFile)
-				PreferenceGroup(IniGroup)
-				IniRead(IniFile)
-				IniFileSetPaths(IniFile)
-				IniWrite()
-			EndIf
+	Protected x, fn.s
+	If PreferenceGroup(#EXT_SECTION_MAIN+".Files") ; EXT:Ini.Files
+		ExaminePreferenceKeys()
+		; Секция содержит строки вида Id=IniFile
+		; Составляем список всех файлов и их идентификаторов
+		While NextPreferenceKey()
+			nListFiles+1
+			ReDim ListFiles(nListFiles)
+			ListFiles(nListFiles)\Id = PreferenceKeyName()
+			ListFiles(nListFiles)\File = NormalizePPath(PreferenceKeyValue())
+		Wend
+	EndIf
+	
+	Protected iListFile, CGroup.s, CFile.s
+	Protected k.s, v.s, g.s
+	For iListFile=1 To nListFiles
+		; EXT:Ini.#Id.SetData
+		IniRead(ListFiles(iListFile)\File)
+		DbgExt("  IniFile: "+ListFiles(iListFile)\File)
+		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id+".SetData"
+		If PreferenceGroup(CGroup)
+			DbgExt("  Section: "+CGroup)
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = PreferenceKeyName()
+				v = ExpandEnvironmentStrings(PreferenceKeyValue())
+				x = FindString(k,"|")
+				If x
+					g = Left(k,x-1)
+					k = Mid(k,x+1)
+					DbgExt("  "+g+" :: "+k)
+					IniSet(g,k,v)
+				EndIf
+			Wend
 		EndIf
-	Wend
+		; EXT:Ini.#Id.SetPaths
+		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id+".SetPaths"
+		If PreferenceGroup(CGroup)
+			DbgExt("  Section: "+CGroup)
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = PreferenceKeyName()
+				v = NormalizePPath(ExpandEnvironmentStrings(PreferenceKeyValue()))
+				x = FindString(k,"|")
+				If x
+					g = Left(k,x-1)
+					k = Mid(k,x+1)
+					DbgExt("  "+g+" :: "+k)
+					IniSet(g,k,v)
+				EndIf
+			Wend
+		EndIf
+		; EXT:Ini.#Id.CorrectPaths
+		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id+".CorrectPaths"
+		If PreferenceGroup(CGroup)
+			DbgExt("  Section: "+CGroup)
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				k = PreferenceKeyName()
+				v = PreferenceKeyValue()
+				If v
+					v = NormalizePPath(v)
+				Else
+					v = PrgDirN
+				EndIf
+				x = FindString(k,"|")
+				If x
+					g = Left(k,x-1)
+					k = Mid(k,x+1)
+					DbgExt("  "+g+" :: "+k)
+					IniCorrect(g,k,v)
+				EndIf
+			Wend
+		EndIf
+		;IniWrite()
+	Next
 	FreeArray(IniData())
+	FreeArray(ListFiles())
 	;}
 	
 	;DbgProfMode = DbgExtMode
-	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
-		If PreferenceGroup(#EXT_SECTION_MAIN)
-			DbgProfMode = ReadPreferenceInteger("Debug",0) ; | DbgExtMode
-			DefaultFileName = ReadPreferenceString("Default","")
-			IniFileName = NormalizePPath(ReadPreferenceString("IniFile",DefaultFileName))
-			DefaultFileName = NormalizePPath(DefaultFileName)
-		EndIf
-		;If PreferenceGroup(#EXT_SECTION_FILES)
-		;EndIf
+	If PreferenceGroup(#EXT_SECTION_MAIN)
+		DbgProfMode = ReadPreferenceInteger("Debug",0) ; | DbgExtMode
+		DefaultFileName = ReadPreferenceString("Default","")
+		SubstFileName = NormalizePPath(ReadPreferenceString("Subst",DefaultFileName))
+		DefaultFileName = NormalizePPath(DefaultFileName)
+	EndIf
 		
+	If DefaultFileName Or SubstFileName Or nSubst
 		MH_HookApi(kernel32,GetPrivateProfileSectionA)
 		MH_HookApi(kernel32,GetPrivateProfileSectionW)
 		MH_HookApi(kernel32,GetPrivateProfileSectionNamesA)
@@ -603,10 +640,13 @@ Procedure ExtensionProcedure()
 		MH_HookApi(kernel32,WriteProfileSectionW)
 		MH_HookApi(kernel32,WriteProfileStringA)
 		MH_HookApi(kernel32,WriteProfileStringW)
+		
+		ClosePreferences()
+		ProcedureReturn 0
 	EndIf
 
 	ClosePreferences()
-	;ProcedureReturn #PP_EXT_ALLOW_UNLOAD
+	ProcedureReturn #PP_EXT_ALLOW_UNLOAD
 EndProcedure
 
 ;;======================================================================================================================
@@ -618,8 +658,8 @@ Procedure.s CheckIni(IniFile.s)
 	
 	If nSubst ; если список не пуст, ищем в нём
 		
-	ElseIf IniFileName ; если задано, подменяем на это
-		ProcedureReturn IniFileName
+	ElseIf SubstFileName ; если задано, подменяем на это
+		ProcedureReturn SubstFileName
 	ElseIf DefaultFileName ; или на это
 		ProcedureReturn DefaultFileName
 	EndIf
@@ -627,50 +667,12 @@ Procedure.s CheckIni(IniFile.s)
 	ProcedureReturn ini
 EndProcedure
 ;;======================================================================================================================
-; Коррекция ini-файлов
-Procedure IniFileCorrectPaths(IniFile.s)
-	Protected i, k.s, v.s, g.s, p.s
-	;Protected IniGroup.s = PreferenceGroupName()
-	ExaminePreferenceKeys()
-	While NextPreferenceKey()
-		k = PreferenceKeyName()
-		v = PreferenceKeyValue()
-		If v
-			v = NormalizePPath(v)
-		Else
-			v = PrgDirN
-		EndIf
-		i = FindString(k,"|")
-		If i
-			g = Left(k,i-1)
-			k = Mid(k,i+1)
-			DbgExt("  "+g+" :: "+k)
-			IniCorrect(g,k,v)
-		EndIf
-	Wend
-EndProcedure
-Procedure IniFileSetPaths(IniFile.s)
-	Protected i, k.s, v.s, g.s, p.s
-	ExaminePreferenceKeys()
-	While NextPreferenceKey()
-		k = PreferenceKeyName()
-		v = NormalizePPath(ExpandEnvironmentStrings(PreferenceKeyValue()))
-		i = FindString(k,"|")
-		If i
-			g = Left(k,i-1)
-			k = Mid(k,i+1)
-			DbgExt("  "+g+" :: "+k)
-			IniSet(g,k,v)
-		EndIf
-	Wend
-EndProcedure
-;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 569
-; FirstLine = 93
-; Folding = CAAAQg-
+; CursorPosition = 612
+; FirstLine = 311
+; Folding = DAAAwh-
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
@@ -683,5 +685,5 @@ EndProcedure
 ; VersionField4 = 4.11.0.0
 ; VersionField5 = 4.11.0.8
 ; VersionField6 = Work with ini-files
-; VersionField7 = PurePortIni.dll
+; VersionField7 = PurePortIni
 ; VersionField9 = (c) Smitis, 2017-2025
