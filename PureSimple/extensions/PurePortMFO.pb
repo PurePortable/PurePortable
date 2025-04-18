@@ -10,7 +10,7 @@
 ;RES_VERSION 4.11.0.8
 ;RES_DESCRIPTION Monitoring file operations
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
-;RES_INTERNALNAME PurePortMFO.dll
+;RES_INTERNALNAME PurePortMFO
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
 ;PP_X32_COPYAS nul
@@ -157,41 +157,111 @@ Procedure Detour_SHFileOperationW(*FileOp.SHFILEOPSTRUCT)
 	ProcedureReturn Original_SHFileOperationW(*FileOp)
 EndProcedure
 ;;======================================================================================================================
-
-Procedure ExtensionProcedure()
-	DbgExt("EXTENSION: Monitoring file operations")
-	MH_HookApi(kernel32,GetFullPathNameA)
-	MH_HookApi(kernel32,GetFullPathNameW)
-	MH_HookApi(kernel32,FindFirstFileA)
-	MH_HookApi(kernel32,FindFirstFileW)
-	MH_HookApi(kernel32,FindFirstFileExA)
-	MH_HookApi(kernel32,FindFirstFileExW)
-	MH_HookApi(kernel32,GetFileAttributesA)
-	MH_HookApi(kernel32,GetFileAttributesW)
-	MH_HookApi(kernel32,GetFileAttributesExA)
-	MH_HookApi(kernel32,GetFileAttributesExW)
-	MH_HookApi(kernel32,CreateFile2,#MH_HOOKAPI_NOCHECKRESULT)
-	MH_HookApi(kernel32,CreateFileA)
-	MH_HookApi(kernel32,CreateFileW)
-	MH_HookApi(kernel32,CreateDirectoryA)
-	MH_HookApi(kernel32,CreateDirectoryW)
-	MH_HookApi(kernel32,CreateDirectoryExA)
-	MH_HookApi(kernel32,CreateDirectoryExW)
-	LoadLibrary_(@"shell32.dll")
-	MH_HookApi(shell32,SHCreateDirectoryExA)
-	MH_HookApi(shell32,SHCreateDirectoryExW)
-	MH_HookApi(shell32,SHFileOperationA)
-	MH_HookApi(shell32,SHFileOperationW)
+; https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw
+Prototype CreateProcess(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
+Global Original_CreateProcessA.CreateProcess
+Procedure Detour_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
+	dbg("CreateProcessA: «"+PeekSZ(lpApplicationName,-1,#PB_Ascii)+"» «"+PeekSZ(lpCommandLine,-1,#PB_Ascii)+"»")
+	ProcedureReturn Original_CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo,*ProcessInformation)
+EndProcedure
+Global Original_CreateProcessW.CreateProcess
+Procedure Detour_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation.PROCESS_INFORMATION)
+	dbg("CreateProcessW: «"+PeekSZ(lpApplicationName)+"» «"+PeekSZ(lpCommandLine)+"»")
+	ProcedureReturn Original_CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,lpCurrentDirectory,*StartupInfo.STARTUPINFO,*ProcessInformation)
+EndProcedure
+;;======================================================================================================================
+; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutew
+Prototype ShellExecute(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
+Global Original_ShellExecuteA.ShellExecute
+Procedure Detour_ShellExecuteA(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
+	dbg("ShellExecuteA: «"+PeekSZ(lpOperation,-1,#PB_Ascii)+"» «"+PeekSZ(lpFile,-1,#PB_Ascii)+"» «"+PeekSZ(lpParameters,-1,#PB_Ascii)+"»")
+	ProcedureReturn Original_ShellExecuteA(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
+EndProcedure
+Global Original_ShellExecuteW.ShellExecute
+Procedure Detour_ShellExecuteW(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
+	dbg("ShellExecuteW: «"+PeekSZ(lpOperation)+"» «"+PeekSZ(lpFile)+"» «"+PeekSZ(lpParameters)+"»")
+	ProcedureReturn Original_ShellExecuteW(hwnd,lpOperation,lpFile,lpParameters,lpDirectory,nShowCmd)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecuteexw
+; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-shellexecuteinfow
+Prototype ShellExecuteEx(*pExecInfo.SHELLEXECUTEINFO)
+Global Original_ShellExecuteExA.ShellExecuteEx
+Procedure Detour_ShellExecuteExA(*pExecInfo.SHELLEXECUTEINFO)
+	dbg("ShellExecuteExA: «"+PeekSZ(*pExecInfo\lpVerb,-1,#PB_Ascii)+"» «"+PeekSZ(*pExecInfo\lpFile,-1,#PB_Ascii)+"» «"+PeekSZ(*pExecInfo\lpParameters,-1,#PB_Ascii)+"»")
+	ProcedureReturn Original_ShellExecuteExA(*pExecInfo)
+EndProcedure
+Global Original_ShellExecuteExW.ShellExecuteEx
+Procedure Detour_ShellExecuteExW(*pExecInfo.SHELLEXECUTEINFO)
+	dbg("ShellExecuteExW: «"+PeekSZ(*pExecInfo\lpVerb)+"» «"+PeekSZ(*pExecInfo\lpFile)+"» «"+PeekSZ(*pExecInfo\lpParameters)+"»")
+	ProcedureReturn Original_ShellExecuteExW(*pExecInfo)
 EndProcedure
 ;;======================================================================================================================
 
+#EXT_SECTION_MAIN = "EXT:MFO"
+
+Global MonitorFileOp = 1
+Global MonitorShellOp = 1
+Global MonitorCreateProcess = 1
+Global MonitorShellExecute = 1
+
+Procedure ExtensionProcedure()
+	DbgExt("EXTENSION: Monitoring file operations")
+	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
+		If PreferenceGroup(#EXT_SECTION_MAIN)
+			MonitorFileOp = ReadPreferenceInteger("FileOp",0)
+			MonitorShellOp = ReadPreferenceInteger("ShellOp",0)
+			MonitorCreateProcess = ReadPreferenceInteger("CreateProcess",0)
+			MonitorShellExecute = ReadPreferenceInteger("ShellExecute",0)
+		EndIf
+		ClosePreferences()
+	EndIf
+	
+	If MonitorFileOp
+		MH_HookApi(kernel32,GetFullPathNameA)
+		MH_HookApi(kernel32,GetFullPathNameW)
+		MH_HookApi(kernel32,FindFirstFileA)
+		MH_HookApi(kernel32,FindFirstFileW)
+		MH_HookApi(kernel32,FindFirstFileExA)
+		MH_HookApi(kernel32,FindFirstFileExW)
+		MH_HookApi(kernel32,GetFileAttributesA)
+		MH_HookApi(kernel32,GetFileAttributesW)
+		MH_HookApi(kernel32,GetFileAttributesExA)
+		MH_HookApi(kernel32,GetFileAttributesExW)
+		MH_HookApi(kernel32,CreateFile2,#MH_HOOKAPI_NOCHECKRESULT)
+		MH_HookApi(kernel32,CreateFileA)
+		MH_HookApi(kernel32,CreateFileW)
+		MH_HookApi(kernel32,CreateDirectoryA)
+		MH_HookApi(kernel32,CreateDirectoryW)
+		MH_HookApi(kernel32,CreateDirectoryExA)
+		MH_HookApi(kernel32,CreateDirectoryExW)
+	EndIf
+	If MonitorShellOp
+		LoadLibrary_(@"shell32.dll")
+		MH_HookApi(shell32,SHCreateDirectoryExA)
+		MH_HookApi(shell32,SHCreateDirectoryExW)
+		MH_HookApi(shell32,SHFileOperationA)
+		MH_HookApi(shell32,SHFileOperationW)
+	EndIf
+	If MonitorCreateProcess
+		MH_HookApi(kernel32,CreateProcessA)
+		MH_HookApi(kernel32,CreateProcessW)
+	EndIf
+	If MonitorShellExecute
+		MH_HookApi(shell32,ShellExecuteA)
+		MH_HookApi(shell32,ShellExecuteW)
+		MH_HookApi(shell32,ShellExecuteExA)
+		MH_HookApi(shell32,ShellExecuteExW)
+	EndIf
+	
+EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 161
-; FirstLine = 154
-; Folding = ----
+; CursorPosition = 196
+; FirstLine = 162
+; Folding = -----
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
@@ -203,6 +273,6 @@ EndProcedure
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
 ; VersionField5 = 4.11.0.8
-; VersionField6 = PurePortableSimpleExtension
-; VersionField7 = PurePortExecute.dll
+; VersionField6 = Monitoring file operations
+; VersionField7 = PurePortMFO
 ; VersionField9 = (c) Smitis, 2017-2025
