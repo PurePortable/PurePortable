@@ -13,7 +13,6 @@
 ;RES_INTERNALNAME PurePortIni
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
-;PP_X32_COPYAS "P:\Lab\Programs\FastVideoCutterJoiner\PurePortIni.dll"
 ;PP_X32_COPYAS nul
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
@@ -596,7 +595,7 @@ Procedure ExtensionProcedure()
 				EndIf
 			Wend
 		EndIf
-		;IniWrite()
+		IniWrite()
 	Next
 	FreeArray(IniData())
 	FreeArray(ListFiles())
@@ -670,9 +669,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 612
-; FirstLine = 311
-; Folding = DAAAwh-
+; CursorPosition = 15
+; Folding = DAAAwg-
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
