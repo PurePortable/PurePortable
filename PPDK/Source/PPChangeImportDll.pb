@@ -5,7 +5,7 @@
 ;PP_SILENT 1
 ;PP_BACKUP 0
 ;PP_PUREPORTABLE 1
-;RES_VERSION 1.0.2.0
+;RES_VERSION 1.0.3.0
 ;RES_PRODUCTVERSION 1.0.2.0
 ;RES_DESCRIPTION PurePortable change import dll name
 ;RES_COPYRIGHT (c) Smitis, 2020-2025
@@ -221,6 +221,7 @@ Procedure CorrectImport(BinFile.s,Dll1.s,Dll2.s)
 					If LCase(ImportDllName) = Dll1
 						PrintN("  "+ImportDllName+" -> "+Dll2)
 						PokeS(*ImportDllName,Dll2,Len(ImportDllName),#PB_Ascii)
+						Changed = #True
 					EndIf
 					*ImportDir + SizeOf(IMAGE_IMPORT_DESCRIPTOR)
 					*ImportDllName = RVA2A(*BaseAddress,*ImportDir\Name)
@@ -255,8 +256,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Console
-; CursorPosition = 184
-; FirstLine = 140
+; CursorPosition = 7
 ; Folding = v9
 ; Optimizer
 ; EnableThread
@@ -264,10 +264,10 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 1.0.2.0
+; VersionField0 = 1.0.3.0
 ; VersionField1 = 1.0.2.0
 ; VersionField4 = 1.0.2.0
-; VersionField5 = 1.0.2.0
+; VersionField5 = 1.0.3.0
 ; VersionField6 = PurePortable change import dll name
 ; VersionField7 = PPChangeImportDll
 ; VersionField9 = (c) Smitis, 2020-2025
