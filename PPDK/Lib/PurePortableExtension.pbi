@@ -7,13 +7,40 @@
 XIncludeFile "PP_Extension.pbi"
 Global *EXT.EXTDATA
 ;;======================================================================================================================
-;Procedure dbg(txt.s="") : OutputDebugString_("PORT: "+txt) : EndProcedure
+UndefineMacro DoubleQuote
+Macro DoubleQuote
+	"
+EndMacro
+Macro DeclareImport(LibName,Name32,Name64,FuncDeclaration)
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		Import DoubleQuote#LibName.lib#DoubleQuote
+			FuncDeclaration As DoubleQuote#Name32#DoubleQuote
+		EndImport
+	CompilerElse
+		Import DoubleQuote#LibName.lib#DoubleQuote
+			FuncDeclaration As DoubleQuote#Name64#DoubleQuote
+		EndImport
+	CompilerEndIf
+EndMacro
+Macro DeclareImportC(LibName,Name32,Name64,FuncDeclaration)
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		ImportC DoubleQuote#LibName.lib#DoubleQuote
+			FuncDeclaration As DoubleQuote#Name32#DoubleQuote
+		EndImport
+	CompilerElse
+		ImportC DoubleQuote#LibName.lib#DoubleQuote
+			FuncDeclaration As DoubleQuote#Name64#DoubleQuote
+		EndImport
+	CompilerEndIf
+EndMacro
+;;======================================================================================================================
+;DeclareImport(kernel32,_OutputDebugStringW@4,OutputDebugStringW,OutputDebugStringW(*txt))
+;Procedure dbg(txt.s="") : OutputDebugStringW("PORT: "+txt) : EndProcedure
 Procedure dbg(txt.s="") : *EXT\HF\dbg(txt) : EndProcedure
 ;CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
 Global DbgExtMode
 Procedure DbgExt(txt.s)
 	If DbgExtMode
-		;dbg(txt)
 		*EXT\HF\dbg(txt)
 	EndIf
 EndProcedure
@@ -42,10 +69,8 @@ Macro DoubleQuote
 	"
 EndMacro
 Macro MH_HookApi(DllName,FuncName,flags=0)
-	;CompilerIf Defined(Detour_#FuncName,#PB_Procedure)
 	Global Target_#FuncName
 	*EXT\MH\_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
-	;CompilerEndIf
 EndMacro
 ;;======================================================================================================================
 Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование относительных путей
@@ -115,9 +140,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 60
-; FirstLine = 36
-; Folding = --
+; CursorPosition = 36
+; Folding = 5--
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
