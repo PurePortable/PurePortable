@@ -7,6 +7,8 @@ Prototype.s Bin2Hex(*Bin.Byte,BinCnt)
 Prototype.i Hex2Bin(sHex.s,*Buf=#Null,*cb.Integer=#Null)
 Prototype EncodeCtrl(*s.Unicode,t=0)
 Prototype DecodeCtrl(*s.Unicode)
+Prototype.s guid2s(*id)
+Prototype s2guid(guid.s,*guid.GUID)
 
 Structure IHelpful
 	dbg.Proto_dbg
@@ -36,14 +38,16 @@ CompilerIf #IHELPFUL_INIT
 		Data.i @Hex2Bin()
 		Data.i @EncodeCtrl()
 		Data.i @DecodeCtrl()
+		Data.i @guid2s()
+		Data.i @s2guid()
 		Data.i 0
 	EndDataSection
 	
 CompilerEndIf
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 18
-; FirstLine = 3
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 41
+; FirstLine = 9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
