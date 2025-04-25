@@ -37,7 +37,7 @@ CompilerElse
 CompilerEndIf
 ;;======================================================================================================================
 
-#EXT_SECTION_MAIN = "EXT:LoadFonts"
+#EXT_SECTION_MAIN = "EXT:Fonts"
 ;#EXT_SECTION_FILES = "EXT:LaodFonts."
 
 Procedure ExtensionProcedure()
@@ -48,7 +48,9 @@ Procedure ExtensionProcedure()
 	Protected r
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
 		Protected FontMask.s, FontDir.s, FontFile.s, Dir
-		If PreferenceGroup(#EXT_SECTION_MAIN)
+		;If PreferenceGroup(#EXT_SECTION_MAIN)
+		;EndIf
+		If PreferenceGroup(#EXT_SECTION_MAIN+".Load")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				FontMask = NormalizePath(PreferenceKeyName())
@@ -75,7 +77,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 53
+; CursorPosition = 51
 ; FirstLine = 33
 ; Folding = -
 ; Optimizer
