@@ -21,6 +21,7 @@ EnableExplicit
 IncludePath "..\..\PPDK\Lib"
 
 XIncludeFile "PurePortableExtension.pbi"
+XIncludeFile "proc\GuidInfo.pbi"
 ;;======================================================================================================================
 ; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfullpathnamew
 Prototype GetFullPathName(lpFileName,nBufferLength,lpBuffer,*lpFilePart)
@@ -197,6 +198,40 @@ Procedure Detour_ShellExecuteExW(*pExecInfo.SHELLEXECUTEINFO)
 	ProcedureReturn Original_ShellExecuteExW(*pExecInfo)
 EndProcedure
 ;;======================================================================================================================
+XIncludeFile "proc\GuidInfo.pbi"
+;;----------------------------------------------------------------------------------------------------------------------
+; https://docs.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstance
+; ole32.lib, combaseapi.h (include objbase.h)
+Prototype CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
+Global Original_CoCreateInstance.CoCreateInstance
+Procedure Detour_CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
+	dbg("CoCreateInstance: "+GuidInfo(rclsid))
+	ProcedureReturn Original_CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstanceex
+Prototype CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx.l,*pServerInfo,dwCount.l,*pResults)
+Global Original_CoCreateInstanceEx.CoCreateInstanceEx
+Procedure Detour_CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx.l,*pServerInfo,dwCount.l,*pResults)
+	dbg("CoCreateInstanceEx: "+GuidInfo(rclsid))
+	ProcedureReturn Original_CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx,*pServerInfo,dwCount,*pResults)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-cogetinstancefromfile
+; CoGetInstanceFromFile ???
+;Prototype CoGetInstanceFromFile(*pServerInfo,*pClsid,*punkOuter,dwClsCtx.l,grfMode.l,*pwszName,dwCount,*pResults)
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/ru-ru/windows/win32/api/combaseapi/nf-combaseapi-cogetclassobject
+Prototype CoGetClassObject(rclsid,dwClsContext.l,*pvReserved,riid,*ppv)
+Global Original_CoGetClassObject.CoGetClassObject
+Procedure Detour_CoGetClassObject(rclsid,dwClsContext.l,*pvReserved,riid,*ppv)
+	dbg("CoGetClassObject: "+GuidInfo(rclsid))
+	ProcedureReturn Original_CoGetClassObject(rclsid,dwClsContext,*pvReserved,riid,*ppv)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; CoGetObject ???
+; https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-cogetobject
+;;======================================================================================================================
 
 #EXT_SECTION_MAIN = "EXT:MFO"
 
@@ -204,15 +239,17 @@ Global MonitorFileOp = 1
 Global MonitorShellOp = 1
 Global MonitorCreateProcess = 1
 Global MonitorShellExecute = 1
+Global MonitorCOM = 0
 
 Procedure ExtensionProcedure()
 	DbgExt("EXTENSION: Monitoring file operations")
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace)
 		If PreferenceGroup(#EXT_SECTION_MAIN)
-			MonitorFileOp = ReadPreferenceInteger("FileOp",0)
-			MonitorShellOp = ReadPreferenceInteger("ShellOp",0)
-			MonitorCreateProcess = ReadPreferenceInteger("CreateProcess",0)
-			MonitorShellExecute = ReadPreferenceInteger("ShellExecute",0)
+			MonitorFileOp = ReadPreferenceInteger("FileOp",1)
+			MonitorShellOp = ReadPreferenceInteger("ShellOp",1)
+			MonitorCreateProcess = ReadPreferenceInteger("CreateProcess",1)
+			MonitorShellExecute = ReadPreferenceInteger("ShellExecute",1)
+			MonitorCOM = ReadPreferenceInteger("COM",0)
 		EndIf
 		ClosePreferences()
 	EndIf
@@ -253,15 +290,20 @@ Procedure ExtensionProcedure()
 		MH_HookApi(shell32,ShellExecuteExA)
 		MH_HookApi(shell32,ShellExecuteExW)
 	EndIf
-	
+	If MonitorCOM
+		;LoadLibrary_(@"ole32.dll")
+		MH_HookApi(ole32,CoCreateInstance)
+		MH_HookApi(ole32,CoCreateInstanceEx)
+		MH_HookApi(ole32,CoGetClassObject)
+	EndIf
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 196
-; FirstLine = 162
-; Folding = -----
+; CursorPosition = 215
+; FirstLine = 129
+; Folding = AAAAA-
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
