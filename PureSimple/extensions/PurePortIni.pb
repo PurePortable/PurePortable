@@ -655,22 +655,25 @@ EndProcedure
 Procedure.s CheckIni(IniFile.s)
 	Protected ini.s
 	
-	If nSubst ; если список не пуст, ищем в нём
-		
-	ElseIf SubstFileName ; если задано, подменяем на это
-		ProcedureReturn SubstFileName
-	ElseIf DefaultFileName ; или на это
-		ProcedureReturn DefaultFileName
-	EndIf
-	
-	ProcedureReturn ini
+	;If nSubst ; если список не пуст, ищем в нём
+	;	
+	;ElseIf SubstFileName ; если задано, подменяем на это
+	;	ProcedureReturn SubstFileName
+	;ElseIf DefaultFileName ; или на это
+	;	ProcedureReturn DefaultFileName
+	;EndIf
+	DbgProf("CheckIni: «"+IniFile+"»")
+	IniFile = PrgDir+GetFilePart(IniFile)
+	DbgProf("      ->: «"+IniFile+"»")
+	ProcedureReturn IniFile
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 15
-; Folding = DAAAwg-
+; CursorPosition = 666
+; FirstLine = 326
+; Folding = HAAAwg-
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
