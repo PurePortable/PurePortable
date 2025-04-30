@@ -78,15 +78,15 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBGX_FILE_OPERATIONS = 0
 #DBGX_PROFILE_STRINGS = 0
 ;}
-;{ Блокировка интернета
+;{ Блокировки
 #BLOCK_WININET = 1 ; wininet.dll
 #BLOCK_WINHTTP = 1 ; winhttp.dll
 #BLOCK_WINSOCKS = 2 ; по умолчанию будет ws2_32
 #DBG_BLOCK_INTERNET = 0
-;}
-;{ Блокировка консоли
 #BLOCK_CONSOLE = 1
 #DBG_BLOCK_CONSOLE = 0
+#BLOCK_RECENT_DOCS = 1
+#DBG_BLOCK_RECENT_DOCS = 0
 ;}
 ;{ Управление сохранением конфигурации
 #CFG_SAVE_ON_CLOSE = 0 ; Сохранять настройки при RegCloseKey (может вызвать замедление). 1 - сохранять всегда, 2 - управление через переменную CfgSaveOnClose
@@ -379,6 +379,9 @@ EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Declare RunFrom(k.s,p.s)
 ;;----------------------------------------------------------------------------------------------------------------------
+; До AttachProcedure
+; Выбор файла конфигурации с учётом MultiConfig.
+; Проверка программы (ValidateProgram).
 Procedure CheckProgram()
 	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
 	Protected RetCode
@@ -578,6 +581,9 @@ Procedure AttachProcedure()
 			;If BlockWinSocksPermit = 1 ; wsock32 иначе ws2_32, т.к. #BLOCK_WINSOCKS=2 
 			;	WinSocksDll = "wsock32"
 			;EndIf
+		CompilerEndIf
+		CompilerIf Defined(BLOCK_RECENT_DOCS,#PB_Constant)
+			BlockRecentDocsPermit = ReadPreferenceInteger("BlockRecentDocs",0)
 		CompilerEndIf
 		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
@@ -976,7 +982,6 @@ Procedure DetachProcedure()
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
 		ProcedureReturn 1
 	EndIf
-	
 	If LastProcess
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()

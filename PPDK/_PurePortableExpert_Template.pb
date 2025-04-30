@@ -93,15 +93,15 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBGX_PROFILE_STRINGS = 0
 ;}
 ;;----------------------------------------------------------------------------------------------------------------------
-;{ Блокировка интернета
+;{ Блокировки
 #BLOCK_WININET = 0 ; wininet.dll
 #BLOCK_WINHTTP = 0 ; winhttp.dll
 #BLOCK_WINSOCKS = 0 ; 1 - wsock32.dll, 2 - ws2_32.dll
 #DBG_BLOCK_INTERNET = 0
-;}
-;{ Блокировка консоли
 #BLOCK_CONSOLE = 0
 #DBG_BLOCK_CONSOLE = 0
+#BLOCK_RECENT_DOCS = 0
+#DBG_BLOCK_RECENT_DOCS = 0
 ;}
 ;{ Некоторые дополнительные процедуры
 #PROC_GETVERSIONINFO = 1 ; Получение информации о файле
@@ -310,7 +310,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = AwLOy
+; CursorPosition = 102
+; FirstLine = 48
+; Folding = A5FH6
+; Markers = 106
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll

@@ -170,6 +170,13 @@ CompilerIf #BLOCK_CONSOLE
 CompilerEndIf
 
 ;;======================================================================================================================
+; Блокировка добавления файлов в Recent
+CompilerIf Not Defined(BLOCK_RECENT_DOCS,#PB_Constant) : #BLOCK_RECENT_DOCS = 0 : CompilerEndIf
+CompilerIf #BLOCK_RECENT_DOCS
+	XIncludeFile "PP_BlockRecentDocs.pbi"
+CompilerEndIf
+
+;;======================================================================================================================
 CompilerIf Not Defined(PORTABLE_ENTRYPOINT,#PB_Constant) : #PORTABLE_ENTRYPOINT = 0 : CompilerEndIf
 CompilerIf #PORTABLE_ENTRYPOINT
 	XIncludeFile "PP_EntryPointHook.pbi"
