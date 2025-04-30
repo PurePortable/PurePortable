@@ -772,9 +772,12 @@ Procedure AttachProcedure()
 					If i
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
+						t = "s" ; по умолчанию попробуем рассмотреть как строку
 						i = FindString(p,":")
-						t = LCase(Left(p,i-1))
-						p = Mid(p,i+1)
+						If i
+							t = LCase(Left(p,i-1))
+							p = Mid(p,i+1)
+						EndIf
 						Select t
 							Case "s"
 								SetCfgS(k,v,p)
@@ -782,6 +785,8 @@ Procedure AttachProcedure()
 								SetCfgD(k,v,Val(p))
 							Case "b"
 								SetCfgB(k,v,p)
+							Default ; попробуем рассмотреть как строку
+								SetCfgS(k,v,p)
 						EndSelect
 					EndIf
 				Wend
