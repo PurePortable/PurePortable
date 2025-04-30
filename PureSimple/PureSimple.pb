@@ -930,7 +930,7 @@ Procedure AttachProcedure()
 	EndIf
 	;}
 	ClosePreferences()
-	; Зарершающие операции с закрытым файлом конфигурации!
+	; Завершающие операции с закрытым файлом конфигурации!
 	;{ Загрузка расширений
 	If nExtFiles
 		Protected PurePortableExtension.PurePortableExtension
@@ -999,7 +999,7 @@ Procedure DetachProcedure()
 		Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
 		If PreferenceGroup("Portable")
 			Cleanup = ReadPreferenceInteger("Cleanup",0)
-			CleanupDirectory = ReadPreferenceString("CleanupDirectory","")
+			CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
 		EndIf
 		If Cleanup
 			If PreferenceGroup("Debug")
@@ -1010,7 +1010,7 @@ Procedure DetachProcedure()
 			EndIf
 			DbgCln("CleanupDirectory: "+CleanupDirectory)
 			Protected Dim ClnDirs.s(0), iClnDir
-			Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory)
+			Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory,"|")
 			If nClnDir = 0
 				nClnDir = AddArrayS(ClnDirs(),PrgDirN)
 			EndIf
