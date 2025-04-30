@@ -167,9 +167,9 @@ EndProcedure
 ;CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 100
-; FirstLine = 45
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 90
+; FirstLine = 37
 ; Folding = +-
 ; EnableThread
 ; DisableDebugger

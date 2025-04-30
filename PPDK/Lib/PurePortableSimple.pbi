@@ -3,6 +3,7 @@ EnableExplicit
 
 XIncludeFile "PurePortable.pbi"
 XIncludeFile "proc\s2guid.pbi"
+XIncludeFile "proc\guid2s.pbi"
 XIncludeFile "proc\Execute.pbi"
 XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 
@@ -43,8 +44,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 33
-; FirstLine = 8
+; CursorPosition = 5
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

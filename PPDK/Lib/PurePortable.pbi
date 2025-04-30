@@ -582,8 +582,8 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 532
-; FirstLine = 504
+; CursorPosition = 175
+; FirstLine = 143
 ; Folding = O--
 ; EnableThread
 ; DisableDebugger
