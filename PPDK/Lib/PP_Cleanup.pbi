@@ -47,7 +47,7 @@ EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Ручное добавление цели в список очистки для использования в PureExpert из DetachProcedure.
 Procedure Clean(Item.s)
-	If PrgIsValid And SingleProcess
+	If PrgIsValid And LastProcess
 		AddCleanItem(Item)
 	EndIf
 EndProcedure
@@ -55,7 +55,7 @@ EndProcedure
 ; Команды для добавления в DetachProcedure
 ; Если это последний процесс и список очистки создан (вызывались Clean или AddCleanItem), будет создан отдельный процесс для очистки.
 Macro DetachCleanup
-	If PrgIsValid And SingleProcess And hCleaupList
+	If PrgIsValid And LastProcess And hCleaupList
 		CloseFile(hCleaupList)
 		;dbg("Execute rundll32 "+Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34))
 		Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34))
@@ -109,8 +109,6 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 57
-; FirstLine = 56
 ; Folding = --
 ; EnableThread
 ; DisableDebugger
