@@ -12,7 +12,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.8
+;RES_VERSION 4.11.0.9
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 411.dll
@@ -70,7 +70,6 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_ENTRYPOINT = 0
 
 #PORTABLE_CLEANUP = 0
-#PORTABLE_CHECK_PROGRAM = 1 ; Использовать CheckProgram
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Мониторинг
@@ -110,6 +109,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PROC_ICFG = 0 ; макросы и процедуры для работы с массивами виртуального реестра
 ;#PROC_GUID2S = 0 ; Преобразование GUID/CLSID в строку вида {4AABE186-2666-4663-9E3E-5DFD6EAAAB60}
 ;}
+#PORTABLE_CHECK_PROGRAM = 1 ; Использовать CheckProgram
 #INCLUDE_MIN_HOOK = 0 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
 XIncludeFile "PurePortable.pbi"
@@ -308,23 +308,23 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 102
-; FirstLine = 48
-; Folding = A5FH6
-; Markers = 106
+; CursorPosition = 111
+; FirstLine = 56
+; Folding = A6FH6
+; Markers = 105
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.8
+; VersionField0 = 4.11.0.9
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.8
+; VersionField5 = 4.11.0.9
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 411.dll
 ; VersionField9 = (c) Smitis, 2017-2025

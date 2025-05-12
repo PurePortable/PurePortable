@@ -4,9 +4,19 @@
 (-) удалено
 (?) непонятно ))
 
+[4.11.0.9] 
+(+) PureSimple: В секции Registry.SetData если не задан тип значения, оно расматривается как строка (s:).
+(*) PPChangeImportDll: Исправление правки контрольной суммы
+(*) PurePortIni: Доработки. Файлы ini просто перенаправляются без изменения имени. Параметр Subst больше не используется.
+(*) PurePortFonts: Доработки. Секциb расширения [EXT:Fonts] и [EXT:Fonts.Load]
+(*) PurePortMFO: Доработки.
+(+) Добавлена блокировка добавления файлов в Recent (SHAddToRecentDocs).
+
+Cleanup.Registry
+
 [4.11.0.8a] 2025-04-18
 (!) PurePortIni: Ошибка сохранения файла.
-(+) PurePortMFO: Доработки. Отслеживание CreateProcess и ShellExecute.
+(+) PurePortMFO: Доработки. Отслеживание CreateProcess, ShellExecute, CoCreateInstance, CoCreateInstanceEx, CoGetClassObject.
 
 [4.11.0.8] 2025-04-14
 (*) Рефакторинг системы проверки.

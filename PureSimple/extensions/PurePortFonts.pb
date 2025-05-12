@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.8
+;RES_VERSION 4.11.0.9
 ;RES_DESCRIPTION Loaded fonts
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortFonts
@@ -86,11 +86,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.8
+; VersionField0 = 4.11.0.9
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.8
+; VersionField5 = 4.11.0.9
 ; VersionField6 = Loaded fonts
 ; VersionField7 = PurePortFonts.dll
 ; VersionField9 = (c) Smitis, 2017-2025

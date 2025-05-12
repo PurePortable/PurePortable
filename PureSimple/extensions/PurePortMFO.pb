@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.8
+;RES_VERSION 4.11.0.9
 ;RES_DESCRIPTION Monitoring file operations
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortMFO
@@ -199,22 +199,52 @@ Procedure Detour_ShellExecuteExW(*pExecInfo.SHELLEXECUTEINFO)
 EndProcedure
 ;;======================================================================================================================
 XIncludeFile "proc\GuidInfo.pbi"
+XIncludeFile "proc\guid2s.pbi"
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-clsidfromprogid
+Prototype CLSIDFromProgID(lpszProgID,*clsid)
+Global Original_CLSIDFromProgID.CLSIDFromProgID
+Procedure Detour_CLSIDFromProgID(lpszProgID,*clsid)
+	Protected Result = Original_CLSIDFromProgID(lpszProgID,*clsid)
+	;Protected clsid.s
+	If Result
+		dbg("CLSIDFromProgID: "+PeekSZ(lpszProgID)+" CLSID: "+guid2s(*clsid))
+	Else
+		dbg("CLSIDFromProgID: "+PeekSZ(lpszProgID)+" CLSID: "+guid2s(*clsid)+" ???")
+	EndIf
+	ProcedureReturn Result
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-progidfromclsid
+Prototype ProgIDFromCLSID(*clsid,*ProgID.Integer)
+Global Original_ProgIDFromCLSID.ProgIDFromCLSID
+Procedure Detour_ProgIDFromCLSID(*clsid,*ProgID.Integer)
+	Protected Result = Original_ProgIDFromCLSID(*clsid,*ProgID)
+	If Result
+		dbg("ProgIDFromCLSID: "+guid2s(*clsid)+" ProgID: "+PeekSZ(*ProgID\i))
+	Else
+		dbg("ProgIDFromCLSID: "+guid2s(*clsid)+" ProgID: "+PeekSZ(*ProgID\i)+" ???")
+	EndIf
+	ProcedureReturn Result
+EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://docs.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstance
 ; ole32.lib, combaseapi.h (include objbase.h)
 Prototype CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
 Global Original_CoCreateInstance.CoCreateInstance
 Procedure Detour_CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
-	dbg("CoCreateInstance: "+GuidInfo(rclsid))
-	ProcedureReturn Original_CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
+	Protected Result = Original_CoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,*ppv)
+	dbg("CoCreateInstance: ("+Str(Result)+") "+GuidInfo(rclsid))
+	ProcedureReturn Result
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstanceex
 Prototype CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx.l,*pServerInfo,dwCount.l,*pResults)
 Global Original_CoCreateInstanceEx.CoCreateInstanceEx
 Procedure Detour_CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx.l,*pServerInfo,dwCount.l,*pResults)
-	dbg("CoCreateInstanceEx: "+GuidInfo(rclsid))
-	ProcedureReturn Original_CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx,*pServerInfo,dwCount,*pResults)
+	Protected Result = Original_CoCreateInstanceEx(rclsid,*punkOuter,dwClsCtx,*pServerInfo,dwCount,*pResults)
+	dbg("CoCreateInstanceEx: ("+Str(Result)+") "+GuidInfo(rclsid))
+	ProcedureReturn Result
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-cogetinstancefromfile
@@ -225,8 +255,9 @@ EndProcedure
 Prototype CoGetClassObject(rclsid,dwClsContext.l,*pvReserved,riid,*ppv)
 Global Original_CoGetClassObject.CoGetClassObject
 Procedure Detour_CoGetClassObject(rclsid,dwClsContext.l,*pvReserved,riid,*ppv)
-	dbg("CoGetClassObject: "+GuidInfo(rclsid))
-	ProcedureReturn Original_CoGetClassObject(rclsid,dwClsContext,*pvReserved,riid,*ppv)
+	Protected Result = Original_CoGetClassObject(rclsid,dwClsContext,*pvReserved,riid,*ppv)
+	dbg("CoGetClassObject: ("+Str(Result)+") "+GuidInfo(rclsid))
+	ProcedureReturn Result
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; CoGetObject ???
@@ -295,26 +326,28 @@ Procedure ExtensionProcedure()
 		MH_HookApi(ole32,CoCreateInstance)
 		MH_HookApi(ole32,CoCreateInstanceEx)
 		MH_HookApi(ole32,CoGetClassObject)
+		MH_HookApi(ole32,CLSIDFromProgID)
+		MH_HookApi(ole32,ProgIDFromCLSID)
 	EndIf
 EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 215
-; FirstLine = 129
-; Folding = AAAAA-
+; CursorPosition = 244
+; FirstLine = 148
+; Folding = AAAA5-
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.8
+; VersionField0 = 4.11.0.9
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.8
+; VersionField5 = 4.11.0.9
 ; VersionField6 = Monitoring file operations
 ; VersionField7 = PurePortMFO
 ; VersionField9 = (c) Smitis, 2017-2025
