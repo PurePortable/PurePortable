@@ -12,8 +12,6 @@
 (*) PurePortMFO: Доработки.
 (+) Добавлена блокировка добавления файлов в Recent (SHAddToRecentDocs).
 
-Cleanup.Registry
-
 [4.11.0.8a] 2025-04-18
 (!) PurePortIni: Ошибка сохранения файла.
 (+) PurePortMFO: Доработки. Отслеживание CreateProcess, ShellExecute, CoCreateInstance, CoCreateInstanceEx, CoGetClassObject.
