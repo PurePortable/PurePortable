@@ -125,15 +125,14 @@ EndProcedure
 ; EndProcedure
 
 ;;======================================================================================================================
-CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFormat=#PB_Compiler_DLL
+CompilerIf Not Defined(PurePortable,#PB_Procedure)
 	ProcedureDLL PurePortable(id.l,*param1,*param2,reserved)
 		ProcedureReturn 0
 	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

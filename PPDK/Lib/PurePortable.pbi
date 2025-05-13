@@ -88,10 +88,8 @@ Macro AddInitProcedure(Proc) : AddArrayI(ModuleInitProcedures(),@Proc()) : EndMa
 ; Некоторые процедуры
 Declare InitProcedure()
 Declare ExitProcedure()
-CompilerIf #PB_Compiler_ExecutableFormat = #PB_Compiler_DLL
-	Declare AttachProcedure()
-	Declare DetachProcedure()
-CompilerEndIf
+Declare AttachProcedure()
+Declare DetachProcedure()
 
 ;;======================================================================================================================
 XIncludeFile "PurePortableCustom.pbi"
@@ -275,7 +273,7 @@ CompilerIf #INCLUDE_IAT_HOOK
 CompilerEndIf
 
 ;;======================================================================================================================
-CompilerIf Not Defined(PurePortable,#PB_Procedure) And #PB_Compiler_ExecutableFormat=#PB_Compiler_DLL
+CompilerIf Not Defined(PurePortable,#PB_Procedure)
 	ProcedureDLL PurePortable(id.l,*param1,*param2,reserved)
 		ProcedureReturn 0
 	EndProcedure
@@ -398,11 +396,9 @@ Procedure ExitProcedure()
 	;ReleaseMutex_(hProcessMutex)
 	;CloseHandle_(hProcessMutex)
 	
-	CompilerIf #PB_Compiler_ExecutableFormat = #PB_Compiler_DLL
-		If DetachProcedure() = 0
-			DetachCleanup
-		EndIf
-	CompilerEndIf
+	If DetachProcedure() = 0
+		DetachCleanup
+	EndIf
 	
 	ExitProcedureIsComleted = #True
 EndProcedure
@@ -529,24 +525,22 @@ ProcedureDLL.l AttachProcess(Instance)
 		DbgAlways("ATTACHPROCESS: "+DllPath)
 		ProcedureReturn
 	EndIf
-	CompilerIf #PB_Compiler_ExecutableFormat = #PB_Compiler_DLL
-		CompilerIf #PORTABLE_CHECK_PROGRAM
-			If CheckProgram() = #INVALID_PROGRAM
-				;PrgIsValid = 0
-				DbgAlways("ATTACHPROCESS: "+DllPath)
-				ProcedureReturn
-			EndIf
-			StartProcedure()
-			AttachProcedure()
-		CompilerElse
-			; Для совместимости - когда нет CheckProgram, проверка осуществляется в AttachProcedure.
-			StartProcedure()
-			If AttachProcedure() = #INVALID_PROGRAM
-				;PrgIsValid = 0
-				DbgAlways("ATTACHPROCESS: "+DllPath)
-				ProcedureReturn
-			EndIf
-		CompilerEndIf
+	CompilerIf #PORTABLE_CHECK_PROGRAM
+		If CheckProgram() = #INVALID_PROGRAM
+			;PrgIsValid = 0
+			DbgAlways("ATTACHPROCESS: "+DllPath)
+			ProcedureReturn
+		EndIf
+		StartProcedure()
+		AttachProcedure()
+	CompilerElse
+		; Для совместимости - когда нет CheckProgram, проверка осуществляется в AttachProcedure.
+		StartProcedure()
+		If AttachProcedure() = #INVALID_PROGRAM
+			;PrgIsValid = 0
+			DbgAlways("ATTACHPROCESS: "+DllPath)
+			ProcedureReturn
+		EndIf
 	CompilerEndIf
 
 	PrgIsValid = 1
@@ -572,6 +566,7 @@ ProcedureDLL.l AttachProcess(Instance)
 	;DbgAlways("ATTACHPROCESS: Complete")
 EndProcedure
 ;;======================================================================================================================
+; Для тестирования
 CompilerIf #PB_Compiler_IsMainFile
 	Procedure AttachProcedure()
 	EndProcedure
@@ -580,10 +575,10 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 175
-; FirstLine = 143
+; CursorPosition = 568
+; FirstLine = 528
 ; Folding = O--
 ; EnableThread
 ; DisableDebugger
