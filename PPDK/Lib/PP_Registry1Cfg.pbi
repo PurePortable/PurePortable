@@ -333,6 +333,12 @@ Procedure ReadCfgFile(Config.s)
 						EndIf
 					Next
 					; После завершения цикла for, i будет равен либо индексу найденного значения, либо на единицу больше nCfg
+					If sType = "-" ; удаление
+						If i <= nCfg
+							Cfg(i)\h = 0
+						EndIf
+						Continue
+					EndIf
 					If i > nCfg
 						nCfg = i
 						ReDim Cfg(nCfg)
@@ -468,7 +474,9 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = AAAA-
+; CursorPosition = 339
+; FirstLine = 125
+; Folding = AAAI-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

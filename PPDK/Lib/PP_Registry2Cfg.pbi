@@ -180,6 +180,10 @@ Procedure ImportCfg(Config.s)
 					sKey = LCase(Left(s,x1-1))
 					sName = LCase(Mid(s,x1+1,x2-x1-1))
 					sType = Mid(s,x2+1,x3-x2-1)
+					If sType = "-" ; удаляем
+						RegDeleteKeyValue_(hAppKey,@sKey,@sName)
+						Continue
+					EndIf
 					sData = Mid(s,x3+1)
 					If RegCreateKey_(hAppKey,@sKey,@hKey) = #NO_ERROR
 						Select sType
@@ -273,9 +277,9 @@ Procedure WriteCfg()
 	; Ничего не делаем
 EndProcedure
 ;;======================================================================================================================
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 224
-; FirstLine = 107
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 184
+; FirstLine = 76
 ; Folding = AQ9
 ; EnableThread
 ; DisableDebugger
