@@ -773,21 +773,25 @@ Procedure AttachProcedure()
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
 						t = "s" ; по умолчанию попробуем рассмотреть как строку
-						i = FindString(p,":")
-						If i
-							t = LCase(Left(p,i-1))
-							p = Mid(p,i+1)
+						If p="" Or p="-"
+							DelCfg(k,v)
+						Else
+							i = FindString(p,":")
+							If i
+								t = LCase(Left(p,i-1))
+								p = Mid(p,i+1)
+							EndIf
+							Select t
+								Case "s"
+									SetCfgS(k,v,p)
+								Case "d"
+									SetCfgD(k,v,Val(p))
+								Case "b"
+									SetCfgB(k,v,p)
+								Default ; попробуем рассмотреть как строку
+									SetCfgS(k,v,p)
+							EndSelect
 						EndIf
-						Select t
-							Case "s"
-								SetCfgS(k,v,p)
-							Case "d"
-								SetCfgD(k,v,Val(p))
-							Case "b"
-								SetCfgB(k,v,p)
-							Default ; попробуем рассмотреть как строку
-								SetCfgS(k,v,p)
-						EndSelect
 					EndIf
 				Wend
 			EndIf
@@ -1067,7 +1071,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = BCAAAARAAg
+; CursorPosition = 776
+; FirstLine = 129
+; Folding = BCAAAARAEg
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
