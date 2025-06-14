@@ -6,13 +6,13 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.9
+;RES_VERSION 4.11.0.10
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePort.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
-;PP_X32_COPYAS nul
+;PP_X32_COPYAS "P:\Games\Lines\Lines98\4.02\winmm.dll"
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
@@ -20,7 +20,7 @@ EnableExplicit
 IncludePath "..\PPDK\Lib"
 XIncludeFile "PurePortableCustom.pbi"
 
-#PROXY_DLL = "pureport"
+#PROXY_DLL = "winmm"
 #PROXY_DLL_COMPATIBILITY = 0 ; Совместимость: 0 - по умолчанию, 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
 
 #CONFIG_FILENAME = ""
@@ -772,26 +772,28 @@ Procedure AttachProcedure()
 					If i
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
-						t = "s" ; по умолчанию попробуем рассмотреть как строку
-						If p="" Or p="-"
-							DelCfg(k,v)
-						Else
-							i = FindString(p,":")
-							If i
-								t = LCase(Left(p,i-1))
-								p = Mid(p,i+1)
-							EndIf
-							Select t
-								Case "s"
-									SetCfgS(k,v,p)
-								Case "d"
-									SetCfgD(k,v,Val(p))
-								Case "b"
-									SetCfgB(k,v,p)
-								Default ; попробуем рассмотреть как строку
-									SetCfgS(k,v,p)
-							EndSelect
+					Else
+						v = ""
+					EndIf
+					t = "s" ; по умолчанию попробуем рассмотреть как строку
+					If p="" Or p="-"
+						DelCfg(k,v)
+					Else
+						i = FindString(p,":")
+						If i
+							t = LCase(Left(p,i-1))
+							p = Mid(p,i+1)
 						EndIf
+						Select t
+							Case "s"
+								SetCfgS(k,v,p)
+							Case "d"
+								SetCfgD(k,v,Val(p))
+							Case "b"
+								SetCfgB(k,v,p)
+							Default ; попробуем рассмотреть как строку
+								SetCfgS(k,v,p)
+						EndSelect
 					EndIf
 				Wend
 			EndIf
@@ -805,10 +807,11 @@ Procedure AttachProcedure()
 					If i
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
-						SetCfgS(k,v,p)
-						;CreatePath(p)
-					Else ; значение по умолчанию?
+					Else
+						v = ""
 					EndIf
+					;CreatePath(p)
+					SetCfgS(k,v,p)
 				Wend
 			EndIf
 			; Коррекция путей
@@ -821,15 +824,16 @@ Procedure AttachProcedure()
 					If i
 						v = Mid(k,i+1)
 						k = Left(k,i-1)
-						o = GetCfgS(k,v)
-						If p=""
-							p = PrgDirN
-						EndIf
-						n = CorrectPath(o,p)
-						If n And n<>o
-							SetCfgS(k,v,n)
-						EndIf
-					Else ; дефолтное значение?
+					Else
+						v = ""
+					EndIf
+					o = GetCfgS(k,v)
+					If p=""
+						p = PrgDirN
+					EndIf
+					n = CorrectPath(o,p)
+					If n And n<>o
+						SetCfgS(k,v,n)
 					EndIf
 				Wend
 			EndIf
@@ -1071,20 +1075,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 776
-; FirstLine = 129
-; Folding = BCAAAARAEg
+; Folding = BCAAAARAAg
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.9
+; VersionField0 = 4.11.0.10
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.9
+; VersionField5 = 4.11.0.10
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2025
