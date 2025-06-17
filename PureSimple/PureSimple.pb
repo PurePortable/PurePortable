@@ -617,6 +617,7 @@ Procedure AttachProcedure()
 	;{ Создание папок
 	If PreferenceGroup("CreateDirectories")
 		While NextPreferenceKey()
+			ExaminePreferenceKeys()
 			CreatePath(NormalizePPath(PreferenceKeyName()))
 		Wend
 	EndIf
