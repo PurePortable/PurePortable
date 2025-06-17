@@ -4,9 +4,19 @@
 (-) удалено
 (?) непонятно ))
 
-[4.11.0.9] 
+[4.11.0.10]
+(*) Исключена проверка формата #PB_Compiler_Executable
+(+) PureSimple: Если в [Registry.SetData] задано пустое значение или значение «-», параметр удаляется.
+(+) Если в pport-файле тип значения «-», значение удаляется.
+(!) PureSimple: Обработка дефолтных параметров реестра.
+(!) PureSimple: Исправление обработки CreateDirectories.
+(+) CorrectPath: CORRECTPATH_DOUBLE_BACKSLASH
+(-) PureSimple: Удалён код для перехвата CLSIDFromProgID.
+(+) EnvironmentVariables: Предварительная загрузка crt.
+
+[4.11.0.9] 2025-05-12
 (+) PureSimple: В секции Registry.SetData если не задан тип значения, оно расматривается как строка (s:).
-(*) PPChangeImportDll: Исправление правки контрольной суммы
+(*) PPChangeImportDll: Исправление правки контрольной суммы.
 (*) PurePortIni: Доработки. Файлы ini просто перенаправляются без изменения имени. Параметр Subst больше не используется.
 (*) PurePortFonts: Доработки. Секции расширения [EXT:Fonts] и [EXT:Fonts.Load]
 (*) PurePortMFO: Доработки.
