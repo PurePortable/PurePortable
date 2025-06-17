@@ -42,11 +42,12 @@ XIncludeFile "PurePortableCustom.pbi"
 #DETOUR_USERENV = 1	; Перехват функций из userenv.dll
 ;}
 #PORTABLE_ENVIRONMENT_VARIABLES = 1
+#PORTABLE_ENVIRONMENT_VARIABLES_CRT = 1
 ;{ Управление хуками PORTABLE_ENVIRONMENT_VARIABLES
 #DETOUR_ENVIRONMENTVARIABLE = 1
 #DETOUR_ENVIRONMENTSTRINGS = 1
 #DETOUR_EXPANDENVIRONMENTSTRINGS = 1
-#DETOUR_ENVIRONMENT_CRT = "" ; msvcrt
+#DETOUR_ENVIRONMENT_CRT = "" ; msvcrt ucrtbase
 ;}
 #PORTABLE_PROFILE_STRINGS = 0
 #PROFILE_STRINGS_FILENAME = "PurePortable"
@@ -531,6 +532,7 @@ Procedure AttachProcedure()
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
 		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
+		EnvironmentVariablesCrt = ReadPreferenceString("EnvironmentVariablesCrt","")
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)
@@ -1029,7 +1031,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = BCAAAICAA+
+; Folding = JCAAAICAA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
