@@ -13,6 +13,8 @@
 (+) CorrectPath: CORRECTPATH_DOUBLE_BACKSLASH
 (-) PureSimple: Удалён код для перехвата CLSIDFromProgID.
 (+) EnvironmentVariables: Предварительная загрузка crt.
+(+) EnvironmentVariables: Управление именем crt через переменную. Константа #PORTABLE_ENVIRONMENT_VARIABLES_CRT.
+(+) PureSimple: Управление перехватом переменных среды через crt.
 
 [4.11.0.9] 2025-05-12
 (+) PureSimple: В секции Registry.SetData если не задан тип значения, оно расматривается как строка (s:).
