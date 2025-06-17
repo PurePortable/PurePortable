@@ -15,6 +15,11 @@
 ; - GetEnvironmentStrings (без A и W!)
 ;;======================================================================================================================
 
+UndefineMacro DoubleQuote
+Macro DoubleQuote
+	"
+EndMacro
+
 Global ProfileRedir.s
 Global AppDataRedir.s
 Global LocalAppDataRedir.s
@@ -464,12 +469,15 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 CompilerEndIf
 
 ;;======================================================================================================================
-; msvcrt msvcr80 msvcr90 msvcr100 msvcr100clr0400 msvcr110 msvcr110clr0400 msvcr120 msvcr120clr0400 ucrtbase
+; msvcrt msvcr80 msvcr90 msvcr100 msvcr100clr0400 msvcr110 msvcr110clr0400 msvcr120 msvcr120clr0400 msvcr140 ucrtbase
 ; api-ms-win-crt-environment-l1-1-0 api-ms-win-crt-private-l1-1-0 -> ucrtbase
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
-	#ENVIRONMENT_CRT_DLLNAME = #DETOUR_ENVIRONMENT_CRT+".dll"
-	#ENVIRONMENT_CRT_LIBNAME = #DETOUR_ENVIRONMENT_CRT+".lib"
+	Global EnvironmentVariablesCrt.s = DoubleQuote#ENVIRONMENT_CRT_DLLNAME.dll#DoubleQuote
+CompilerElse
+	Global EnvironmentVariablesCrt.s
+CompilerEndIf
+CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES_CRT Or #DETOUR_ENVIRONMENT_CRT<>""
 	Global ProfileRedirA.s, AppDataRedirA.s, LocalAppDataRedirA.s, CommonAppDataRedirA.s
 	;;------------------------------------------------------------------------------------------------------------------
 	; https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getenv-s-wgetenv-s
@@ -575,25 +583,6 @@ CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
 		ProcedureReturn Result
 	EndProcedure
 	;;------------------------------------------------------------------------------------------------------------------
-	; https://docs.microsoft.com/ru-ru/cpp/c-runtime-library/reference/getenv-wgetenv
-	; https://github.com/MicrosoftDocs/cpp-docs/blob/main/docs/c-runtime-library/reference/getenv-wgetenv.md
-	;;------------------------------------------------------------------------------------------------------------------
-	;CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-	;	#CRT_GETENV = "_getenv"
-	;	#CRT_WGETENV = "__wgetenv"
-	;CompilerElse
-	;	#CRT_GETENV = "getenv"
-	;	#CRT_WGETENV = "_wgetenv"
-	;CompilerEndIf
-	;ImportC #ENVIRONMENT_CRT_LIBNAME
-	;	_crt_getenv(*p) As #CRT_GETENV
-	;	_crt_wgetenv(*p) As #CRT_WGETENV
-	;EndImport
-	;Procedure fake_msvcrt()
-	;	_crt_getenv(0)
-	;	_crt_wgetenv(0)
-	;EndProcedure
-
 	PrototypeC Proto_getenv(env)
 	; stdlib.h
 	Global Original_getenv.Proto_getenv
@@ -631,6 +620,7 @@ XIncludeFile "PP_MinHook.pbi"
 ;CompilerEndIf
 
 Global EnvironmentVariablesPermit = 1
+Global EnvironmentVariablesCrtPermit = 0
 Procedure _InitEnvironmentVariablesHooks()
 	If EnvironmentVariablesPermit
 		If ProfileRedir
@@ -654,7 +644,7 @@ Procedure _InitEnvironmentVariablesHooks()
 				MH_HookApi(kernel32,FreeEnvironmentStringsW)
 			EndIf
 		CompilerEndIf
-		CompilerIf #DETOUR_ENVIRONMENT_CRT<>""
+		CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES_CRT Or #DETOUR_ENVIRONMENT_CRT<>""
 			If ProfileRedir
 				ProfileRedirA = SpaceA(Len(ProfileRedir))
 				PokeS(@ProfileRedirA,ProfileRedir,-1,#PB_Ascii)
@@ -675,18 +665,20 @@ Procedure _InitEnvironmentVariablesHooks()
 				CommonAppDataRedirA = SpaceA(Len(CommonAppDataRedir))
 				PokeS(@CommonAppDataRedirA,CommonAppDataRedir,-1,#PB_Ascii)
 			EndIf
-			;OpenLibrary(#PB_Any,#ENVIRONMENT_CRT_DLLNAME)
-			MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,getenv)
-			MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,_wgetenv)
-			MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,getenv_s)
-			MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,_wgetenv_s)
+			If EnvironmentVariablesCrt
+				LoadLibrary_(@EnvironmentVariablesCrt)
+				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,getenv)
+				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,_wgetenv)
+				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,getenv_s)
+				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,_wgetenv_s)
+			EndIf
 		CompilerEndIf
 	EndIf
 EndProcedure
 AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = HgAA9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = fABA9
 ; DisableDebugger
 ; EnableExeConstant

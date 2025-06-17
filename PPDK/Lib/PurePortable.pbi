@@ -136,8 +136,9 @@ CompilerEndIf
 ;;======================================================================================================================
 ; Переменные среды
 CompilerIf Not Defined(PORTABLE_ENVIRONMENT_VARIABLES,#PB_Constant) : #PORTABLE_ENVIRONMENT_VARIABLES = 0 : CompilerEndIf
+CompilerIf Not Defined(PORTABLE_ENVIRONMENT_VARIABLES_CRT,#PB_Constant) : #PORTABLE_ENVIRONMENT_VARIABLES_CRT = 0 : CompilerEndIf
 CompilerIf Not Defined(DBG_ENVIRONMENT_VARIABLES,#PB_Constant) : #DBG_ENVIRONMENT_VARIABLES = 0 : CompilerEndIf
-CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES
+CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES Or #PORTABLE_ENVIRONMENT_VARIABLES_CRT
 	XIncludeFile "PP_EnvironmentVariables.pbi"
 CompilerEndIf
 
@@ -575,10 +576,8 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 568
-; FirstLine = 528
 ; Folding = O--
 ; EnableThread
 ; DisableDebugger

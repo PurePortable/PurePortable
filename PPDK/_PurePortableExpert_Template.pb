@@ -10,9 +10,9 @@
 
 ;PP_SILENT
 ;PP_PUREPORTABLE 1
-;PP_FORMAT DLL
+;;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.9
+;RES_VERSION 4.11.0.10
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 411.dll
@@ -54,6 +54,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DETOUR_USERENV = 0 ; Перехват функций из userenv.dll
 ;}
 #PORTABLE_ENVIRONMENT_VARIABLES = 0
+#PORTABLE_ENVIRONMENT_VARIABLES_CRT = 0
 ;{ Управление хуками PORTABLE_ENVIRONMENT_VARIABLES
 #DETOUR_ENVIRONMENTVARIABLE = 1
 #DETOUR_ENVIRONMENTSTRINGS = 0
@@ -308,23 +309,21 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 111
-; FirstLine = 56
-; Folding = A6FH6
-; Markers = 105
+; Folding = k6FH6
+; Markers = 106
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.9
+; VersionField0 = 4.11.0.10
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.9
+; VersionField5 = 4.11.0.10
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 411.dll
 ; VersionField9 = (c) Smitis, 2017-2025
