@@ -34,6 +34,8 @@ Procedure.s CorrectPath(Path.s,Base.s,Flags=0)
 	If Flags & #CORRECTPATH_FORWARD_SLASH
 		Path = ReplaceString(Path,"/","\")
 		;WindowsReplaceString_(@Path,"/","\",@Path)
+	ElseIf Flags & #CORRECTPATH_DOUBLE_BACKSLASH
+		Path = ReplaceString(Path,"\\","\")
 	EndIf
 	DbgCorPath("Path: "+Path)
 	If Path
@@ -46,6 +48,8 @@ Procedure.s CorrectPath(Path.s,Base.s,Flags=0)
 					DbgCorPath("   == "+NewPath)
 					If Flags & #CORRECTPATH_FORWARD_SLASH
 						NewPath = ReplaceString(NewPath,"\","/")
+					ElseIf Flags & #CORRECTPATH_DOUBLE_BACKSLASH
+						NewPath = ReplaceString(NewPath,"\","\\")
 					EndIf
 					ProcedureReturn NewPath+Ending
 				EndIf
@@ -60,6 +64,8 @@ Procedure.s CorrectPath(Path.s,Base.s,Flags=0)
 					DbgCorPath("   == "+NewPath)
 					If Flags & #CORRECTPATH_FORWARD_SLASH
 						NewPath = ReplaceString(NewPath,"\","/")
+					ElseIf Flags & #CORRECTPATH_DOUBLE_BACKSLASH
+						NewPath = ReplaceString(NewPath,"\","\\")
 					EndIf
 					ProcedureReturn NewPath+Ending
 				EndIf
@@ -73,12 +79,15 @@ Procedure.s CorrectPath(Path.s,Base.s,Flags=0)
 	EndIf
 	If Flags & #CORRECTPATH_FORWARD_SLASH
 		Path = ReplaceString(Path,"\","/")
+	ElseIf Flags & #CORRECTPATH_DOUBLE_BACKSLASH
+		Path = ReplaceString(Path,"\","\\")
 	EndIf
 	ProcedureReturn Path+Ending
 EndProcedure
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 2
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 36
+; FirstLine = 20
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
