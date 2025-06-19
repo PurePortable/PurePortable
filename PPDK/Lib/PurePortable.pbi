@@ -71,7 +71,8 @@ Global PreferenceFile.s
 Global WinDir.s, SysDir.s, TempDir.s
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 ;Global DllReason ; будет иметь то же значение, что и параметр fdwReason в DllMain
-Global DbgDetachMode = 1
+CompilerIf Not Defined(DBG_DETACH,#PB_Constant) : #DBG_DETACH = 1 : CompilerEndIf
+Global DbgDetachMode = #DBG_DETACH
 ; Инициализация общих переменных
 Declare GlobalInitialization()
 GlobalInitialization()

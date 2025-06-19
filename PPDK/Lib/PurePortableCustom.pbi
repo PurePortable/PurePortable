@@ -51,7 +51,7 @@
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Константы #PORTABLE_ENVIRONMENT_VARIABLES
-;#PORTABLE_ENV_
+#PORTABLE_ENV_KERNELBASE = $100 ; Перехватывать kernelbase вместо kernel32
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Константы #PORTABLE_CBT_HOOK и для управлением при выходе
@@ -71,6 +71,8 @@
 
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 53
+; FirstLine = 27
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

@@ -59,7 +59,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DETOUR_ENVIRONMENTVARIABLE = 1
 #DETOUR_ENVIRONMENTSTRINGS = 0
 #DETOUR_EXPANDENVIRONMENTSTRINGS = 0
-#DETOUR_ENVIRONMENT_CRT = "" ; msvcrt
+#DETOUR_ENVIRONMENT_CRT = "" ; msvcrt ucrtbase
 ;}
 #PORTABLE_PROFILE_STRINGS = 0
 ;{ Управление хуками PORTABLE_PROFILE_STRINGS
@@ -196,7 +196,7 @@ CompilerIf #PORTABLE_CBT_HOOK
 		If Title = "qtpowerdummywindow"
 			ProcedureReturn #PORTABLE_CBTR_EXIT ; завершение работы программы как при DetachProcess
 		EndIf
-		If Title = "cicmarshalwnd"
+		If Title = "cicmarshalwnd" ; QT5
 			ProcedureReturn #PORTABLE_CBTR_EXIT ; завершение работы программы как при DetachProcess
 		EndIf
 		ProcedureReturn 0
@@ -309,9 +309,11 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = k6FH6
+; CursorPosition = 198
+; FirstLine = 114
+; Folding = k6dH6
 ; Markers = 106
 ; Optimizer
 ; EnableThread
