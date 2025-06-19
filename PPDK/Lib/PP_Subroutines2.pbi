@@ -42,18 +42,10 @@ CompilerEndIf
 ; Кодирование служебных символов
 ; 0xE000 символ из набора символов для частного использования для кодирования символа 0x0000
 ; Служебные символы 0x0000-0x001F кодируются, соответственно 0xE000-0xE01F
-; Обработка идёт до появления нулевого символа для #REG_SZ, #REG_EXPAND_SZ или до двойного нулевого для #REG_MULTI_SZ
-; #REG_MULTI_SZ = 7
 CompilerIf Not Defined(EncodeCtrl,#PB_Procedure)
-	Procedure EncodeCtrl(*s.Unicode,t=0)
-		While 1
-			If *s\u=#NUL And t=#REG_MULTI_SZ
-				*s\u = #XNUL
-				*s+2
-			EndIf
-			If *s\u=#NUL
-				ProcedureReturn
-			EndIf
+	Procedure EncodeCtrl(*s.Unicode,n)
+		Protected *e = *s+n
+		While *s < *e
 			If *s\u<#SP
 				*s\u+#XNUL
 			EndIf
@@ -75,9 +67,9 @@ CompilerIf Not Defined(DecodeCtrl,#PB_Procedure)
 CompilerEndIf
 ;=======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 22
-; FirstLine = 3
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 44
+; FirstLine = 33
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

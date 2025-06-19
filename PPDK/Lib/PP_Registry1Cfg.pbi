@@ -444,7 +444,7 @@ Procedure WriteCfg()
 						;sData = Cfg(i)\a ; MultiString так присваивать нельзя
 						sData = SpaceB(cbData)
 						CopyMemory(@Cfg(i)\a,@sData,cbData)
-						EncodeCtrl(@sData,dwType)
+						EncodeCtrl(@sData,cbData-2)
 					ElseIf dwType=#REG_DWORD And cbData=4 ; Иногда попадаются REG_DWORD нестандартной длины, например, 8 байт (REG_QWORD)
 						sData = Hex(Cfg(i)\l,#PB_Long)
 					Else ; всё остальное храним в HEX виде, в том числе REG_DWORD нестандартной длины
