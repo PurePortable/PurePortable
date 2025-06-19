@@ -409,9 +409,10 @@ Procedure WriteCfg()
 	If ConfigFile <> "" And ConfigChanged
 		Protected hCfg = CreateFile(#PB_Any,ConfigFile,#PB_File_SharedRead|#PB_File_SharedWrite)
 		If hCfg
-			;dbg(Str(nKeys)+" "+Str(nCfg))
+			;dbg("WriteCfg: ArraySizes: "+Str(nKeys)+" "+Str(nCfg))
 			WriteStringFormat(hCfg,#PB_Unicode)
 			For i=1 To nKeys
+				;dbg("WriteCfg: Key: "+Str(i)+" :: "+Keys(i))
 				sKey = Keys(i)
 				If sKey And Left(sKey,1)<>"?"
 					WriteStringN(hCfg,sKey,#PB_Unicode)
@@ -459,7 +460,7 @@ Procedure WriteCfg()
 						EndIf
 					EndIf
 					WriteStringN(hCfg,sKey+#CONFIG_SEPARATOR$+sName+#CONFIG_SEPARATOR$+sType+#CONFIG_SEPARATOR$+sData,#PB_Unicode)
-					;dbg(sKey+#CONFIG_SEPARATOR$+sName+#CONFIG_SEPARATOR$+sType+#CONFIG_SEPARATOR$+sData)
+					;dbg(Str(i)+" :: "+sKey+#CONFIG_SEPARATOR$+sName+#CONFIG_SEPARATOR$+sType+#CONFIG_SEPARATOR$+sData)
 					;FlushFileBuffers(hCfg)
 				EndIf
 			Next
@@ -473,10 +474,10 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 339
-; FirstLine = 125
-; Folding = AAAI-
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 447
+; FirstLine = 161
+; Folding = BAAg-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
