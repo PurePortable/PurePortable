@@ -491,7 +491,7 @@ Procedure StartProcedure()
 	PPGUID = PeekS(?sGUID)
 	PPTickCount = PeekL(?TickCount)
 	;ProcessMutexName = PrgName+"."+PPGUID
-	ProcessPipeName = "\\.\pipe\"+PrgName+"."+PPGUID
+	ProcessPipeName = "\\.\pipe\PP."+PrgName+"."+PPGUID
 	
 	; В это время может завершаться или запускаться другой процесс
 	;hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
@@ -577,8 +577,10 @@ CompilerIf #PB_Compiler_IsMainFile
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 403
+; FirstLine = 368
 ; Folding = O--
 ; EnableThread
 ; DisableDebugger
