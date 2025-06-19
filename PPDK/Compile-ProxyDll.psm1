@@ -77,7 +77,6 @@ function Compile-ProxyDll {
     if ($Compiler32 -eq "") {
       if ($exe.Substring(0,2) -eq "..") { # Относительный путь
         $exe = "$PSScriptRoot\$exe"
-        $exe
       }
       if (Test-Path $exe) {
         $Compiler32 = $exe
@@ -94,11 +93,17 @@ function Compile-ProxyDll {
       }
     }
   }
-	if ($Compiler32 -eq "" -or $Compiler64 -eq "") {
-		Write-Error "The compiler was not found"
-		exit
-	}
-	
+	if ($x32 -and $Compiler32 -eq "") {
+    Write-Error "Compiler x32 was not found"
+    exit
+  }
+  Write-Host "Compiler x32: $Compiler32"
+  if ($x64 -and $Compiler64 -eq "") {
+    Write-Error "Compiler x64 was not found"
+    exit
+  }
+  Write-Host "Compiler x64: $Compiler64"
+
 	$SrcTmp = "~tmp.pb"
 	$RcTmp = "~tmp.rc"
 	$SubDir = "."
