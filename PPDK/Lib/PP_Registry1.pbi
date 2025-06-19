@@ -385,8 +385,8 @@ Procedure _InitRegistryHooks()
 		If OSMajorVersion <= 7
 			RegistryDll = RegistryDll2
 		EndIf
-		MH_HookApiD(RegistryDll,RegCloseKey)
-		MH_HookApiD(RegistryDll,RegFlushKey)
+		CompilerIf #DETOUR_REGCLOSEKEY : MH_HookApiD(RegistryDll,RegCloseKey) : CompilerEndIf
+		CompilerIf #DETOUR_REGFLUSHKEY : MH_HookApiD(RegistryDll,RegFlushKey) : CompilerEndIf
 		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll2,RegCreateKeyA,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf ; advapi32
 		CompilerIf #DETOUR_REGCREATEKEY : MH_HookApiD(RegistryDll2,RegCreateKeyW,#MH_HOOKAPI_NOCHECKRESULT) : CompilerEndIf
 		CompilerIf #DETOUR_REGCREATEKEYEX : MH_HookApiD(RegistryDll,RegCreateKeyExA) : CompilerEndIf ; advapi32, kernelbase
@@ -459,8 +459,8 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 382
-; FirstLine = 53
+; CursorPosition = 387
+; FirstLine = 62
 ; Folding = gjj--4v-
 ; DisableDebugger
 ; EnableExeConstant
