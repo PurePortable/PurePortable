@@ -10,8 +10,8 @@ Compile-ProxyDll-Start
 
 @(
   "winmm", "version", "version+"
-  "avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "glu32", "iphlpapi", "ktmw32"
-  "mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "secur32"
+  "avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "dwrite", "glu32", "iphlpapi", "ktmw32"
+  "mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "propsys", "secur32"
   "shfolder", "urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wtsapi32", "vcruntime140"
   "comdlg32", "wintrust"
 ) | foreach {
