@@ -533,6 +533,9 @@ Procedure AttachProcedure()
 		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
 		EnvironmentVariablesCrt = ReadPreferenceString("EnvironmentVariablesCrt","")
+		If ReadPreferenceInteger("EnvironmentVariablesDll",0)=1
+			EnvironmentVariablesDll = "kernelbase"
+		EndIf
 		ProxyErrorMode = ReadPreferenceInteger("ProxyErrorMode",0)
 		MinHookErrorMode = ReadPreferenceInteger("MinHookErrorMode",0)
 		BlockConsolePermit = ReadPreferenceInteger("BlockConsole",0)

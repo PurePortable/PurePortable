@@ -378,15 +378,19 @@ CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 		EnvCriticalLeave
 		ProcedureReturn #True
 	EndProcedure
-
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
-; Возврат - необходимое количество символов, ключая нулевой.
+; Возврат - необходимое количество символов, включая нулевой.
 ; Если буфер меньше необходимого, копируется столько, сколько заданно. Нулевой не копируется!
 ; Но! Переменная не раскрывается, если она существует, но не влезает в буфер. Рузультат обрезается по эту переменную.
 ; Здесь будет несовместимость.
+
+; Поведение на тестовом примере (Win10):
+; - если nSize=0, приёмный буфер не меняется
+; - если nSize>0 and nSize<NeedSize, приёмный буфер обнуляется
+
 CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
-	Procedure.s _ExpandEnvironment(*s,cp=#PB_Unicode)
+	Procedure.s _ExpandEnvironment(*s,l=0,cp=#PB_Unicode)
 		Protected s.s = PeekS(*s,-1,cp)
 		Protected r.s, e.s, v.s
 		Protected p1, p2
@@ -411,7 +415,7 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 		Wend
 		ProcedureReturn r+s
 	EndProcedure
-	;{ Procedure.s _ExpandEnvironment2(s.s)
+	;{ Procedure.s _ExpandEnvironment2(s.s,l=0)
 	; 	Protected r.s
 	; 	Protected p0,p1, p2
 	; 	p1 = FindString(s,"%")
@@ -432,40 +436,47 @@ CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
 	Global Original_ExpandEnvironmentStringsA.ExpandEnvironmentStrings
 	Procedure.l Detour_ExpandEnvironmentStringsA(lpSrc,lpDst,nSize)
 		Protected Result
-		DbgEnv("ExpandEnvironmentStringsA (1): «"+PeekSZ(lpSrc,-1,#PB_Ascii)+"» nSize: "+Str(nSize))
+		;DbgEnv("ExpandEnvironmentStringsA: "+Str(lpSrc)+" "+Str(lpDst))
+		DbgEnv("ExpandEnvironmentStringsA: «"+PeekS(lpSrc,-1,#PB_Ascii)+"» nSize: "+Str(nSize))
 		CompilerIf Not #PORTABLE
 			Result = Original_ExpandEnvironmentStringsA(lpSrc,lpDst,nSize)
 		CompilerElse
-			Protected s.s = _ExpandEnvironment(lpSrc,#PB_Ascii)
+			Protected s.s = _ExpandEnvironment(lpSrc,nSize,#PB_Ascii)
 			Result = Len(s)+1
-			If nSize > Result
-				PokeSZ(lpDst,s,-1,#PB_Ascii)
+			If nSize >= Result
+				PokeS(lpDst,s,-1,#PB_Ascii)
+				DbgEnv("ExpandEnvironmentStringsA: «"+s+"» Result: "+Str(Result))
 			Else
-				PokeSZ(lpDst,s,nSize,#PB_Ascii|#PB_String_NoZero)
+				If nSize And lpDst
+					PokeB(lpDst,0)
+				EndIf
+				DbgEnv("ExpandEnvironmentStringsA: «"+s+"» Need: "+Str(Result))
 			EndIf
 		CompilerEndIf
-		DbgEnv("ExpandEnvironmentStringsA (2): «"+PeekSZ(lpDst,-1,#PB_Ascii)+"» Result: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
 	Global Original_ExpandEnvironmentStringsW.ExpandEnvironmentStrings
 	Procedure.l Detour_ExpandEnvironmentStringsW(lpSrc,lpDst,nSize)
 		Protected Result
-		DbgEnv("ExpandEnvironmentStringsW (1): «"+PeekSZ(lpSrc)+"» nSize: "+Str(nSize))
+		;DbgEnv("ExpandEnvironmentStringsW: "+Str(lpSrc)+" "+Str(lpDst))
+		DbgEnv("ExpandEnvironmentStringsW: «"+PeekS(lpSrc)+"» nSize: "+Str(nSize))
 		CompilerIf Not #PORTABLE
 			Result = Original_ExpandEnvironmentStringsW(lpSrc,lpDst,nSize)
 		CompilerElse
-			Protected s.s = _ExpandEnvironment(lpSrc,#PB_Unicode)
+			Protected s.s = _ExpandEnvironment(lpSrc,nSize,#PB_Unicode)
 			Result = Len(s)+1
-			If nSize > Result
-				PokeSZ(lpDst,s)
+			If nSize >= Result
+				PokeS(lpDst,s)
+				DbgEnv("ExpandEnvironmentStringsW: «"+s+"» Result: "+Str(Result))
 			Else
-				PokeSZ(lpDst,s,nSize,#PB_Unicode|#PB_String_NoZero)
+				If nSize And lpDst
+					PokeW(lpDst,0)
+				EndIf
+				DbgEnv("ExpandEnvironmentStringsW: «"+s+"» Need: "+Str(Result))
 			EndIf
 		CompilerEndIf
-		DbgEnv("ExpandEnvironmentStringsW (2): «"+PeekSZ(lpDst)+"» Result: "+Str(Result))
 		ProcedureReturn Result
 	EndProcedure
-
 CompilerEndIf
 
 ;;======================================================================================================================
@@ -478,7 +489,7 @@ CompilerElse
 	Global EnvironmentVariablesCrt.s
 CompilerEndIf
 CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES_CRT Or #DETOUR_ENVIRONMENT_CRT<>""
-	Global ProfileRedirA.s, AppDataRedirA.s, LocalAppDataRedirA.s, CommonAppDataRedirA.s
+	Global *ProfileRedirA, *AppDataRedirA, *LocalAppDataRedirA, *CommonAppDataRedirA
 	;;------------------------------------------------------------------------------------------------------------------
 	; https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getenv-s-wgetenv-s
 	; ??? __p__environ https://docs.microsoft.com/ru-ru/cpp/c-runtime-library/internal-crt-globals-and-functions
@@ -546,37 +557,37 @@ CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES_CRT Or #DETOUR_ENVIRONMENT_CRT<>""
 		ProcedureReturn Result
 	EndProcedure
 	;;------------------------------------------------------------------------------------------------------------------
-	Global HomeDriveRedirA.s, HomePathRedirA.s
+	Global *HomeDriveRedirA, *HomePathRedirA
 	Procedure env2ptr(Env.s,Ansi=#False)
 		Protected Result
 		CharLower_(@Env)
 		If Env="userprofile" And ProfileRedir
 			DbgEnv("env2ptr: "+ProfileRedir)
-			Result = iif(Ansi,@ProfileRedirA,@ProfileRedir)
+			Result = iif(Ansi,*ProfileRedirA,@ProfileRedir)
 		ElseIf Env="home" And ProfileRedir
 			DbgEnv("env2ptr: "+ProfileRedir)
-			Result = iif(Ansi,@ProfileRedirA,@ProfileRedir)
+			Result = iif(Ansi,*ProfileRedirA,@ProfileRedir)
 		ElseIf Env="homedrive" And ProfileRedir
 			DbgEnv("env2ptr: "+HomeDriveRedir)
-			Result = iif(Ansi,@HomeDriveRedirA,@HomeDriveRedir)
+			Result = iif(Ansi,*HomeDriveRedirA,@HomeDriveRedir)
 		ElseIf Env="homepath" And ProfileRedir
 			DbgEnv("env2ptr: "+HomePathRedir)
-			Result = iif(Ansi,@HomePathRedirA,@HomePathRedir)
+			Result = iif(Ansi,*HomePathRedirA,@HomePathRedir)
 		ElseIf Env="appdata" And AppDataRedir
 			DbgEnv("env2ptr: "+AppDataRedir)
-			Result = iif(Ansi,@AppDataRedirA,@AppDataRedir)
+			Result = iif(Ansi,*AppDataRedirA,@AppDataRedir)
 		ElseIf Env="localappdata" And LocalAppDataRedir
 			DbgEnv("env2ptr: "+LocalAppDataRedir)
-			Result = iif(Ansi,@LocalAppDataRedirA,@LocalAppDataRedir)
+			Result = iif(Ansi,*LocalAppDataRedirA,@LocalAppDataRedir)
 		ElseIf Env="allusersprofile" And CommonAppDataRedir
 			DbgEnv("env2ptr: "+CommonAppDataRedir)
-			Result = iif(Ansi,@CommonAppDataRedirA,@CommonAppDataRedir)
+			Result = iif(Ansi,*CommonAppDataRedirA,@CommonAppDataRedir)
 		ElseIf Env="programdata" And CommonAppDataRedir
 			DbgEnv("env2ptr: "+CommonAppDataRedir)
-			Result = iif(Ansi,@CommonAppDataRedirA,@CommonAppDataRedir)
+			Result = iif(Ansi,*CommonAppDataRedirA,@CommonAppDataRedir)
 		ElseIf Env="public" And CommonAppDataRedir
 			DbgEnv("env2ptr: "+CommonAppDataRedir)
-			Result = iif(Ansi,@CommonAppDataRedirA,@CommonAppDataRedir)
+			Result = iif(Ansi,*CommonAppDataRedirA,@CommonAppDataRedir)
 		;Else
 		;	Result = #Null
 		EndIf
@@ -621,56 +632,61 @@ XIncludeFile "PP_MinHook.pbi"
 
 Global EnvironmentVariablesPermit = 1
 Global EnvironmentVariablesCrtPermit = 0
+CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES & #PORTABLE_ENV_KERNELBASE
+	Global EnvironmentVariablesDll.s = "kernelbase"
+CompilerElse
+	Global EnvironmentVariablesDll.s = "kernel32"
+CompilerEndIf
 Procedure _InitEnvironmentVariablesHooks()
 	If EnvironmentVariablesPermit
+		If OSMajorVersion <= 7
+			EnvironmentVariablesDll = "kernel32"
+		EndIf
 		If ProfileRedir
 			HomeDriveRedir = Left(ProfileRedir,2)
 			HomePathRedir = Mid(ProfileRedir,3)
 		EndIf
 		CompilerIf #DETOUR_ENVIRONMENTVARIABLE
-			MH_HookApi(kernel32,GetEnvironmentVariableA)
-			MH_HookApi(kernel32,GetEnvironmentVariableW)
+			MH_HookApiD(EnvironmentVariablesDll,GetEnvironmentVariableA)
+			MH_HookApiD(EnvironmentVariablesDll,GetEnvironmentVariableW)
 		CompilerEndIf
 		CompilerIf #DETOUR_EXPANDENVIRONMENTSTRINGS
-			MH_HookApi(kernel32,ExpandEnvironmentStringsA)
-			MH_HookApi(kernel32,ExpandEnvironmentStringsW)
+			MH_HookApiD(EnvironmentVariablesDll,ExpandEnvironmentStringsA)
+			MH_HookApiD(EnvironmentVariablesDll,ExpandEnvironmentStringsW)
 		CompilerEndIf
 		CompilerIf #DETOUR_ENVIRONMENTSTRINGS
 			If EnvironmentVariablesPermit>=2
-				MH_HookApi(kernel32,GetEnvironmentStrings)
-				MH_HookApi(kernel32,GetEnvironmentStringsA)
-				MH_HookApi(kernel32,GetEnvironmentStringsW)
-				MH_HookApi(kernel32,FreeEnvironmentStringsA)
-				MH_HookApi(kernel32,FreeEnvironmentStringsW)
+				MH_HookApiD(EnvironmentVariablesDll,GetEnvironmentStrings)
+				MH_HookApiD(EnvironmentVariablesDll,GetEnvironmentStringsA)
+				MH_HookApiD(EnvironmentVariablesDll,GetEnvironmentStringsW)
+				MH_HookApiD(EnvironmentVariablesDll,FreeEnvironmentStringsA)
+				MH_HookApiD(EnvironmentVariablesDll,FreeEnvironmentStringsW)
 			EndIf
 		CompilerEndIf
 		CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES_CRT Or #DETOUR_ENVIRONMENT_CRT<>""
 			If ProfileRedir
-				ProfileRedirA = SpaceA(Len(ProfileRedir))
-				PokeS(@ProfileRedirA,ProfileRedir,-1,#PB_Ascii)
-				HomeDriveRedirA  = SpaceA(Len(HomeDriveRedir))
-				PokeS(@HomeDriveRedirA,HomeDriveRedir,-1,#PB_Ascii)
-				HomePathRedirA  = SpaceA(Len(HomePathRedir))
-				PokeS(@HomePathRedirA,HomePathRedir,-1,#PB_Ascii)
+				*ProfileRedirA = Ascii(ProfileRedir)
+				*HomeDriveRedirA  = Ascii(HomeDriveRedir)
+				*HomePathRedirA  = Ascii(HomePathRedir)
 			EndIf
 			If AppDataRedir
-				AppDataRedirA = SpaceA(Len(AppDataRedir))
-				PokeS(@AppDataRedirA,AppDataRedir,-1,#PB_Ascii)
+				*AppDataRedirA = Ascii(AppDataRedir)
 			EndIf
 			If LocalAppDataRedir
-				LocalAppDataRedirA = SpaceA(Len(LocalAppDataRedir))
-				PokeS(@LocalAppDataRedirA,LocalAppDataRedir,-1,#PB_Ascii)
+				*LocalAppDataRedirA = Ascii(LocalAppDataRedir)
 			EndIf
 			If CommonAppDataRedir
-				CommonAppDataRedirA = SpaceA(Len(CommonAppDataRedir))
-				PokeS(@CommonAppDataRedirA,CommonAppDataRedir,-1,#PB_Ascii)
+				*CommonAppDataRedirA = Ascii(CommonAppDataRedir)
 			EndIf
 			If EnvironmentVariablesCrt
+				If GetExtensionPart(EnvironmentVariablesCrt)=""
+					EnvironmentVariablesCrt+".dll"
+				EndIf
 				LoadLibrary_(@EnvironmentVariablesCrt)
-				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,getenv)
-				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,_wgetenv)
-				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,getenv_s)
-				MH_HookApiD(#DETOUR_ENVIRONMENT_CRT,_wgetenv_s)
+				MH_HookApiD(EnvironmentVariablesCrt,getenv)
+				MH_HookApiD(EnvironmentVariablesCrt,_wgetenv)
+				MH_HookApiD(EnvironmentVariablesCrt,getenv_s)
+				MH_HookApiD(EnvironmentVariablesCrt,_wgetenv_s)
 			EndIf
 		CompilerEndIf
 	EndIf
@@ -678,7 +694,9 @@ EndProcedure
 AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = fABA9
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 662
+; FirstLine = 362
+; Folding = HAkH-
 ; DisableDebugger
 ; EnableExeConstant
