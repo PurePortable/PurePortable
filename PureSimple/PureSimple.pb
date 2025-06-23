@@ -12,7 +12,7 @@
 ;RES_INTERNALNAME PurePort.dll
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
-;PP_X32_COPYAS "P:\Games\Lines\Lines98\4.02\winmm.dll"
+;PP_X32_COPYAS nul
 ;PP_X64_COPYAS nul
 ;PP_CLEAN 2
 
@@ -20,7 +20,7 @@ EnableExplicit
 IncludePath "..\PPDK\Lib"
 XIncludeFile "PurePortableCustom.pbi"
 
-#PROXY_DLL = "winmm"
+#PROXY_DLL = "pureport"
 #PROXY_DLL_COMPATIBILITY = 0 ; Совместимость: 0 - по умолчанию, 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
 
 #CONFIG_FILENAME = ""
@@ -579,8 +579,8 @@ Procedure AttachProcedure()
 	;}
 	;{ Создание папок
 	If PreferenceGroup("CreateDirectories")
+		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			ExaminePreferenceKeys()
 			CreatePath(NormalizePPath(PreferenceKeyName()))
 		Wend
 	EndIf
