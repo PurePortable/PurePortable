@@ -598,9 +598,13 @@ Procedure AttachProcedure()
 				If v
 					AddKeyData(k,v)
 				ElseIf Left(k,9)="software\" ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
-					v = Mid(k,10)
-					AddKeyData(k,v)
-					AddKeyData(v,v)
+					v = Mid(k,10) ; все подстановки будут на этот путь
+					i = 0
+					Repeat
+						k = Mid(k,i+1)
+						AddKeyData(k,v)
+						i = FindString(k,"\")
+					Until i=0
 				Else ; используем as is
 					AddKeyData(k,k)
 				EndIf
@@ -1034,7 +1038,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; Folding = JCAAAICAA+
+; Folding = pCAAAICAA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
