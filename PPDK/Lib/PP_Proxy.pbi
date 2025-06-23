@@ -50,12 +50,12 @@ EndMacro
 ; Макросы для описания прокси-dll
 ; Используются в начале каждого файла в папке proxy
 ; DLL загружаем, но не выгружаем!
-Macro DeclareProxyDll(DllName)
-	Global hDll_#DllName = LoadDll(DoubleQuote#DllName#DoubleQuote)
+Macro DeclareProxyDll(DllName,fSystem=1)
+	Global hDll_#DllName = LoadDll(DoubleQuote#DllName#DoubleQuote,fSystem)
 	;Global hDll = hDll_#DllName
 EndMacro
-Macro DeclareProxyDllExt(DllName,DllExt)
-	Global hDll_#DllName = LoadDll(DoubleQuote#DllName.DllExt#DoubleQuote)
+Macro DeclareProxyDllExt(DllName,DllExt,fSystem=1)
+	Global hDll_#DllName = LoadDll(DoubleQuote#DllName.DllExt#DoubleQuote,fSystem)
 	;Global hDll = hDll_#DllName
 EndMacro
 
@@ -370,8 +370,10 @@ EndProcedure
 Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассемблера
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = -AAg
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 52
+; FirstLine = 38
+; Folding = -Agw
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
