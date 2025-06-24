@@ -118,7 +118,7 @@ Procedure DelCfg(sKey.s,sName.s)
 	EndIf
 	ProcedureReturn Bool(RegDeleteKeyValue_(hAppKey,@sKey,@sName)=#NO_ERROR)
 EndProcedure
-Procedure DelTree(sKey.s)
+Procedure DelCfgTree(sKey.s)
 	If Original_RegDeleteTreeW
 		ProcedureReturn Bool(Original_RegDeleteTreeW(hAppKey,@sKey)=#NO_ERROR)
 	EndIf

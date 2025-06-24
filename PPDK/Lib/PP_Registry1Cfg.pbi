@@ -170,18 +170,18 @@ Procedure DelCfg(sKey.s,sName.s)
 		Next
 	EndIf
 EndProcedure
-Procedure DelTree(sKey.s)
+Procedure DelCfgTree(sKey.s)
 	Protected CmpKey.s = sKey + "\"
 	Protected lenCmpKey = Len(CmpKey)
 	Protected ik, ic, vKey
 	For ik=1 To nKeys ; ищем все подключи и сам ключ
 		If Keys(ik) = sKey Or Left(Keys(ik),lenCmpKey) = CmpKey
-			;dbg("DelTree: "+Keys(ik))
+			;dbg("DelCfgTree: "+Keys(ik))
 			ConfigChanged = #True
 			vKey = i2hkey(ik) ; виртуальный хэндл удаляемого подключа
 			For ic=1 To nCfg  ; ищем и удаляем значения связанные с удаляемым ключом
 				If Cfg(ic)\h = vKey
-					;dbg("DelTree: Val: "+Cfg(ic)\n)
+					;dbg("DelCfgTree: Val: "+Cfg(ic)\n)
 					Cfg(ic)\h = 0
 					Cfg(ic)\c = 0
 					;Cfg(ic)\m = 0
