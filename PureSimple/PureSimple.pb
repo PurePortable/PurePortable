@@ -953,15 +953,46 @@ EndProcedure
 ; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
 ; Для rundll32 не выполняется.
 Procedure DetachProcedure()
+	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
+		dbg("DetachProcedure: Error open prefs")
+		ProcedureReturn 1
+	EndIf
+	Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
+	If PreferenceGroup("Portable")
+		Cleanup = ReadPreferenceInteger("Cleanup",0)
+		CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
+	EndIf
+	CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для Registry1 чистку реестра производим здесь
+		If Cleanup And RegistryPermit
+			If PreferenceGroup("Cleanup.Registry")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					CleanupItem = PreferenceKeyName()
+					DbgCln("Cleanup: Registry: "+CleanupItem)
+					DelCfgTree(CleanupItem)
+				Wend
+			EndIf
+		EndIf
+	CompilerEndIf
 	CompilerIf #PORTABLE_REGISTRY
 		If RegistryPermit
 			WriteCfg()
 		EndIf
 	CompilerEndIf
-	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
-		ProcedureReturn 1
-	EndIf
 	If LastProcess
+		CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
+			If Cleanup And RegistryPermit
+				If PreferenceGroup("Cleanup.Registry")
+					ExaminePreferenceKeys()
+					While NextPreferenceKey()
+						CleanupItem = PreferenceKeyName()
+						DbgCln("Cleanup: Registry: "+CleanupItem)
+						DelCfgTree(CleanupItem)
+					Wend
+				EndIf
+				WriteCfg()
+			EndIf
+		CompilerEndIf
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -970,11 +1001,6 @@ Procedure DetachProcedure()
 		EndIf
 		
 		; Удаление ненужных файлов и папок.
-		Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
-		If PreferenceGroup("Portable")
-			Cleanup = ReadPreferenceInteger("Cleanup",0)
-			CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
-		EndIf
 		If Cleanup
 			If PreferenceGroup("Debug")
 				DbgClnMode = ReadPreferenceInteger("Cleanup",0)
@@ -1039,9 +1065,11 @@ Procedure RunFrom(k.s,p.s)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = pCAAAICAA+
+; CursorPosition = 55
+; FirstLine = 29
+; Folding = pCAAAICAg+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
