@@ -41,10 +41,10 @@ CompilerEndIf
 #RRF_RT_DWORD=$00000018 ; #RRF_RT_REG_BINARY|#RRF_RT_REG_DWORD
 #RRF_RT_REG_SZ=$00000002
 #RRF_RT_ANY=$0000FFFF
-DeclareImport(kernel32,_RegGetValueW@28,RegGetValueW,RegGetValue_(hKey,*SubKey,*ValueName,dwFlags.l,*dwType,*Data,*cbData))
-DeclareImport(kernel32,_RegSetKeyValueW@24,RegSetKeyValueW,RegSetKeyValue_(hKey,*SubKey,*ValueName,dwType.l,*Data,*cbData))
-DeclareImport(kernel32,_RegDeleteKeyValueW@12,RegDeleteKeyValueW,RegDeleteKeyValue_(hKey,*SubKey,*ValueName))
-DeclareImport(kernel32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey,*SubKey))
+DeclareImport(advapi32,_RegGetValueW@28,RegGetValueW,RegGetValue_(hKey,*SubKey,*ValueName,dwFlags.l,*dwType,*Data,*cbData))
+DeclareImport(advapi32,_RegSetKeyValueW@24,RegSetKeyValueW,RegSetKeyValue_(hKey,*SubKey,*ValueName,dwType.l,*Data,*cbData))
+DeclareImport(advapi32,_RegDeleteKeyValueW@12,RegDeleteKeyValueW,RegDeleteKeyValue_(hKey,*SubKey,*ValueName))
+DeclareImport(advapi32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey,*SubKey))
 
 Procedure.s GetCfgS(sKey.s,sName.s)
 	Protected dwType, cbData, Result.s
