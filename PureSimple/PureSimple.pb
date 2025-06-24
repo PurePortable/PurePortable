@@ -952,6 +952,9 @@ EndProcedure
 ; Действия выполняемые при завершении работы программы.
 ; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
 ; Для rundll32 не выполняется.
+CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для R2 уже есть
+	DeclareImport(advapi32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey.l,*lpSubKey))
+CompilerEndIf
 Procedure DetachProcedure()
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
 		dbg("DetachProcedure: Error open prefs")
@@ -970,6 +973,32 @@ Procedure DetachProcedure()
 					CleanupItem = PreferenceKeyName()
 					DbgCln("Cleanup: Registry: "+CleanupItem)
 					DelCfgTree(CleanupItem)
+				Wend
+			EndIf
+		EndIf
+		If Cleanup
+			If PreferenceGroup("Cleanup.RealRegistry")
+				Protected hKey, sKey.s, x
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					CleanupItem = PreferenceKeyName()
+					DbgCln("Cleanup: RealRegistry: "+CleanupItem)
+					x = FindString(CleanupItem,"\")
+					If x
+						sKey = Mid(CleanupItem,x+1)
+						hKey = 0
+						Select UCase(Left(CleanupItem,x-1))
+							Case "HKLM","HKEY_LOCAL_MACHINE"
+								hKey = #HKEY_LOCAL_MACHINE
+							Case "HKCR","HKEY_CLASSES_ROOT"
+								hKey = #HKEY_CLASSES_ROOT
+							Case "HKCU","HKEY_CURRENT_USER"
+								hKey = #HKEY_CURRENT_USER
+						EndSelect
+						If hKey
+							RegDeleteTree_(hKey,@sKey)
+						EndIf
+					EndIf
 				Wend
 			EndIf
 		EndIf
@@ -1067,8 +1096,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 55
-; FirstLine = 29
+; CursorPosition = 954
+; FirstLine = 149
 ; Folding = pCAAAICAg+
 ; Optimizer
 ; EnableThread
