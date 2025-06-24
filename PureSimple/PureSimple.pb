@@ -976,6 +976,13 @@ Procedure DetachProcedure()
 				Wend
 			EndIf
 		EndIf
+	CompilerEndIf
+	CompilerIf #PORTABLE_REGISTRY
+		If RegistryPermit
+			WriteCfg()
+		EndIf
+	CompilerEndIf
+	If LastProcess
 		If Cleanup
 			If PreferenceGroup("Cleanup.RealRegistry")
 				Protected hKey, sKey.s, x
@@ -1002,13 +1009,6 @@ Procedure DetachProcedure()
 				Wend
 			EndIf
 		EndIf
-	CompilerEndIf
-	CompilerIf #PORTABLE_REGISTRY
-		If RegistryPermit
-			WriteCfg()
-		EndIf
-	CompilerEndIf
-	If LastProcess
 		CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
 			If Cleanup And RegistryPermit
 				If PreferenceGroup("Cleanup.Registry")
@@ -1096,8 +1096,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 954
-; FirstLine = 149
+; CursorPosition = 984
+; FirstLine = 185
 ; Folding = pCAAAICAg+
 ; Optimizer
 ; EnableThread
