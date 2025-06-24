@@ -69,6 +69,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 #PORTABLE_CBT_HOOK = 0 ; Хук для отслеживания закрытия окон для сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
+#PORTABLE_USE_MUTEX = 0
 
 #PORTABLE_CLEANUP = 0
 

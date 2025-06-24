@@ -1,5 +1,5 @@
 ﻿;;======================================================================================================================
-; PurePortable main lib 4.11.0.6
+; PurePortable main lib 4.11.0.10
 #PP_MAINVERSION = 4.11
 ;;======================================================================================================================
 
@@ -15,6 +15,7 @@ CompilerEndIf
 CompilerIf Not Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant) : #PORTABLE_CHECK_PROGRAM = 0 : CompilerEndIf
 CompilerIf Not Defined(PROXY_DLL_COMPATIBILITY,#PB_Constant) : #PROXY_DLL_COMPATIBILITY = 7 : CompilerEndIf
 ;#PROXY_DLL_COMPATIBILITY_DEFAULT = 7 ; Это совместимость по умолчанию для #PROXY_DLL_COMPATIBILITY=0 ???
+CompilerIf Not Defined(PORTABLE_USE_MUTEX,#PB_Constant) : #PORTABLE_USE_MUTEX = 0 : CompilerEndIf
 
 ;{ Символы для кодирования данных
 #XNUL = $E000 ; 57344 - Из набора символов для частного использования
@@ -388,17 +389,22 @@ Procedure ExitProcedure()
 	CompilerEndIf
 	
 	; В это время может завершаться или запускаться другой процесс
-	;hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
-	;WaitForSingleObject_(hProcessMutex,#INFINITE)
 	ProcessCntPrev = ProcessCnt
 	GetNamedPipeHandleState_(hProcessPipe,#Null,@ProcessCnt,#Null,#Null,#Null,0)
 	SingleProcess = Bool(ProcessCnt=1)
 	LastProcess = SingleProcess
 	CloseHandle_(hProcessPipe)
-	;ReleaseMutex_(hProcessMutex)
-	;CloseHandle_(hProcessMutex)
 	
-	If DetachProcedure() = 0
+	CompilerIf #PORTABLE_USE_MUTEX
+		hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
+		WaitForSingleObject_(hProcessMutex,#INFINITE)
+	CompilerEndIf
+	Protected r = DetachProcedure()
+	CompilerIf #PORTABLE_USE_MUTEX
+		ReleaseMutex_(hProcessMutex)
+		CloseHandle_(hProcessMutex)
+	CompilerEndIf
+	If r = 0
 		DetachCleanup
 	EndIf
 	
@@ -484,18 +490,12 @@ Procedure StartProcedure()
 		StringFromGUID2_(?bGUID,?sGUID,40)
 		PokeI(?DllInitComplete,1)
 	EndIf
-	; ???
-	; Может, здесь нужен цикл ожидания на случай, если первый процесс ещё не закончил инициализацию,
-	; а следующий уже пытается определить PPGUID и имена мьютекса и канала?
-	; С другой стороны, пока первый процесс не закончил инициализацию, откуда взяться второму?
 	PPGUID = PeekS(?sGUID)
 	PPTickCount = PeekL(?TickCount)
-	;ProcessMutexName = PrgName+"."+PPGUID
-	ProcessPipeName = "\\.\pipe\PP."+PrgName+"."+PPGUID
+	ProcessMutexName = "PP."+PrgName+"."+PPGUID
+	ProcessPipeName = "\\.\pipe\"+ProcessMutexName
+	;ProcessPipeName = "\\.\pipe\PP."+PrgName+"."+PPGUID
 	
-	; В это время может завершаться или запускаться другой процесс
-	;hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
-	;WaitForSingleObject_(hProcessMutex,#INFINITE)
 	hProcessPipe = CreateNamedPipe_(@ProcessPipeName,#PIPE_ACCESS_DUPLEX,0,#PIPE_UNLIMITED_INSTANCES,16,16,0,#Null)
 	If hProcessPipe
 		; https://learn.microsoft.com/ru-ru/windows/win32/api/winbase/nf-winbase-getnamedpipehandlestatew
@@ -506,8 +506,6 @@ Procedure StartProcedure()
 		dbg("CreateNamedPipe: «"+ProcessPipeName+"»")
 		dbg("CreateNamedPipe: "+GetLastErrorStr())
 	EndIf
-	;ReleaseMutex_(hProcessMutex)
-	;CloseHandle_(hProcessMutex)
 	
 	;dbg("GUID: "+ProcessGUID+" TC: "+Str(ProcessTickCount))
 	;DisableThreadLibraryCalls_(DllInstance) ; https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-disablethreadlibrarycalls
@@ -534,7 +532,15 @@ ProcedureDLL.l AttachProcess(Instance)
 			ProcedureReturn
 		EndIf
 		StartProcedure()
+		CompilerIf #PORTABLE_USE_MUTEX
+			hProcessMutex = CreateMutex_(#Null,#False,@ProcessMutexName)
+			WaitForSingleObject_(hProcessMutex,#INFINITE)
+		CompilerEndIf
 		AttachProcedure()
+		CompilerIf #PORTABLE_USE_MUTEX
+			ReleaseMutex_(hProcessMutex)
+			CloseHandle_(hProcessMutex)
+		CompilerEndIf
 	CompilerElse
 		; Для совместимости - когда нет CheckProgram, проверка осуществляется в AttachProcedure.
 		StartProcedure()
@@ -579,9 +585,7 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 403
-; FirstLine = 368
-; Folding = O--
+; Folding = OB9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

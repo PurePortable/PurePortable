@@ -53,6 +53,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PROFILE_STRINGS_FILENAME = "PurePortable"
 #PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
+#PORTABLE_USE_MUTEX = 0
 #PORTABLE_CLEANUP = 1
 #PORTABLE_CHECK_PROGRAM = 1
 ;}
