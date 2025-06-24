@@ -570,6 +570,7 @@ Procedure AttachProcedure()
 	DbgAnyMode = 0
 	DbgDetach = 1
 	DbgExecMode = 0
+	DbgClnMode = 0
 	If PreferenceGroup("Debug")
 		DbgRegMode = ReadPreferenceInteger("Registry",0)
 		DbgSpecMode = ReadPreferenceInteger("SpecialFolders",0)
@@ -578,6 +579,7 @@ Procedure AttachProcedure()
 		DbgDetach = ReadPreferenceInteger("Detach",1)
 		DbgExtMode = ReadPreferenceInteger("Extensions",0)
 		DbgExecMode = ReadPreferenceInteger("RunFrom",0)
+		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
 	EndIf
 	;}
 	;{ Создание папок
