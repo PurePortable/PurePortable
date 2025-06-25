@@ -1002,63 +1002,61 @@ Procedure DetachProcedure()
 				RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 			Wend
 		EndIf
-		
-		; Удаление файлов, папок и разделов реестра.
-		If Cleanup
-			If PreferenceGroup("Cleanup.RealRegistry")
-				Protected hKey, sKey.s, x
-				ExaminePreferenceKeys()
-				While NextPreferenceKey()
-					CleanupItem = PreferenceKeyName()
-					DbgCln("Cleanup: RealRegistry: "+CleanupItem)
-					x = FindString(CleanupItem,"\")
-					If x
-						sKey = Mid(CleanupItem,x+1)
-						hKey = 0
-						Select UCase(Left(CleanupItem,x-1))
-							Case "HKLM","HKEY_LOCAL_MACHINE"
-								hKey = #HKEY_LOCAL_MACHINE
-							Case "HKCR","HKEY_CLASSES_ROOT"
-								hKey = #HKEY_CLASSES_ROOT
-							Case "HKCU","HKEY_CURRENT_USER"
-								hKey = #HKEY_CURRENT_USER
-						EndSelect
-						If hKey
-							RegDeleteTree_(hKey,@sKey)
-						EndIf
+	EndIf
+	If Cleanup = 2 Or (LastProcess And Cleanup) ; Удаление файлов, папок и разделов реестра.
+		If PreferenceGroup("Cleanup.RealRegistry")
+			Protected hKey, sKey.s, x
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				CleanupItem = PreferenceKeyName()
+				DbgCln("Cleanup: RealRegistry: "+CleanupItem)
+				x = FindString(CleanupItem,"\")
+				If x
+					sKey = Mid(CleanupItem,x+1)
+					hKey = 0
+					Select UCase(Left(CleanupItem,x-1))
+						Case "HKLM","HKEY_LOCAL_MACHINE"
+							hKey = #HKEY_LOCAL_MACHINE
+						Case "HKCR","HKEY_CLASSES_ROOT"
+							hKey = #HKEY_CLASSES_ROOT
+						Case "HKCU","HKEY_CURRENT_USER"
+							hKey = #HKEY_CURRENT_USER
+					EndSelect
+					If hKey
+						RegDeleteTree_(hKey,@sKey)
 					EndIf
-				Wend
-			EndIf
-			DbgCln("CleanupDirectory: "+CleanupDirectory)
-			Protected Dim ClnDirs.s(0), iClnDir
-			Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory,"|")
-			If nClnDir = 0
-				nClnDir = AddArrayS(ClnDirs(),PrgDirN)
-			EndIf
-			For iClnDir=1 To nClnDir
-				ClnDirs(iClnDir) = NormalizePPath(ClnDirs(iClnDir))
-			Next
-			ClnDirs(0) = TempDir ; всегда разрешено во временной папке
-			If PreferenceGroup("Cleanup")
-				ExaminePreferenceKeys()
-				While NextPreferenceKey()
-					CleanupItem = NormalizePPath(PreferenceKeyName())
-					DbgCln("Cleanup: "+CleanupItem)
-					; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
-					Cleanup = 0
-					For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
-						DbgCln("Cleanup: Chk: "+ClnDirs(iClnDir))
-						If StartWithPath(CleanupItem,ClnDirs(iClnDir))
-							Cleanup = 1
-							DbgCln("Cleanup: Into: "+ClnDirs(iClnDir))
-							Break
-						EndIf
-					Next
-					If Cleanup
-						AddCleanItem(CleanupItem)
+				EndIf
+			Wend
+		EndIf
+		DbgCln("CleanupDirectory: "+CleanupDirectory)
+		Protected Dim ClnDirs.s(0), iClnDir
+		Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory,"|")
+		If nClnDir = 0
+			nClnDir = AddArrayS(ClnDirs(),PrgDirN)
+		EndIf
+		For iClnDir=1 To nClnDir
+			ClnDirs(iClnDir) = NormalizePPath(ClnDirs(iClnDir))
+		Next
+		ClnDirs(0) = TempDir ; всегда разрешено во временной папке
+		If PreferenceGroup("Cleanup")
+			ExaminePreferenceKeys()
+			While NextPreferenceKey()
+				CleanupItem = NormalizePPath(PreferenceKeyName())
+				DbgCln("Cleanup: "+CleanupItem)
+				; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
+				Cleanup = 0
+				For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
+					DbgCln("Cleanup: Chk: "+ClnDirs(iClnDir))
+					If StartWithPath(CleanupItem,ClnDirs(iClnDir))
+						Cleanup = 1
+						DbgCln("Cleanup: Into: "+ClnDirs(iClnDir))
+						Break
 					EndIf
-				Wend
-			EndIf
+				Next
+				If Cleanup
+					AddCleanItem(CleanupItem)
+				EndIf
+			Wend
 		EndIf
 	EndIf
 	ClosePreferences()
@@ -1088,9 +1086,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 954
-; FirstLine = 146
-; Folding = pCAAAICAg+
+; CursorPosition = 1060
+; FirstLine = 310
+; Folding = pCAAAIaAg+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
