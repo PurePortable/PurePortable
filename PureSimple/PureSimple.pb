@@ -952,7 +952,7 @@ EndProcedure
 ; Действия выполняемые при завершении работы программы.
 ; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
 ; Для rundll32 не выполняется.
-CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для R2 уже есть
+CompilerIf Not #PORTABLE_REGISTRY Or (#PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) <> 2) ; Для R2 уже есть
 	DeclareImport(advapi32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey.l,*lpSubKey))
 CompilerEndIf
 Procedure DetachProcedure()
@@ -965,7 +965,7 @@ Procedure DetachProcedure()
 		Cleanup = ReadPreferenceInteger("Cleanup",0)
 		CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
 	EndIf
-	CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для Registry1 чистку реестра производим здесь
+	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для Registry1 чистку реестра производим здесь
 		If Cleanup And RegistryPermit
 			If PreferenceGroup("Cleanup.Registry")
 				ExaminePreferenceKeys()
@@ -983,7 +983,7 @@ Procedure DetachProcedure()
 		EndIf
 	CompilerEndIf
 	If LastProcess
-		CompilerIf (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
+		CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
 			If Cleanup And RegistryPermit
 				If PreferenceGroup("Cleanup.Registry")
 					ExaminePreferenceKeys()
@@ -1028,12 +1028,6 @@ Procedure DetachProcedure()
 						EndIf
 					EndIf
 				Wend
-			EndIf
-			If PreferenceGroup("Debug")
-				DbgClnMode = ReadPreferenceInteger("Cleanup",0)
-			EndIf
-			If CleanupDirectory = ""
-				CleanupDirectory = PrgDirN
 			EndIf
 			DbgCln("CleanupDirectory: "+CleanupDirectory)
 			Protected Dim ClnDirs.s(0), iClnDir
@@ -1094,8 +1088,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 985
-; FirstLine = 183
+; CursorPosition = 954
+; FirstLine = 146
 ; Folding = pCAAAICAg+
 ; Optimizer
 ; EnableThread
