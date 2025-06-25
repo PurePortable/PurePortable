@@ -966,7 +966,19 @@ Procedure DetachProcedure()
 		CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
 	EndIf
 	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для Registry1 чистку реестра производим здесь
-		If Cleanup And RegistryPermit
+		If RegistryPermit And Cleanup
+			If PreferenceGroup("Cleanup.Registry")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					CleanupItem = PreferenceKeyName()
+					DbgCln("Cleanup: Registry: "+CleanupItem)
+					DelCfgTree(CleanupItem)
+				Wend
+			EndIf
+		EndIf
+	CompilerEndIf
+	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
+		If RegistryPermit And (Cleanup = 2 Or (LastProcess And Cleanup))
 			If PreferenceGroup("Cleanup.Registry")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
@@ -983,19 +995,6 @@ Procedure DetachProcedure()
 		EndIf
 	CompilerEndIf
 	If LastProcess
-		CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
-			If Cleanup And RegistryPermit
-				If PreferenceGroup("Cleanup.Registry")
-					ExaminePreferenceKeys()
-					While NextPreferenceKey()
-						CleanupItem = PreferenceKeyName()
-						DbgCln("Cleanup: Registry: "+CleanupItem)
-						DelCfgTree(CleanupItem)
-					Wend
-				EndIf
-				WriteCfg()
-			EndIf
-		CompilerEndIf
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
@@ -1086,8 +1085,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1060
-; FirstLine = 310
+; CursorPosition = 968
+; FirstLine = 250
 ; Folding = pCAAAIaAg+
 ; Optimizer
 ; EnableThread
