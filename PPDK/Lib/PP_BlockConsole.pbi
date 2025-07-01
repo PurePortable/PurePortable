@@ -26,19 +26,25 @@ CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://docs.microsoft.com/en-us/windows/console/allocconsole
-Prototype AllocConsole()
-Global Original_AllocConsole.AllocConsole
-Procedure Detour_AllocConsole()
-	DbgCon("AllocConsole")
-	ProcedureReturn 0
-EndProcedure
+;Prototype AllocConsole()
+;Global Original_AllocConsole.AllocConsole
+; Procedure Detour_AllocConsole()
+; 	DbgCon("AllocConsole")
+; 	ProcedureReturn 0
+; EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://docs.microsoft.com/en-us/windows/console/attachconsole
-Prototype AttachConsole(dwProcessId)
+#ATTACH_PARENT_PROCESS = -1
+Prototype AttachConsole(dwProcessId.l)
 Global Original_AttachConsole.AttachConsole
-Procedure Detour_AttachConsole(dwProcessId)
-	DbgCon("AttachConsole")
-	ProcedureReturn 0
+Procedure Detour_AttachConsole(dwProcessId.l)
+	If dwProcessId = #ATTACH_PARENT_PROCESS
+		DbgCon("AttachConsole: ATTACH_PARENT_PROCESS")
+		SetLastError_(#ERROR_INVALID_HANDLE)
+		ProcedureReturn 0
+	EndIf
+	DbgCon("AttachConsole: "+Str(dwProcessId))
+	ProcedureReturn Original_AttachConsole(dwProcessId)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Prototype FreeConsole()
@@ -92,7 +98,7 @@ XIncludeFile "PP_MinHook.pbi"
 Global BlockConsolePermit = 1
 Procedure _InitBlockConsoleHooks()
 	If BlockConsolePermit
-		MH_HookApi(kernel32,AllocConsole)
+		;MH_HookApi(kernel32,AllocConsole)
 		MH_HookApi(kernel32,AttachConsole)
 		;MH_HookApi(kernel32,FreeConsole)
 		;MH_HookApi(kernel32,SetConsoleMode)
@@ -106,6 +112,6 @@ AddInitProcedure(_InitBlockConsoleHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = v
+; Folding = -
 ; DisableDebugger
 ; EnableExeConstant
