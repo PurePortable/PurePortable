@@ -248,6 +248,7 @@ Procedure AttachProcedure()
 		;LocalLowAppDataRedir = PrgDirN
 		CommonAppDataRedir = PrgDirN
 		;DocumentsRedir = PrgDirN+"\Documents"
+		;PublicRedir = PrgDirN
 		;CommonDocumentsRedir = DocumentsRedir
 		;CreatePath(DocumentsRedir)
 	CompilerEndIf
@@ -312,10 +313,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 198
-; FirstLine = 114
-; Folding = k6dH6
-; Markers = 106
+; Folding = k6NH6
+; Markers = 107
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
