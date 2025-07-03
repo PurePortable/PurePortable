@@ -21,7 +21,7 @@ Procedure.s NormalizePath(Path.s,Dir.s="")
 			Else
 				Dir = RTrim(Dir,"\")+"\"
 			EndIf
-			Path = Dir+Path ; TODO: пути, начинающиеся с "\"
+			NewPath = Dir+Path ; TODO: пути, начинающиеся с "\"
 		EndIf
 		Protected *Buf
 		Protected LenBuf = GetFullPathName_(@NewPath,0,#Null,#Null)
@@ -50,8 +50,8 @@ EndProcedure
 ; 	ProcedureReturn Path
 ; EndProcedure
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 21
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 23
 ; FirstLine = 6
 ; Folding = -
 ; EnableThread
