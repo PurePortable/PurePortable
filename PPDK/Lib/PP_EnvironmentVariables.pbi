@@ -25,6 +25,7 @@ Global AppDataRedir.s
 Global LocalAppDataRedir.s
 Global LocalLowAppDataRedir.s
 Global DocumentsRedir.s
+Global PublicRedir.s
 Global CommonAppDataRedir.s
 Global CommonDocumentsRedir.s
 Global TempRedir.s
