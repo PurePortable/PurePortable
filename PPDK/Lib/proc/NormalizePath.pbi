@@ -15,7 +15,7 @@ Procedure.s NormalizePath(Path.s,Dir.s="")
 		Else
 			NewPath = Path + "\."
 		EndIf
-		If Mid(Path,2) <> ":" ; относительный путь
+		If Mid(Path,2,1) <> ":" ; относительный путь
 			If Dir=""
 				Dir = GetCurrentDirectory()
 			Else
@@ -51,8 +51,7 @@ EndProcedure
 ; EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 23
-; FirstLine = 6
+; CursorPosition = 8
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
