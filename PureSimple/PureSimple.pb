@@ -663,6 +663,9 @@ Procedure AttachProcedure()
 				Case "documents"
 					DocumentsRedir = p
 					CreatePath(p)
+				Case "public"
+					PublicRedir = p
+					CreatePath(p)
 				Case "commondocuments"
 					CommonDocumentsRedir = p
 					CreatePath(p)
@@ -717,6 +720,8 @@ Procedure AttachProcedure()
 					If p="" And AppDataRedir<>p : p = AppDataRedir : EndIf
 				Case "localappdata"
 					If p="" And AppDataRedir<>p : p = AppDataRedir : EndIf
+				Case "public"
+					If p="" And PublicRedir<>p : p = PublicRedir : EndIf
 				Case "temp","tmp"
 					If p="" And TempRedir<>p : p = TempRedir : EndIf
 				Default
@@ -1085,8 +1090,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 968
-; FirstLine = 250
+; CursorPosition = 723
+; FirstLine = 216
 ; Folding = pCAAAIaAg+
 ; Optimizer
 ; EnableThread

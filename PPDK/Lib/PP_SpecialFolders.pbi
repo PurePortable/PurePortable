@@ -12,6 +12,7 @@ Global LocalAppDataRedir.s
 Global LocalLowAppDataRedir.s
 Global DocumentsRedir.s
 Global CommonAppDataRedir.s
+Global PublicRedir.s
 Global CommonDocumentsRedir.s
 Global TempRedir.s
 
@@ -147,6 +148,10 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH Or #DETOUR_SHGETFOLDERPATHEX Or #DETOUR_
 			DbgSpec("kfid2path: "+CommonAppDataRedir)
 			ProcedureReturn CommonAppDataRedir
 		EndIf
+		If CompareMemory(kfid,?FOLDERID_Public,16) And PublicRedir
+			DbgSpec("kfid2path: "+PublicRedir)
+			ProcedureReturn PublicRedir
+		EndIf
 		If CompareMemory(kfid,?FOLDERID_PublicDocuments,16) And CommonDocumentsRedir
 			DbgSpec("kfid2path: "+CommonDocumentsRedir)
 			ProcedureReturn CommonDocumentsRedir
@@ -165,6 +170,11 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH Or #DETOUR_SHGETFOLDERPATHEX Or #DETOUR_
 		Data.l $62AB5D82
 		Data.w $FDC1,$4DC3
 		Data.b $A9,$DD,$07,$0D,$1D,$49,$5D,$97
+
+		FOLDERID_Public: ; {DFDF76A2-C82A-4D63-906A-5644AC457385}
+		Data.l $DFDF76A2
+		Data.w $C82A,$4D63
+		Data.b $90,$6A,$56,$44,$AC,$45,$73,$85
 
 		FOLDERID_PublicDocuments: ; {ED4824AF-DCE4-45A8-81E2-FC7965083634}
 		Data.l $ED4824AF
@@ -698,8 +708,8 @@ EndProcedure
 AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = qBAA+
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = uDAC+
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant

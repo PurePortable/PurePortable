@@ -93,9 +93,9 @@ Procedure.s env2path(Env.s)
 	ElseIf Env="programdata" And CommonAppDataRedir
 		DbgEnv("env2path: "+CommonAppDataRedir)
 		Result = CommonAppDataRedir
-	ElseIf Env="public" And CommonAppDataRedir
-		DbgEnv("env2path: "+CommonAppDataRedir)
-		Result = CommonAppDataRedir
+	ElseIf Env="public" And PublicRedir
+		DbgEnv("env2path: "+PublicRedir)
+		Result = PublicRedir
 	ElseIf (Env="temp" Or Env="tmp") And TempRedir
 		DbgEnv("env2path: "+TempRedir)
 		Result = TempRedir
@@ -695,8 +695,6 @@ AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 662
-; FirstLine = 362
-; Folding = HAkH-
+; Folding = FAAA5
 ; DisableDebugger
 ; EnableExeConstant
