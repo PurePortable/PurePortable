@@ -4,7 +4,7 @@
 (-) удалено
 (?) непонятно ))
 
-[4.11.0.10]
+[4.11.0.10] 2025-07-07
 (*) Исключена проверка формата #PB_Compiler_Executable
 (+) PureSimple: Если в [Registry.SetData] задано пустое значение или значение «-», параметр удаляется.
 (+) Если в pport-файле тип значения «-», значение удаляется.
@@ -14,7 +14,20 @@
 (-) PureSimple: Удалён код для перехвата CLSIDFromProgID.
 (+) EnvironmentVariables: Предварительная загрузка crt.
 (+) EnvironmentVariables: Управление именем crt через переменную. Константа #PORTABLE_ENVIRONMENT_VARIABLES_CRT.
-(+) PureSimple: Управление перехватом переменных среды через crt.
+(+) EnvironmentVariables: Перехват kernelbase.
+(+) PureSimple: Изменения управлением перехватом переменных среды в связи с последними изменениями PureExpert. Параметры EnvironmentVariablesDll, EnvironmentVariablesCrt.
+(+) #DBG_DETACH
+(!) Исправление перекодировки при сохранении REG_MULTI_SZ.
+(+) Proxy dlls: dwrite, propsys, vcruntime140_0
+(+) Макросы DeclareProxyDll и DeclareProxyDllExt принимают дополнительный параметр fSystem.
+(+) PureSimple: Более двух уровней в сокращённом указании ключей, начинающихся на "Software" в [Registry].
+(+) PureSimple: Чтение DbgClnMode в AttachProcedure.
+(+) Использование мьютекса при выполнении AttachProcess и DetachProcess.
+(+) PureSimple: Cleanup.Registry
+(+) PureSimple: Режим Cleanup=2.
+(*) BlockConsole: Только AttachConsole к родительскому процессу.
+(!) Исправление в NormalizePath.
+(+) Перенаправление Public.
 
 [4.11.0.9] 2025-05-12
 (+) PureSimple: В секции Registry.SetData если не задан тип значения, оно расматривается как строка (s:).
