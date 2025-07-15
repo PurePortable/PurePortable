@@ -654,7 +654,7 @@ Procedure AttachProcedure()
 				Case "localappdata"
 					LocalAppDataRedir = p
 					CreatePath(p)
-				Case "localappdatalow"
+				Case "localappdatalow","locallowappdata"
 					LocalLowAppDataRedir = p
 					CreatePath(p)
 				Case "commonappdata"
@@ -1090,9 +1090,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 723
-; FirstLine = 216
-; Folding = pCAAAIaAg+
+; CursorPosition = 656
+; FirstLine = 231
+; Folding = pCAAAIaMg+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
