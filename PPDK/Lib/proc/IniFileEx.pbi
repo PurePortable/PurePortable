@@ -29,13 +29,17 @@ EndStructure
 Global Dim IniData.INIDATA(0)
 Global IniFile.s,IniChanged,IniSize,IniCodepage
 ;;----------------------------------------------------------------------------------------------------------------------
+Procedure IniClear()
+	ReDim IniData(0)
+EndProcedure
+;;----------------------------------------------------------------------------------------------------------------------
 Procedure IniRead(Ini.s)
 	;IniFile = PrgDir+Ini
 	IniFile = Ini
 	IniChanged = #False
 	IniSize = 0
 	IniCodepage = 0
-	ReDim IniData(0)
+	IniClear()
 	Protected CurrentSection.s,CurrentSectionL.s
 	Protected s.s, x
 	Protected hIni = ReadFile(#PB_Any,IniFile)
@@ -218,8 +222,8 @@ EndProcedure
 ; 	IniWrite() ; завершение работы с ini-файлом
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = D5
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = Dw
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
