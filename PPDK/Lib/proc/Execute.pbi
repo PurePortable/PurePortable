@@ -12,6 +12,7 @@
 
 #EXECUTE_WAIT = 1
 #EXECUTE_HIDE = 2
+#EXECUTE_MAX = 4
 
 Procedure.i Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 	Protected StartupInfo.STARTUPINFO
@@ -30,11 +31,11 @@ Procedure.i Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 		CmdLine = Prm
 	EndIf
 	If ExecuteFlags & #EXECUTE_HIDE
-		StartupInfo\dwFlags = #STARTF_USESHOWWINDOW
+		StartupInfo\dwFlags | #STARTF_USESHOWWINDOW
 		StartupInfo\wShowWindow = #SW_HIDE
-	;Else
-	;	StartupInfo\dwFlags = #STARTF_USESHOWWINDOW
-	;	StartupInfo\wShowWindow = #SW_SHOW
+	EndIf
+	If ExecuteFlags & #EXECUTE_MAX
+		StartupInfo\dwFlags | #SW_SHOWMAXIMIZED
 	EndIf
 	;https://translated.turbopages.org/proxy_u/en-ru.ru.ba073929-6686a092-110882e6-74722d776562/https/stackoverflow.com/questions/17336227/how-can-i-wait-until-an-external-process-has-completed
 	;dbg("CreateProcess: "+CmdLine)
@@ -54,8 +55,8 @@ Procedure.i Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 43
-; FirstLine = 2
+; CursorPosition = 37
+; FirstLine = 14
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
