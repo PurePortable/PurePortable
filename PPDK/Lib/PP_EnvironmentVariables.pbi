@@ -29,6 +29,7 @@ Global PublicRedir.s
 Global CommonAppDataRedir.s
 Global CommonDocumentsRedir.s
 Global TempRedir.s
+Global HomeDriveRedir.s, HomePathRedir.s
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
@@ -57,15 +58,13 @@ CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Общие переменные, если не были созданы в другом месте
-CompilerIf Not Defined(ProfileRedir,#PB_Variable)         : Global ProfileRedir.s         : CompilerEndIf
-CompilerIf Not Defined(AppDataRedir,#PB_Variable)         : Global AppDataRedir.s         : CompilerEndIf
-CompilerIf Not Defined(LocalAppDataRedir,#PB_Variable)    : Global LocalAppDataRedir.s    : CompilerEndIf
-CompilerIf Not Defined(LocalLowAppDataRedir,#PB_Variable) : Global LocalLowAppDataRedir.s : CompilerEndIf
-CompilerIf Not Defined(DocumentsRedir,#PB_Variable)       : Global DocumentsRedir.s       : CompilerEndIf
-CompilerIf Not Defined(CommonAppDataRedir,#PB_Variable)   : Global CommonAppDataRedir.s   : CompilerEndIf
-CompilerIf Not Defined(CommonDocumentsRedir,#PB_Variable) : Global CommonDocumentsRedir.s : CompilerEndIf
-;;----------------------------------------------------------------------------------------------------------------------
-Global HomeDriveRedir.s, HomePathRedir.s
+;CompilerIf Not Defined(ProfileRedir,#PB_Variable)         : Global ProfileRedir.s         : CompilerEndIf
+;CompilerIf Not Defined(AppDataRedir,#PB_Variable)         : Global AppDataRedir.s         : CompilerEndIf
+;CompilerIf Not Defined(LocalAppDataRedir,#PB_Variable)    : Global LocalAppDataRedir.s    : CompilerEndIf
+;CompilerIf Not Defined(LocalLowAppDataRedir,#PB_Variable) : Global LocalLowAppDataRedir.s : CompilerEndIf
+;CompilerIf Not Defined(DocumentsRedir,#PB_Variable)       : Global DocumentsRedir.s       : CompilerEndIf
+;CompilerIf Not Defined(CommonAppDataRedir,#PB_Variable)   : Global CommonAppDataRedir.s   : CompilerEndIf
+;CompilerIf Not Defined(CommonDocumentsRedir,#PB_Variable) : Global CommonDocumentsRedir.s : CompilerEndIf
 ;;======================================================================================================================
 Procedure.s env2path(Env.s)
 	Protected Result.s
@@ -665,29 +664,31 @@ Procedure _InitEnvironmentVariablesHooks()
 			EndIf
 		CompilerEndIf
 		CompilerIf #PORTABLE_ENVIRONMENT_VARIABLES_CRT Or #DETOUR_ENVIRONMENT_CRT<>""
-			If ProfileRedir
-				*ProfileRedirA = Ascii(ProfileRedir)
-				*HomeDriveRedirA  = Ascii(HomeDriveRedir)
-				*HomePathRedirA  = Ascii(HomePathRedir)
-			EndIf
-			If AppDataRedir
-				*AppDataRedirA = Ascii(AppDataRedir)
-			EndIf
-			If LocalAppDataRedir
-				*LocalAppDataRedirA = Ascii(LocalAppDataRedir)
-			EndIf
-			If CommonAppDataRedir
-				*CommonAppDataRedirA = Ascii(CommonAppDataRedir)
-			EndIf
-			If EnvironmentVariablesCrt
-				If GetExtensionPart(EnvironmentVariablesCrt)=""
-					EnvironmentVariablesCrt+".dll"
+			If EnvironmentVariablesCrtPermit
+				If ProfileRedir
+					*ProfileRedirA = Ascii(ProfileRedir)
+					*HomeDriveRedirA  = Ascii(HomeDriveRedir)
+					*HomePathRedirA  = Ascii(HomePathRedir)
 				EndIf
-				LoadLibrary_(@EnvironmentVariablesCrt)
-				MH_HookApiD(EnvironmentVariablesCrt,getenv)
-				MH_HookApiD(EnvironmentVariablesCrt,_wgetenv)
-				MH_HookApiD(EnvironmentVariablesCrt,getenv_s)
-				MH_HookApiD(EnvironmentVariablesCrt,_wgetenv_s)
+				If AppDataRedir
+					*AppDataRedirA = Ascii(AppDataRedir)
+				EndIf
+				If LocalAppDataRedir
+					*LocalAppDataRedirA = Ascii(LocalAppDataRedir)
+				EndIf
+				If CommonAppDataRedir
+					*CommonAppDataRedirA = Ascii(CommonAppDataRedir)
+				EndIf
+				If EnvironmentVariablesCrt
+					If GetExtensionPart(EnvironmentVariablesCrt)=""
+						EnvironmentVariablesCrt+".dll"
+					EndIf
+					LoadLibrary_(@EnvironmentVariablesCrt)
+					MH_HookApiD(EnvironmentVariablesCrt,getenv)
+					MH_HookApiD(EnvironmentVariablesCrt,_wgetenv)
+					MH_HookApiD(EnvironmentVariablesCrt,getenv_s)
+					MH_HookApiD(EnvironmentVariablesCrt,_wgetenv_s)
+				EndIf
 			EndIf
 		CompilerEndIf
 	EndIf
@@ -696,6 +697,8 @@ AddInitProcedure(_InitEnvironmentVariablesHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = FAAA5
+; CursorPosition = 671
+; FirstLine = 317
+; Folding = FgYC0
 ; DisableDebugger
 ; EnableExeConstant
