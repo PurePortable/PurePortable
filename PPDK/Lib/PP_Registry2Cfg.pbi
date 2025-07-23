@@ -11,7 +11,7 @@ CompilerIf Not Defined(CONFIG_FILEEXT,#PB_Constant) : #CONFIG_FILEEXT = ".pphiv"
 CompilerIf Not Defined(CONFIG_ADDITIONALEXT,#PB_Constant) : #CONFIG_INITIALEXT = ".pport" : CompilerEndIf
 CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 	CompilerIf #CONFIG_FILENAME<>""
-		ConfigFile = PrgDir+#CONFIG_FILENAME
+		ConfigFile = NormalizePath(#CONFIG_FILENAME,PrgDirN)
 		If GetExtensionPart(ConfigFile)=""
 			ConfigFile + #CONFIG_FILEEXT
 		EndIf
@@ -21,7 +21,7 @@ CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 CompilerEndIf
 CompilerIf Defined(CONFIG_INITIAL,#PB_Constant)
 	CompilerIf #CONFIG_INITIAL<>""
-		InitialFile = PrgDir+#CONFIG_INITIAL
+		InitialFile = NormalizePath(#CONFIG_INITIAL,PrgDirN)
 		If GetExtensionPart(InitialFile)=""
 			InitialFile + #CONFIG_FILEEXT
 		EndIf
@@ -278,7 +278,8 @@ Procedure WriteCfg()
 EndProcedure
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = AA9
+; CursorPosition = 23
+; Folding = AC9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

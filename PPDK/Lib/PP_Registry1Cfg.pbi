@@ -10,7 +10,7 @@ CompilerIf Not Defined(CONFIG_FILEEXT,#PB_Constant) : #CONFIG_FILEEXT = ".pport"
 CompilerIf Not Defined(CONFIG_INITIALEXT,#PB_Constant) : #CONFIG_INITIALEXT = #CONFIG_FILEEXT : CompilerEndIf
 CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 	CompilerIf #CONFIG_FILENAME<>""
-		ConfigFile = PrgDir+#CONFIG_FILENAME
+		ConfigFile = NormalizePath(#CONFIG_FILENAME,PrgDirN)
 		If GetExtensionPart(ConfigFile)=""
 			ConfigFile + #CONFIG_FILEEXT
 		EndIf
@@ -20,7 +20,7 @@ CompilerIf Defined(CONFIG_FILENAME,#PB_Constant)
 CompilerEndIf
 CompilerIf Defined(CONFIG_PERMANENT,#PB_Constant) ; depricated
 	CompilerIf #CONFIG_PERMANENT<>""
-		InitialFile = PrgDir+#CONFIG_PERMANENT
+		InitialFile = NormalizePath(#CONFIG_PERMANENT,PrgDirN)
 		If GetExtensionPart(InitialFile)=""
 			InitialFile + #CONFIG_INITIALEXT
 		EndIf
@@ -29,7 +29,7 @@ CompilerIf Defined(CONFIG_PERMANENT,#PB_Constant) ; depricated
 	CompilerEndIf
 CompilerElseIf Defined(CONFIG_INITIAL,#PB_Constant)
 	CompilerIf #CONFIG_INITIAL<>""
-		InitialFile = PrgDir+#CONFIG_INITIAL
+		InitialFile = NormalizePath(#CONFIG_INITIAL,PrgDirN)
 		If GetExtensionPart(InitialFile)=""
 			InitialFile + #CONFIG_INITIALEXT
 		EndIf
@@ -39,7 +39,7 @@ CompilerElseIf Defined(CONFIG_INITIAL,#PB_Constant)
 CompilerEndIf
 CompilerIf Defined(CONFIG_OLDNAME,#PB_Constant)
 	CompilerIf #CONFIG_OLDNAME<>""
-		Global ConfigOldFile.s = PrgDir+#CONFIG_OLDNAME
+		Global ConfigOldFile.s = NormalizePath(#CONFIG_OLDNAME,PrgDirN)
 		If FileSize(ConfigOldFile)>=0
 			RenameFile(ConfigOldFile,ConfigFile)
 		EndIf
@@ -475,6 +475,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 41
+; FirstLine = 16
 ; Folding = BAAA-
 ; EnableThread
 ; DisableDebugger

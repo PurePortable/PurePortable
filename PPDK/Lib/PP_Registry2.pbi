@@ -118,17 +118,18 @@ CompilerIf #DBG_REGISTRY_MODE
 	;UndefineMacro DbgAny : DbgAnyDef
 	Procedure.s HKey2Str(hKey.l)
 		Protected sKey.s
-		If hKey = HKLM
-			sKey = "HKLM"
-		ElseIf hKey = HKCU
-			sKey = "HKCU"
-		ElseIf hKey = HKCR
-			sKey = "HKCR"
-		ElseIf hKey = HKU
-			sKey = "HKU"
-		Else
-			sKey = HexL(hKey)
-		EndIf
+		Select hKey
+			Case #HKEY_LOCAL_MACHINE
+				sKey = "HKLM"
+			Case #HKEY_CURRENT_USER
+				sKey = "HKCU"
+			Case #HKEY_CLASSES_ROOT
+				sKey = "HKCR"
+			Case #HKEY_USERS
+				sKey = "HKU"
+			Default
+				sKey = HexL(hKey)
+		EndSelect
 		ProcedureReturn sKey
 	EndProcedure
 	Procedure.s Type2Str(dwType.l)
@@ -374,9 +375,9 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 317
-; FirstLine = 151
-; Folding = jjz-0
+; CursorPosition = 127
+; FirstLine = 109
+; Folding = njz-0
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
