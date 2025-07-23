@@ -51,7 +51,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;}
 #PORTABLE_PROFILE_STRINGS = 0
 #PROFILE_STRINGS_FILENAME = "PurePortable"
-#PORTABLE_CBT_HOOK = 0 ; Хук на отслеживание закрытие окон и сохранение конфигурации
+#PORTABLE_CBT_HOOK = 1 ; Хук на отслеживание закрытие окон и сохранение конфигурации
 #PORTABLE_ENTRYPOINT = 0
 #PORTABLE_USE_MUTEX = 0
 #PORTABLE_CLEANUP = 1
@@ -66,7 +66,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_SPECIAL_FOLDERS = #DBG_SF_MODE_MAX
 #DBG_ENVIRONMENT_VARIABLES = 1
 #DBG_PROFILE_STRINGS = 0
-#DBG_CBT_HOOK = 0
+#DBG_CBT_HOOK = 1
 #DBG_MIN_HOOK = 0
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
@@ -109,6 +109,7 @@ Global DbgAnyMode
 Global DbgDetach
 Global DbgExtMode
 Global DbgExecMode
+Global DbgCbtMode
 Procedure DbgExt(txt.s)
 	If DbgExtMode
 		dbg(txt)
@@ -197,11 +198,11 @@ CompilerEndIf
 ; 1 - сохранить реестр, 2 - снять CBT-хук (UnhookWindowsHookEx), 4 - снять все хуки
 ; $F - сохранить реестр и снять все хуки (при завершении программы)
 CompilerIf #PORTABLE_CBT_HOOK
-	; Заголовок передаётся в нижнем регистре не более 64 символов.
-	Procedure CheckTitle(nCode,Title.s)
-		;;-------------------         1         2         3         4         5         6         7         8         9
-		;;-------------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		If Left(Title,10) = "cicmarshalwnd"
+	Global CBTTitles.s ;= "|CicMarshalWnd|QtPowerDummyWindow"
+	Procedure CheckTitle(nCode,Title.s) ; Заголовок передаётся в нижнем регистре не более 64 символов.
+		Title = "|"+Title
+		Protected lTitle = Len(Title)
+		If lTitle>1 And StrCmpN(@CbtTitles,@Title,lTitle)=0
 			ProcedureReturn #PORTABLE_CBTR_EXIT
 		EndIf
 		ProcedureReturn 0
@@ -534,6 +535,9 @@ Procedure AttachProcedure()
 		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
 		EnvironmentVariablesCrt = ReadPreferenceString("EnvironmentVariablesCrt","")
+		If EnvironmentVariablesCrt
+			EnvironmentVariablesCrtPermit = 1
+		EndIf
 		If ReadPreferenceInteger("EnvironmentVariablesDll",0)=1
 			EnvironmentVariablesDll = "kernelbase"
 		EndIf
@@ -562,6 +566,8 @@ Procedure AttachProcedure()
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
+		CBTTitles = "|" + ReadPreferenceString("CBTTitles","")
+		CBTHookPermit = Bool(Len(CBTTitles)>1)
 	EndIf
 	;}
 	;{ Вывод отладочной информации
@@ -581,6 +587,7 @@ Procedure AttachProcedure()
 		DbgExtMode = ReadPreferenceInteger("Extensions",0)
 		DbgExecMode = ReadPreferenceInteger("RunFrom",0)
 		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
+		DbgCbtMode = ReadPreferenceInteger("CBT",0)
 	EndIf
 	;}
 	;{ Создание папок
@@ -1090,9 +1097,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 656
-; FirstLine = 231
-; Folding = pCAAAIaMg+
+; Folding = pCAGAICAA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
