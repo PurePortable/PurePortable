@@ -90,7 +90,7 @@ CompilerElse
 	Macro DbgKfid(func,kfid,path="") : EndMacro
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
-#CSIDL_ID_MASK = ~#CSIDL_FLAG_MASK
+#CSIDL_ID_MASK = ~#CSIDL_FLAG_MASK ; $FF00
 ; https://learn.microsoft.com/en-us/windows/win32/shell/csidl
 CompilerIf #DBG_SPECIAL_FOLDERS
 	Procedure.s csidl2s(csidl)
@@ -123,46 +123,46 @@ CompilerEndIf
 CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH Or #DETOUR_SHGETFOLDERPATHEX Or #DETOUR_SHGETKNOWNFOLDERIDLIST
 	Declare.s CheckKFID(kfid)
 	Macro CheckRFID : CheckKFID : EndMacro ; для совместимости
-	Procedure.s kfid2path(kfid)
+	Procedure.s kfid2path(kfid,dwFlags=0)
+		Protected FolderPath.s
 		If CompareMemory(kfid,?FOLDERID_Profile,16) And ProfileRedir
 			DbgSpec("kfid2path: "+ProfileRedir)
-			ProcedureReturn ProfileRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_RoamingAppData,16) And AppDataRedir
+			FolderPath = ProfileRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_RoamingAppData,16) And AppDataRedir
 			DbgSpec("kfid2path: "+AppDataRedir)
-			ProcedureReturn AppDataRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_LocalAppData,16) And LocalAppDataRedir
+			FolderPath = AppDataRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_LocalAppData,16) And LocalAppDataRedir
 			DbgSpec("kfid2path: "+LocalAppDataRedir)
-			ProcedureReturn LocalAppDataRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_LocalLowAppData,16) And LocalLowAppDataRedir
+			FolderPath = LocalAppDataRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_LocalLowAppData,16) And LocalLowAppDataRedir
 			DbgSpec("kfid2path: "+LocalLowAppDataRedir)
-			ProcedureReturn LocalLowAppDataRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_Documents,16) And DocumentsRedir
+			FolderPath = LocalLowAppDataRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_Documents,16) And DocumentsRedir
 			DbgSpec("kfid2path: "+DocumentsRedir)
-			ProcedureReturn DocumentsRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_ProgramData,16) And CommonAppDataRedir
+			FolderPath = DocumentsRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_ProgramData,16) And CommonAppDataRedir
 			DbgSpec("kfid2path: "+CommonAppDataRedir)
-			ProcedureReturn CommonAppDataRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_Public,16) And PublicRedir
+			FolderPath = CommonAppDataRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_Public,16) And PublicRedir
 			DbgSpec("kfid2path: "+PublicRedir)
-			ProcedureReturn PublicRedir
-		EndIf
-		If CompareMemory(kfid,?FOLDERID_PublicDocuments,16) And CommonDocumentsRedir
+			FolderPath = PublicRedir
+		ElseIf CompareMemory(kfid,?FOLDERID_PublicDocuments,16) And CommonDocumentsRedir
 			DbgSpec("kfid2path: "+CommonDocumentsRedir)
-			ProcedureReturn CommonDocumentsRedir
+			FolderPath = CommonDocumentsRedir
+		Else
+			CompilerIf #DBG_SPECIAL_FOLDERS
+				Protected path.s = CheckKFID(kfid)
+				DbgSpec("CheckKFID: "+path)
+				FolderPath = path
+			CompilerElse
+				FolderPath = CheckKFID(kfid)
+			CompilerEndIf
 		EndIf
-		CompilerIf #DBG_SPECIAL_FOLDERS
-			Protected path.s = CheckKFID(kfid)
-			DbgSpec("CheckKFID: "+path)
-			ProcedureReturn path
-		CompilerElse
-			ProcedureReturn CheckKFID(kfid)
-		CompilerEndIf
+		If dwFlags & #KF_FLAG_CREATE
+			DbgSpec("KF_FLAG_CREATE")
+			CreatePath(FolderPath)
+		EndIf
+		ProcedureReturn FolderPath
 	EndProcedure
 	;{ Folder Id Guids
 	DataSection ; https://learn.microsoft.com/en-us/windows/win32/shell/knownfolderid
@@ -223,7 +223,7 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH
 			Result = Original_SHGetKnownFolderPath(kfid,dwFlags,hToken,*ppszPath)
 		CompilerElse
 			DbgKfid("SHGetKnownFolderPath",kfid)
-			Protected FolderPath.s = kfid2path(kfid)
+			Protected FolderPath.s = kfid2path(kfid,dwFlags)
 			If FolderPath
 				;DbgKfid("SHGetKnownFolderPath",kfid,FolderPath)
 				*ppszPath\i = CoTaskMemAlloc_(Len(FolderPath)*2+2)
@@ -251,7 +251,7 @@ CompilerIf #DETOUR_SHGETFOLDERPATHEX
 			DbgKfid("SHGetFolderPathEx",kfid,PeekSZ(*pszPath))
 		CompilerElse
 			DbgKfid("SHGetFolderPathEx",kfid)
-			Protected FolderPath.s = kfid2path(kfid)
+			Protected FolderPath.s = kfid2path(kfid,dwFlags)
 			If FolderPath
 				;DbgKfid("SHGetFolderPathEx",kfid,FolderPath)
 				If Len(FolderPath)>(cchPath-1)
@@ -285,7 +285,7 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERIDLIST
 			Result = Original_SHGetKnownFolderIDList(kfid,dwFlags,hToken,*ppidl)
 		CompilerElse
 			Protected rgfInOut
-			Protected FolderPath.s = kfid2path(kfid)
+			Protected FolderPath.s = kfid2path(kfid,dwFlags)
 			If FolderPath
 				;DbgKfid("SHGetKnownFolderIDList ("+Hex(*ppidl)+")",kfid,FolderPath)
 				Result = SHILCreateFromPath_(@FolderPath,*ppidl,@rgfInOut)
@@ -301,47 +301,52 @@ CompilerEndIf
 CompilerIf #CSIDL2PATH Or #CSIDL2PIDL
 	Declare.s CheckCSIDL(csidl)
 	Procedure.s csidl2path(csidl)
+		Protected FolderPath.s
 		Select csidl & #CSIDL_ID_MASK
 			Case #CSIDL_PROFILE
 				If ProfileRedir
 					DbgSpec("csidl2path: "+ProfileRedir)
-					ProcedureReturn ProfileRedir
+					FolderPath = ProfileRedir
 				EndIf
 			Case #CSIDL_APPDATA
 				If AppDataRedir
 					DbgSpec("csidl2path: "+AppDataRedir)
-					ProcedureReturn AppDataRedir
+					FolderPath = AppDataRedir
 				EndIf
 			Case #CSIDL_LOCAL_APPDATA
 				If LocalAppDataRedir
 					DbgSpec("csidl2path: "+LocalAppDataRedir)
-					ProcedureReturn LocalAppDataRedir
+					FolderPath = LocalAppDataRedir
 				EndIf
 			Case #CSIDL_MYDOCUMENTS,#CSIDL_PERSONAL
 				If DocumentsRedir
 					DbgSpec("csidl2path: "+DocumentsRedir)
-					ProcedureReturn DocumentsRedir
+					FolderPath = DocumentsRedir
 				EndIf
 			Case #CSIDL_COMMON_APPDATA
 				If CommonAppDataRedir
 					DbgSpec("csidl2path: "+CommonAppDataRedir)
-					ProcedureReturn CommonAppDataRedir
+					FolderPath = CommonAppDataRedir
 				EndIf
 			Case #CSIDL_COMMON_DOCUMENTS
 				If CommonDocumentsRedir
 					DbgSpec("csidl2path: "+CommonDocumentsRedir)
-					ProcedureReturn CommonDocumentsRedir
+					FolderPath = CommonDocumentsRedir
 				EndIf
 			Default
 				CompilerIf #DBG_SPECIAL_FOLDERS
 					Protected path.s = CheckCSIDL(csidl & #CSIDL_ID_MASK)
 					DbgSpec("CheckCSIDL: "+path)
-					ProcedureReturn path
+					FolderPath = path
 				CompilerElse
-					ProcedureReturn CheckCSIDL(csidl & #CSIDL_ID_MASK)
+					FolderPath = CheckCSIDL(csidl & #CSIDL_ID_MASK)
 				CompilerEndIf
 		EndSelect
-		ProcedureReturn ""
+		If FolderPath And (csidl & #CSIDL_FLAG_CREATE)
+			DbgSpec("CSIDL_FLAG_CREATE")
+			CreatePath(FolderPath)
+		EndIf
+		ProcedureReturn FolderPath
 	EndProcedure
 CompilerEndIf
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -354,7 +359,6 @@ Prototype.l SHGetFolderPath(hwnd,csidl,hToken,dwFlags.l,*pszPath)
 ; S_OK = 0 : Функция завершилась успешно
 ; S_FALSE = 1 : CSIDL специальной папки существует. Папка является виртуальной
 ; E_INVALIDARG = $80070057 : CSIDL не доступен
-; TODO: CSIDL_FLAG_CREATE
 CompilerIf #DETOUR_SHGETFOLDERPATH
 	Global Original_SHGetFolderPathA.SHGetFolderPath
 	Procedure.l Detour_SHGetFolderPathA(hwnd,csidl,hToken,dwFlags.l,*pszPath)
@@ -371,12 +375,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATH
 			Else
 				Result = Original_SHGetFolderPathA(hwnd,csidl,hToken,dwFlags,*pszPath)
 			EndIf
-		CompilerEndIf
-		CompilerIf #DBG_SPECIAL_FOLDERS
-			If DbgSpecMode And (csidl & #CSIDL_FLAG_CREATE)
-				DbgSpec("SHGetFolderPathA: CSIDL_FLAG_CREATE")
-			EndIf
-			;DbgSpec("SHGetFolderPathA: Result: "+Str(Result))
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
@@ -395,12 +393,6 @@ CompilerIf #DETOUR_SHGETFOLDERPATH
 			Else
 				Result = Original_SHGetFolderPathW(hwnd,csidl,hToken,dwFlags,*pszPath)
 			EndIf
-		CompilerEndIf
-		CompilerIf #DBG_SPECIAL_FOLDERS
-			If DbgSpecMode And (csidl & #CSIDL_FLAG_CREATE)
-				DbgSpec("SHGetFolderPathW: CSIDL_FLAG_CREATE")
-			EndIf
-			;DbgSpec("SHGetFolderPathW: Result: "+Str(Result))
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
@@ -422,20 +414,11 @@ CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR
 				If pszSubDir
 					FolderPath + "\" + PeekS(pszSubDir,-1,#PB_Ascii)
 				EndIf
-				If csidl & #CSIDL_FLAG_CREATE
-					CreateDirectory(FolderPath)
-				EndIf
 				PokeS(*pszPath,FolderPath,-1,#PB_Ascii)
 				Result = #S_OK
 			Else
 				Result = Original_SHGetFolderPathAndSubDirA(hwnd,csidl,hToken,dwFlags,pszSubDir,*pszPath)
 			EndIf
-		CompilerEndIf
-		CompilerIf #DBG_SPECIAL_FOLDERS
-			If DbgSpecMode And (csidl & #CSIDL_FLAG_CREATE)
-				DbgSpec("SHGetFolderPathAndSubDirA: CSIDL_FLAG_CREATE")
-			EndIf
-			;DbgSpec("SHGetFolderPathAndSubDirA: Result: "+Str(Result))
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
@@ -452,20 +435,11 @@ CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR
 				If pszSubDir
 					FolderPath + "\" + PeekS(pszSubDir,-1,#PB_Unicode)
 				EndIf
-				If csidl & #CSIDL_FLAG_CREATE
-					CreateDirectory(FolderPath)
-				EndIf
 				PokeS(*pszPath,FolderPath,-1,#PB_Unicode)
 				Result = #S_OK
 			Else
 				Result = Original_SHGetFolderPathAndSubDirW(hwnd,csidl,hToken,dwFlags,pszSubDir,*pszPath)
 			EndIf
-		CompilerEndIf
-		CompilerIf #DBG_SPECIAL_FOLDERS
-			If DbgSpecMode And (csidl & #CSIDL_FLAG_CREATE)
-				DbgSpec("SHGetFolderPathAndSubDirW: CSIDL_FLAG_CREATE")
-			EndIf
-			;DbgSpec("SHGetFolderPathAndSubDirW: Result: "+Str(Result))
 		CompilerEndIf
 		ProcedureReturn Result
 	EndProcedure
@@ -709,7 +683,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = uDAC+
+; Folding = qBAA+
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
