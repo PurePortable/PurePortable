@@ -12,7 +12,7 @@
 ;PP_PUREPORTABLE 1
 ;;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.10
+;RES_VERSION 4.11.0.0
 ;RES_DESCRIPTION PurePortableExpert
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME 411.dll
@@ -97,7 +97,7 @@ XIncludeFile "PurePortableCustom.pbi"
 ;{ Блокировки
 #BLOCK_WININET = 0 ; wininet.dll
 #BLOCK_WINHTTP = 0 ; winhttp.dll
-#BLOCK_WINSOCKS = 0 ; 1 - wsock32.dll, 2 - ws2_32.dll
+#BLOCK_WINSOCKS = 0
 #DBG_BLOCK_INTERNET = 0
 #BLOCK_CONSOLE = 0
 #DBG_BLOCK_CONSOLE = 0
@@ -194,7 +194,7 @@ CompilerIf #PORTABLE_CBT_HOOK
 		If Left(Title,08) = "settings"
 			ProcedureReturn #PORTABLE_CBTR_SAVECFG ; только сохранение реестра
 		EndIf
-		If Title = "qtpowerdummywindow"
+		If Title = "qtpowerdummywindow" ; QT5
 			ProcedureReturn #PORTABLE_CBTR_EXIT ; завершение работы программы как при DetachProcess
 		EndIf
 		If Title = "cicmarshalwnd" ; QT5
@@ -313,7 +313,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = k6NH6
+; Folding = 15FH6
 ; Markers = 107
 ; Optimizer
 ; EnableThread
@@ -321,11 +321,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.10
+; VersionField0 = 4.11.0.0
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.10
+; VersionField5 = 4.11.0.0
 ; VersionField6 = PurePortableExpert
 ; VersionField7 = 411.dll
 ; VersionField9 = (c) Smitis, 2017-2025

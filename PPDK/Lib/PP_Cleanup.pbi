@@ -78,8 +78,8 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	Protected SHFileOp.SHFILEOPSTRUCT
 	Protected RetCode
 	hCleaupList = ReadFile(#PB_Any,CleanupList,#PB_UTF8)
-	ReadStringFormat(hCleaupList) ; не важен, всегда должен быть UTF8
 	If hCleaupList
+		ReadStringFormat(hCleaupList) ; не важен, всегда должен быть UTF8
 		DbgClnMode = Val(ReadString(hCleaupList,#PB_UTF8)) ; первая строка режим вывода сообщений для PureSimple
 		While Not Eof(hCleaupList)
 			CleanupItem = ReadString(hCleaupList,#PB_UTF8)
@@ -108,7 +108,9 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 80
+; FirstLine = 60
 ; Folding = --
 ; EnableThread
 ; DisableDebugger
