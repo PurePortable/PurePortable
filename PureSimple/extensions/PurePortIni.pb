@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.9
+;RES_VERSION 4.11.0.10
 ;RES_DESCRIPTION Work with ini-files
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortIni
@@ -37,6 +37,12 @@ Global Dim Subst.SUBST(0), nSubst
 Global DbgProfMode
 Procedure DbgProf(txt.s)
 	If DbgProfMode
+		dbg(txt)
+	EndIf
+EndProcedure
+Global DbgIniMode
+Procedure DbgIni(txt.s)
+	If DbgIniMode
 		dbg(txt)
 	EndIf
 EndProcedure
@@ -353,27 +359,33 @@ Structure INIDATA
 EndStructure
 
 Global Dim IniData.INIDATA(0)
-Global IniFile.s, IniChanged, IniSize, IniCodepage
-Procedure IniRead(Ini.s,CP=0)
+Global IniFile.s, IniChanged, IniSize, IniCodepage, IniBOM
+Procedure IniRead(Ini.s,CP=0,BOM=0)
 	;IniFile = PrgDir+Ini
 	IniFile = Ini
 	IniChanged = #False
 	IniSize = 0
-	IniCodepage = 0
+	IniCodepage = CP
+	IniBOM = BOM
 	ReDim IniData(0)
 	Protected CurrentSection.s,CurrentSectionL.s
 	Protected s.s, x
 	Protected hIni = ReadFile(#PB_Any,IniFile)
 	If hIni
-		IniCodepage=ReadStringFormat(hIni)
-		While Eof(hIni)=0
-			s=RTrim(ReadString(hIni,IniCodepage))
+		If IniCodepage = 0
+			; Кодировка может быть задана принудительно, в том числе и без BOM.
+			; Если кодировка принудительно не задана, то определяем её автоматически через ReadStringFormat.
+			IniBOM = ReadStringFormat(hIni)
+			IniCodepage = IniBOM
+		EndIf
+		While Eof(hIni) = 0
+			s = RTrim(ReadString(hIni,IniCodepage))
 			If Left(s,1)="[" And Right(s,1)="]"
 				CurrentSection = Mid(s,2,Len(s)-2)
 				CurrentSectionL = LCase(CurrentSection)
 				;dbg("Section: "+CurrentSection)
 			Else
-				x=FindString(s,"=")
+				x = FindString(s,"=")
 				IniSize+1
 				ReDim IniData(IniSize)
 				IniData(IniSize)\Section = CurrentSection
@@ -399,6 +411,7 @@ Procedure IniWrite()
 	If IniChanged
 		hIni = CreateFile(#PB_Any,IniFile,#PB_File_SharedWrite|IniCodepage)
 		If hIni
+			WriteStringFormat(hIni,IniBOM)
 			IniChanged = #False
 			For i=1 To IniSize
 				If Not IniData(i)\Deleted
@@ -407,20 +420,20 @@ Procedure IniWrite()
 						WriteStringN(hIni,"["+IniData(i)\Section+"]",IniCodepage)
 					EndIf
 					If IniData(i)\Plain
-						DbgExt("IniWrite: "+IniData(i)\Key)
+						;DbgIni("IniWrite: "+IniData(i)\Key)
 						WriteStringN(hIni,IniData(i)\Key,IniCodepage)
 					Else
-						DbgExt("IniWrite: "+IniData(i)\Key+"="+IniData(i)\Value)
+						;DbgIni("IniWrite: "+IniData(i)\Key+"="+IniData(i)\Value)
 						WriteStringN(hIni,IniData(i)\Key+"="+IniData(i)\Value,IniCodepage)
 					EndIf
 					; Чтобы склеить секцию, ищем все ключи этой секции
 					For j=i+1 To IniSize
 						If Not IniData(j)\Deleted And CurrentSection=IniData(j)\SectionL
 							If IniData(j)\Plain
-								DbgExt("IniWrite: "+IniData(j)\Key)
+								;DbgIni("IniWrite: "+IniData(j)\Key)
 								WriteStringN(hIni,IniData(j)\Key,IniCodepage)
 							Else
-								DbgExt("IniWrite: "+IniData(j)\Key+"="+IniData(j)\Value)
+								;DbgIni("IniWrite: "+IniData(j)\Key+"="+IniData(j)\Value)
 								WriteStringN(hIni,IniData(j)\Key+"="+IniData(j)\Value,IniCodepage)
 							EndIf
 							IniData(j)\Deleted = #True ; больше обрабатывать не надо
@@ -450,10 +463,10 @@ Procedure IniCorrectKey(Key.s,Base.s,Flags=0)
 	Protected k.s = LCase(Key)
 	For i=1 To IniSize
 		If Not IniData(i)\Deleted And Not IniData(i)\Plain And IniData(i)\KeyL=k
-			DbgExt("IniCorrectKey: < "+IniData(i)\Value)
+			DbgIni("IniCorrectKey: < "+IniData(i)\Value)
 			Path = CorrectPath(IniData(i)\Value,Base,Flags)
 			If IniData(i)\Value<>Path
-				DbgExt("IniCorrectKey: > "+Path)
+				DbgIni("IniCorrectKey: > "+Path)
 				IniData(i)\Value = Path
 				IniChanged = #True
 			EndIf
@@ -491,9 +504,9 @@ Procedure IniCorrect(Section.s,Key.s,Base.s,Flags=0)
 	Protected s.s = LCase(Section)
 	For i=1 To IniSize
 		If Not IniData(i)\Deleted And Not IniData(i)\Plain And IniData(i)\KeyL=k And IniData(i)\SectionL=s
-			DbgExt("IniCorrect: < "+IniData(i)\Value)
+			DbgIni("IniCorrect: < "+IniData(i)\Value)
 			Path = CorrectPath(IniData(i)\Value,Base,Flags)
-			DbgExt("IniCorrect: > "+Path)
+			DbgIni("IniCorrect: > "+Path)
 			If IniData(i)\Value<>Path
 				IniData(i)\Value = Path
 				IniChanged = #True
@@ -519,7 +532,13 @@ Procedure ExtensionProcedure()
 		DbgExt("Can't open preference file")
 		ProcedureReturn #PP_EXT_ALLOW_UNLOAD
 	EndIf
-	
+	If PreferenceGroup(#EXT_SECTION_MAIN) ; EXT:Ini
+		DbgIniMode = ReadPreferenceInteger("Debug",0)
+		DbgProfMode = ReadPreferenceInteger("DebugProf",0)
+		DefaultFileName = ReadPreferenceString("Default","")
+		SubstFileName = NormalizePPath(ReadPreferenceString("Subst",DefaultFileName))
+		DefaultFileName = NormalizePPath(DefaultFileName)
+	EndIf
 	;{ Коррекция ini-файлов
 	Protected x, fn.s
 	If PreferenceGroup(#EXT_SECTION_MAIN+".Files") ; EXT:Ini.Files
@@ -536,13 +555,31 @@ Procedure ExtensionProcedure()
 	
 	Protected iListFile, CGroup.s, CFile.s
 	Protected k.s, v.s, g.s
+	Protected sCP.s, CP, BOM
 	For iListFile=1 To nListFiles
-		; EXT:Ini.#Id.SetData
-		IniRead(ListFiles(iListFile)\File)
-		DbgExt("  IniFile: "+ListFiles(iListFile)\File)
+		DbgIni("  IniFile: "+ListFiles(iListFile)\File)
+		CP = 0
+		BOM = 0
+		; Секция EXT:Ini.#Id
+		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id
+		If PreferenceGroup(CGroup)
+			BOM = ReadPreferenceInteger("BOM",0)
+			sCP = ReadPreferenceString("CodePage","")
+			Select UCase(sCP)
+				Case "UTF8","UTF-8"
+					CP = #PB_UTF8
+				Case "UTF16","UTF-16","UNICODE"
+					CP = #PB_Unicode
+			EndSelect
+			If BOM
+				BOM = CP
+			EndIf
+		EndIf
+		IniRead(ListFiles(iListFile)\File,CP,BOM)
+		; Секция EXT:Ini.#Id.SetData
 		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id+".SetData"
 		If PreferenceGroup(CGroup)
-			DbgExt("  Section: "+CGroup)
+			DbgIni("  Section: "+CGroup)
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				k = PreferenceKeyName()
@@ -551,15 +588,15 @@ Procedure ExtensionProcedure()
 				If x
 					g = Left(k,x-1)
 					k = Mid(k,x+1)
-					DbgExt("  "+g+" :: "+k)
+					DbgIni("  "+g+" :: "+k)
 					IniSet(g,k,v)
 				EndIf
 			Wend
 		EndIf
-		; EXT:Ini.#Id.SetPaths
+		; Секция EXT:Ini.#Id.SetPaths
 		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id+".SetPaths"
 		If PreferenceGroup(CGroup)
-			DbgExt("  Section: "+CGroup)
+			DbgIni("  Section: "+CGroup)
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				k = PreferenceKeyName()
@@ -568,15 +605,15 @@ Procedure ExtensionProcedure()
 				If x
 					g = Left(k,x-1)
 					k = Mid(k,x+1)
-					DbgExt("  "+g+" :: "+k)
+					DbgIni("  "+g+" :: "+k)
 					IniSet(g,k,v)
 				EndIf
 			Wend
 		EndIf
-		; EXT:Ini.#Id.CorrectPaths
+		; Секция EXT:Ini.#Id.CorrectPaths
 		CGroup = #EXT_SECTION_MAIN+"."+ListFiles(iListFile)\Id+".CorrectPaths"
 		If PreferenceGroup(CGroup)
-			DbgExt("  Section: "+CGroup)
+			DbgIni("  Section: "+CGroup)
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				k = PreferenceKeyName()
@@ -590,7 +627,7 @@ Procedure ExtensionProcedure()
 				If x
 					g = Left(k,x-1)
 					k = Mid(k,x+1)
-					DbgExt("  "+g+" :: "+k)
+					DbgIni("  "+g+" :: "+k)
 					IniCorrect(g,k,v)
 				EndIf
 			Wend
@@ -601,14 +638,6 @@ Procedure ExtensionProcedure()
 	FreeArray(ListFiles())
 	;}
 	
-	;DbgProfMode = DbgExtMode
-	If PreferenceGroup(#EXT_SECTION_MAIN)
-		DbgProfMode = ReadPreferenceInteger("Debug",0) ; | DbgExtMode
-		DefaultFileName = ReadPreferenceString("Default","")
-		SubstFileName = NormalizePPath(ReadPreferenceString("Subst",DefaultFileName))
-		DefaultFileName = NormalizePPath(DefaultFileName)
-	EndIf
-		
 	If DefaultFileName Or SubstFileName Or nSubst
 		MH_HookApi(kernel32,GetPrivateProfileSectionA)
 		MH_HookApi(kernel32,GetPrivateProfileSectionW)
@@ -662,29 +691,29 @@ Procedure.s CheckIni(IniFile.s)
 	;ElseIf DefaultFileName ; или на это
 	;	ProcedureReturn DefaultFileName
 	;EndIf
-	DbgProf("CheckIni: «"+IniFile+"»")
+	DbgIni("CheckIni: «"+IniFile+"»")
 	IniFile = PrgDir+GetFilePart(IniFile)
-	DbgProf("      ->: «"+IniFile+"»")
+	DbgIni("      ->: «"+IniFile+"»")
 	ProcedureReturn IniFile
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 666
-; FirstLine = 326
-; Folding = HAAAwg-
+; CursorPosition = 23
+; FirstLine = 15
+; Folding = -----A-
 ; Optimizer
 ; EnableThread
 ; Executable = PurePortIni.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.9
+; VersionField0 = 4.11.0.10
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.9
+; VersionField5 = 4.11.0.10
 ; VersionField6 = Work with ini-files
 ; VersionField7 = PurePortIni
 ; VersionField9 = (c) Smitis, 2017-2025
