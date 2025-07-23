@@ -307,7 +307,7 @@ Procedure.i StartWithPath(s.s,t.s,cs=0)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; CursorPosition = 254
 ; FirstLine = 88
 ; Folding = 59PA59
