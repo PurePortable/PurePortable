@@ -463,7 +463,7 @@ EndProcedure
 Procedure StartProcedure()
 	CompilerIf Defined(PREFERENCES_FILENAME,#PB_Constant)
 		CompilerIf #PREFERENCES_FILENAME<>""
-			PreferenceFile = PrgDir+#PREFERENCES_FILENAME
+			PreferenceFile = NormalizePath(#PREFERENCES_FILENAME,PrgDirN)
 			If GetExtensionPart(PreferenceFile)=""
 				PreferenceFile + ".prefs"
 			EndIf
@@ -475,7 +475,7 @@ Procedure StartProcedure()
 	CompilerIf Defined(LOGGING_FILENAME,#PB_Constant)
 		Global LoggingFile.s
 		CompilerIf #LOGGING_FILENAME<>""
-			LoggingFile = PrgDir+#LOGGING_FILENAME
+			LoggingFile = NormalizePath(#LOGGING_FILENAME,PrgDirN)
 			If GetExtensionPart(LoggingFile)=""
 				LoggingFile + ".log"
 			EndIf
@@ -585,7 +585,9 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = OB9
+; CursorPosition = 477
+; FirstLine = 330
+; Folding = OB0
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
