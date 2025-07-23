@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.9
+;RES_VERSION 4.11.0.10
 ;RES_DESCRIPTION Loaded fonts
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortFonts
@@ -22,19 +22,7 @@ IncludePath "..\..\PPDK\Lib"
 
 #DBG_EXTENSION = 0
 XIncludeFile "PurePortableExtension.pbi"
-;;======================================================================================================================
-#FR_PRIVATE = $10
-#FR_NOT_ENUM = $20
-
-; https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-addfontresourceexw
-; https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-removefontresourceexw
-CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-	Import "gdi32.lib" : AddFontResourceEx(name,fl,pdv) As "_AddFontResourceExW@12" : EndImport
-	Import "gdi32.lib" : RemoveFontResourceEx(name,fl,pdv) As "_RemoveFontResourceExW@12" : EndImport
-CompilerElse
-	Import "gdi32.lib" : AddFontResourceEx(name,fl,pdv) As "AddFontResourceExW" : EndImport
-	Import "gdi32.lib" : RemoveFontResourceEx(name,fl,pdv) As "RemoveFontResourceExW" : EndImport
-CompilerEndIf
+XIncludeFile "winapi\AddFontResourceEx.pbi"
 ;;======================================================================================================================
 
 #EXT_SECTION_MAIN = "EXT:Fonts"
@@ -75,10 +63,10 @@ Procedure ExtensionProcedure()
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 51
-; FirstLine = 33
+; CursorPosition = 25
+; FirstLine = 15
 ; Folding = -
 ; Optimizer
 ; EnableThread
@@ -86,11 +74,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.9
+; VersionField0 = 4.11.0.10
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.9
+; VersionField5 = 4.11.0.10
 ; VersionField6 = Loaded fonts
 ; VersionField7 = PurePortFonts.dll
 ; VersionField9 = (c) Smitis, 2017-2025
