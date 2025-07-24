@@ -7,33 +7,7 @@
 XIncludeFile "PP_Extension.pbi"
 Global *EXT.EXTDATA
 ;;======================================================================================================================
-UndefineMacro DoubleQuote
-Macro DoubleQuote
-	"
-EndMacro
-Macro DeclareImport(LibName,Name32,Name64,FuncDeclaration)
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Import DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name32#DoubleQuote
-		EndImport
-	CompilerElse
-		Import DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name64#DoubleQuote
-		EndImport
-	CompilerEndIf
-EndMacro
-Macro DeclareImportC(LibName,Name32,Name64,FuncDeclaration)
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		ImportC DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name32#DoubleQuote
-		EndImport
-	CompilerElse
-		ImportC DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name64#DoubleQuote
-		EndImport
-	CompilerEndIf
-EndMacro
-;;======================================================================================================================
+XIncludeFile "winapi\DeclareImportMacro.pbi"
 ;DeclareImport(kernel32,_OutputDebugStringW@4,OutputDebugStringW,OutputDebugStringW(*txt))
 ;Procedure dbg(txt.s="") : OutputDebugStringW("PORT: "+txt) : EndProcedure
 Procedure dbg(txt.s="") : *EXT\HF\dbg(txt) : EndProcedure
@@ -131,17 +105,21 @@ ProcedureDLL PurePortableExtension(*ExtData,*ExtParam)
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
-; ProcedureDLL.l AttachProcess(Instance)
-; EndProcedure
-;;======================================================================================================================
 ProcedureDLL.l DetachProcess(Instance)
 	DbgExt("EXTENSION UNLOAD: "+DllPath)
 EndProcedure
 ;;======================================================================================================================
+; Для тестирования
+CompilerIf #PB_Compiler_IsMainFile
+	Procedure ExtensionProcedure()
+	EndProcedure
+CompilerEndIf
+;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 36
-; Folding = 5--
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 106
+; FirstLine = 81
+; Folding = -4
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

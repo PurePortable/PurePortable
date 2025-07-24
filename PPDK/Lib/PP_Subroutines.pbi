@@ -39,8 +39,11 @@ EndMacro
 ; Дополнительных импорты, отсутствующие или неправильные в стандартной поставке.
 ;;======================================================================================================================
 
-; https://learn.microsoft.com/ru-ru/windows/win32/api/psapi/nf-psapi-getmoduleinformation
 DeclareImport(psapi,_GetModuleInformation@16,GetModuleInformation,GetModuleInformation_(hProcess,hModule,*lpmodinfo,cb))
+
+#GET_MODULE_HANDLE_EX_FLAG_PIN = 1
+#GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS = 4
+DeclareImport(kernel32,_GetModuleHandleExW@12,GetModuleHandleExW,GetModuleHandleEx_(dwFlags.l,*lpModuleName,*phModule))
 
 ;;======================================================================================================================
 ; Выделение памяти в байтах
@@ -279,17 +282,12 @@ XIncludeFile "proc\CorrectPath.pbi"
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpnw
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpiw
 ; https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-strcmpniw
-CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-	Import "shlwapi.lib" : StrCmp(psz1,psz2) As "_StrCmpW@8" : EndImport
-	Import "shlwapi.lib" : StrCmpI(psz1,psz2) As "_StrCmpIW@8" : EndImport
-	Import "shlwapi.lib" : StrCmpN(psz1,psz2,nChar) As "_StrCmpNW@12" : EndImport
-	Import "shlwapi.lib" : StrCmpNI(psz1,psz2,nChar) As "_StrCmpNIW@12" : EndImport
-CompilerElse
-	Import "shlwapi.lib" : StrCmp(psz1,psz2) As "StrCmpW" : EndImport
-	Import "shlwapi.lib" : StrCmpI(psz1,psz2) As "StrCmpIW" : EndImport
-	Import "shlwapi.lib" : StrCmpN(psz1,psz2,nChar) As "StrCmpNW" : EndImport
-	Import "shlwapi.lib" : StrCmpNI(psz1,psz2,nChar) As "StrCmpNIW" : EndImport
-CompilerEndIf
+
+DeclareImport(shlwapi,_StrCmpW@8,StrCmpW,StrCmp(*psz1,*psz2))
+DeclareImport(shlwapi,_StrCmpIW@8,StrCmpIW,StrCmpI(*psz1,*psz2))
+DeclareImport(shlwapi,_StrCmpNW@8,StrCmpNW,StrCmpN(*psz1,*psz2,nChar))
+DeclareImport(shlwapi,_StrCmpNIW@8,StrCmpNIW,StrCmpNI(*psz1,*psz2,nChar))
+
 Procedure.i StartWith(s.s,t.s,cs=0)
 	Protected l = Len(t)
 	If cs
@@ -308,9 +306,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 254
-; FirstLine = 88
-; Folding = 59PA59
+; Folding = 59PAI9
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

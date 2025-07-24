@@ -160,10 +160,6 @@ EndMacro
 #LOAD_LIBRARY_SEARCH_DEFAULT_DIRS = $00001000
 #LOAD_WITH_ALTERED_SEARCH_PATH = $00000008
 
-;DeclareImport(kernel32,_GetModuleHandleExW@12,GetModuleHandleExW,GetModuleHandleEx_(dwFlags.l,*lpModuleName,*phModule))
-#GET_MODULE_HANDLE_EX_FLAG_PIN = 1
-#GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS = 4
-
 Procedure.i LoadDll(DllName.s,fSystem=1)
 	; GetWindowsDirectory(lpBuffer,uSize) https://docs.microsoft.com/ru-ru/windows/win32/api/sysinfoapi/nf-sysinfoapi-getwindowsdirectorya
 	; GetSystemWindowsDirectoryA(lpBuffer,uSize) https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemwindowsdirectorya
@@ -371,8 +367,8 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 52
-; FirstLine = 38
+; CursorPosition = 161
+; FirstLine = 66
 ; Folding = -Agw
 ; EnableThread
 ; DisableDebugger

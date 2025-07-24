@@ -516,7 +516,6 @@ CompilerIf Defined(PORTABLE_CHECK_PROGRAM,#PB_Constant)
 CompilerEndIf
 
 Prototype InitProcProto()
-DeclareImport(kernel32,_GetModuleHandleExW@12,GetModuleHandleExW,GetModuleHandleEx_(dwFlags.l,*lpModuleName,*phModule))
 ProcedureDLL.l AttachProcess(Instance)
 	DbgAlways("ATTACHPROCESS: "+PrgPath)
 	Protected hDll
@@ -585,9 +584,7 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 477
-; FirstLine = 330
-; Folding = OB0
+; Folding = OBw
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
