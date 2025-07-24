@@ -285,8 +285,8 @@ XIncludeFile "proc\CorrectPath.pbi"
 
 DeclareImport(shlwapi,_StrCmpW@8,StrCmpW,StrCmp(*psz1,*psz2))
 DeclareImport(shlwapi,_StrCmpIW@8,StrCmpIW,StrCmpI(*psz1,*psz2))
-DeclareImport(shlwapi,_StrCmpNW@8,StrCmpNW,StrCmpN(*psz1,*psz2,nChar))
-DeclareImport(shlwapi,_StrCmpNIW@8,StrCmpNIW,StrCmpNI(*psz1,*psz2,nChar))
+DeclareImport(shlwapi,_StrCmpNW@12,StrCmpNW,StrCmpN(*psz1,*psz2,nChar))
+DeclareImport(shlwapi,_StrCmpNIW@12,StrCmpNIW,StrCmpNI(*psz1,*psz2,nChar))
 
 Procedure.i StartWith(s.s,t.s,cs=0)
 	Protected l = Len(t)
