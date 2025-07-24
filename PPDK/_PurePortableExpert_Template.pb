@@ -177,10 +177,6 @@ CompilerIf #PORTABLE_PROFILE_STRINGS
 CompilerEndIf
 ;}
 ;{ CBT HOOK
-; Процедура должна вернуть:
-; 0 - выполнить CallNextHookEx
-; 1 - выполнить процедуру завершения DetachProcedure (как при DetachProcess).
-; 2 - сохранить реестр и продолжить работу.
 CompilerIf #PORTABLE_CBT_HOOK
 	; Заголовок передаётся в нижнем регистре не более 64 символов.
 	; Процедура должна возвратить:

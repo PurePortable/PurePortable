@@ -31,7 +31,7 @@ Procedure.l CBTProc(nCode,wParam,*lParam)
 		;DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam))
 		GetWindowText_(wParam,@Title,64)
 		DbgCbt("CBTHook: DESTROYWND: "+Str(wParam)+" 0x"+Hex(wParam)+" «"+Title+"»")
-		CharLower_(Title)
+		CharLower_(@Title)
 		Protected ct = CheckTitle(nCode,Title)
 		If ct = #PORTABLE_CBTR_EXIT ; полное завершение работы программы
 			UnhookWindowsHookEx_(hCBTHook)
@@ -74,9 +74,7 @@ AddInitProcedure(_InitCBTHook)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 38
-; FirstLine = 20
-; Folding = -
+; Folding = y
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
