@@ -198,7 +198,7 @@ CompilerEndIf
 ; 1 - сохранить реестр, 2 - снять CBT-хук (UnhookWindowsHookEx), 4 - снять все хуки
 ; $F - сохранить реестр и снять все хуки (при завершении программы)
 CompilerIf #PORTABLE_CBT_HOOK
-	Global CBTTitles.s ;= "|CicMarshalWnd|QtPowerDummyWindow"
+	Global CBTTitles.s
 	Procedure CheckTitle(nCode,Title.s) ; Заголовок передаётся в нижнем регистре не более 64 символов.
 		Title = "|"+Title
 		Protected lTitle = Len(Title)
@@ -567,6 +567,7 @@ Procedure AttachProcedure()
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
 		CBTTitles = "|" + ReadPreferenceString("CBTTitles","")
+		CharLower_(@CBTTitles)
 		CBTHookPermit = Bool(Len(CBTTitles)>1)
 	EndIf
 	;}
@@ -1097,6 +1098,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
+; CursorPosition = 200
+; FirstLine = 88
 ; Folding = pCAGAICAA+
 ; Optimizer
 ; EnableThread
