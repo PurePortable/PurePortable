@@ -7,33 +7,7 @@
 
 ;;======================================================================================================================
 ; Макросы для упрощения описания имортируемой функции
-;;======================================================================================================================
-UndefineMacro DoubleQuote
-Macro DoubleQuote
-	"
-EndMacro
-Macro DeclareImport(LibName,Name32,Name64,FuncDeclaration)
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		Import DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name32#DoubleQuote
-		EndImport
-	CompilerElse
-		Import DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name64#DoubleQuote
-		EndImport
-	CompilerEndIf
-EndMacro
-Macro DeclareImportC(LibName,Name32,Name64,FuncDeclaration)
-	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-		ImportC DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name32#DoubleQuote
-		EndImport
-	CompilerElse
-		ImportC DoubleQuote#LibName.lib#DoubleQuote
-			FuncDeclaration As DoubleQuote#Name64#DoubleQuote
-		EndImport
-	CompilerEndIf
-EndMacro
+XIncludeFile "winapi\DeclareImportMacro.pbi"
 
 ;;======================================================================================================================
 ; Дополнительных импорты, отсутствующие или неправильные в стандартной поставке.
@@ -305,8 +279,8 @@ Procedure.i StartWithPath(s.s,t.s,cs=0)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = 59PAI9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = n-BAh
 ; EnableAsm
 ; EnableThread
 ; DisableDebugger

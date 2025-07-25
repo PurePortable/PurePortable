@@ -101,6 +101,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #INCLUDE_MIN_HOOK = 1 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
 XIncludeFile "PurePortableSimple.pbi"
+XIncludeFile "PP_ExecuteDll.pbi"
 ;;======================================================================================================================
 Global DbgRegMode
 Global DbgSpecMode
@@ -192,11 +193,6 @@ CompilerIf #PORTABLE_PROFILE_STRINGS
 CompilerEndIf
 ;}
 ;{ CBT HOOK
-; Процедура должна вернуть:
-; 0 - выполнить CallNextHookEx
-; Или сумму флагов
-; 1 - сохранить реестр, 2 - снять CBT-хук (UnhookWindowsHookEx), 4 - снять все хуки
-; $F - сохранить реестр и снять все хуки (при завершении программы)
 CompilerIf #PORTABLE_CBT_HOOK
 	Global CBTTitles.s
 	Procedure CheckTitle(nCode,Title.s) ; Заголовок передаётся в нижнем регистре не более 64 символов.
@@ -966,7 +962,7 @@ EndProcedure
 ; Процедура должна вернуть 1 если не требуется выполнение процедуры завершения (снятие хуков, выполнение очистки и т.п.).
 ; Для rundll32 не выполняется.
 CompilerIf Not #PORTABLE_REGISTRY Or (#PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) <> 2) ; Для R2 уже есть
-	DeclareImport(advapi32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey.l,*lpSubKey))
+	XIncludeFile "winapi\RegDeleteTree.pbi"
 CompilerEndIf
 Procedure DetachProcedure()
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
@@ -1074,8 +1070,6 @@ Procedure DetachProcedure()
 	ClosePreferences()
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-XIncludeFile "PP_ExecuteDll.pbi"
-;;----------------------------------------------------------------------------------------------------------------------
 Procedure RunFrom(k.s,p.s)
 	Protected i
 	Protected Dim Flags.s(0)
@@ -1098,8 +1092,6 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 200
-; FirstLine = 88
 ; Folding = pCAGAICAA+
 ; Optimizer
 ; EnableThread

@@ -35,3 +35,9 @@ Macro DeclareImportC(LibName,Name32,Name64,FuncDeclaration)
 EndMacro
 
 ;;======================================================================================================================
+
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; Folding = -
+; EnableThread
+; DisableDebugger
+; EnableExeConstant
