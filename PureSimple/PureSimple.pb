@@ -963,8 +963,10 @@ EndProcedure
 ; Для rundll32 не выполняется.
 CompilerIf Not #PORTABLE_REGISTRY Or (#PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) <> 2) ; Для R2 уже есть
 	XIncludeFile "winapi\RegDeleteTree.pbi"
+	XIncludeFile "winapi\RegDeleteKeyValue.pbi"
 CompilerEndIf
 Procedure DetachProcedure()
+	Protected x
 	If OpenPreferences(PureSimplePrefs,#PB_Preference_NoSpace) = 0
 		dbg("DetachProcedure: Error open prefs")
 		ProcedureReturn 1
@@ -974,35 +976,51 @@ Procedure DetachProcedure()
 		Cleanup = ReadPreferenceInteger("Cleanup",0)
 		CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
 	EndIf
-	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1 ; Для Registry1 чистку реестра производим здесь
+	;{ Чистка реестра для Registry1
+	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1
 		If RegistryPermit And Cleanup
 			If PreferenceGroup("Cleanup.Registry")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
-					CleanupItem = PreferenceKeyName()
-					DbgCln("Cleanup: Registry: "+CleanupItem)
-					DelCfgTree(CleanupItem)
+					x = FindString(CleanupItem,"|")
+					If x
+						DelCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
+					Else
+						DelCfgTree(CleanupItem)
+					EndIf
+
 				Wend
 			EndIf
 		EndIf
 	CompilerEndIf
-	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2 ; Для Registry2 чистку реестра производим здесь
+	;}
+	;{ Чистка реестра для Registry2
+	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2
 		If RegistryPermit And (Cleanup = 2 Or (LastProcess And Cleanup))
 			If PreferenceGroup("Cleanup.Registry")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					CleanupItem = PreferenceKeyName()
 					DbgCln("Cleanup: Registry: "+CleanupItem)
-					DelCfgTree(CleanupItem)
+					x = FindString(CleanupItem,"|")
+					If x
+						DefCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
+					Else
+						DelCfgTree(CleanupItem)
+					EndIf
 				Wend
 			EndIf
 		EndIf
 	CompilerEndIf
+	;}
+	;{ Сохранение реестра
 	CompilerIf #PORTABLE_REGISTRY
 		If RegistryPermit
 			WriteCfg()
 		EndIf
 	CompilerEndIf
+	;}
+	;{ Запуск из RunFromDetachProcess
 	If LastProcess
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
@@ -1011,9 +1029,11 @@ Procedure DetachProcedure()
 			Wend
 		EndIf
 	EndIf
-	If Cleanup = 2 Or (LastProcess And Cleanup) ; Удаление файлов, папок и разделов реестра.
+	;}
+	If Cleanup = 2 Or (LastProcess And Cleanup)
+		;{ Удаление разделов реального реестра
 		If PreferenceGroup("Cleanup.RealRegistry")
-			Protected hKey, sKey.s, x
+			Protected hKey, sKey.s
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				CleanupItem = PreferenceKeyName()
@@ -1031,11 +1051,18 @@ Procedure DetachProcedure()
 							hKey = #HKEY_CURRENT_USER
 					EndSelect
 					If hKey
-						RegDeleteTree_(hKey,@sKey)
+						x = FindString(sKey,"|")
+						If x
+							RegDeleteKeyValue_(hKey,Left(sKey,x-1),Mid(sKey,x+1))
+						Else
+							RegDeleteTree_(hKey,sKey)
+						EndIf
 					EndIf
 				EndIf
 			Wend
 		EndIf
+		;}
+		;{ Чистка папок
 		DbgCln("CleanupDirectory: "+CleanupDirectory)
 		Protected Dim ClnDirs.s(0), iClnDir
 		Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory,"|")
@@ -1066,6 +1093,7 @@ Procedure DetachProcedure()
 				EndIf
 			Wend
 		EndIf
+		;}
 	EndIf
 	ClosePreferences()
 EndProcedure
@@ -1092,7 +1120,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = pCAGAICAA+
+; CursorPosition = 1057
+; FirstLine = 199
+; Folding = pCAGAICAgQ+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
