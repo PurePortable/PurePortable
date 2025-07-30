@@ -4,8 +4,19 @@
 (-) удалено
 (?) непонятно ))
 
+[4.11.0.11] 2025-07-30
+(!) Исправление в NormalizePath.
+(+) PureSimple: LocalLowAppData синоним для LocalAppDataLow.
+(+) IniFileEx: IniClear().
+(+) Execute: SW_SHOWMAXIMIZED.
+(*) PurePortIni: Танцы с кодировками. Рефакторинг.
+(+) Папка PPDK\Lib\winapi.
+(+) SpecialFolders: KF_FLAG_CREATE, CSIDL_FLAG_CREATE.
+(+) PureSimple: CBT-хуки.
+(+) PureSimple: Cleanup: Удаление параметров.
+
 [4.11.0.10] 2025-07-07
-(*) Исключена проверка формата #PB_Compiler_Executable
+(*) Исключена проверка формата #PB_Compiler_Executable.
 (+) PureSimple: Если в [Registry.SetData] задано пустое значение или значение «-», параметр удаляется.
 (+) Если в pport-файле тип значения «-», значение удаляется.
 (!) PureSimple: Обработка дефолтных параметров реестра.
@@ -16,7 +27,7 @@
 (+) EnvironmentVariables: Управление именем crt через переменную. Константа #PORTABLE_ENVIRONMENT_VARIABLES_CRT.
 (+) EnvironmentVariables: Перехват kernelbase.
 (+) PureSimple: Изменения управлением перехватом переменных среды в связи с последними изменениями PureExpert. Параметры EnvironmentVariablesDll, EnvironmentVariablesCrt.
-(+) #DBG_DETACH
+(+) #DBG_DETACH.
 (!) Исправление перекодировки при сохранении REG_MULTI_SZ.
 (+) Proxy dlls: dwrite, propsys, vcruntime140_0
 (+) Макросы DeclareProxyDll и DeclareProxyDllExt принимают дополнительный параметр fSystem.
