@@ -1004,7 +1004,7 @@ Procedure DetachProcedure()
 					DbgCln("Cleanup: Registry: "+CleanupItem)
 					x = FindString(CleanupItem,"|")
 					If x
-						DefCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
+						DelCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
 					Else
 						DelCfgTree(CleanupItem)
 					EndIf
@@ -1120,9 +1120,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1057
-; FirstLine = 199
-; Folding = pCAGAICAgQ+
+; CursorPosition = 1008
+; FirstLine = 202
+; Folding = pCAGAICAgS+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

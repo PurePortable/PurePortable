@@ -51,7 +51,7 @@ Procedure ExtensionProcedure()
 						If DirectoryEntryType(Dir) = #PB_DirectoryEntry_File
 							FontFile = FontDir+DirectoryEntryName(Dir)
 							DbgExt("  Load font: "+FontFile)
-							r = AddFontResourceEx(@FontFile,#FR_PRIVATE,0)
+							r = AddFontResourceEx_(@FontFile,#FR_PRIVATE,0)
 							;DbgExt("Load font: "+r)
 						EndIf
 					Wend
@@ -65,8 +65,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 25
-; FirstLine = 15
+; CursorPosition = 53
+; FirstLine = 29
 ; Folding = -
 ; Optimizer
 ; EnableThread
