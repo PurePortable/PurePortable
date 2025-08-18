@@ -174,8 +174,8 @@ Procedure IniSet(Section.s,Key.s,Value.s)
 	EndIf
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
-Procedure.s IniGet(Section.s,Key.s)
-	Protected Result.s, i
+Procedure.s IniGet(Section.s,Key.s,Result.s="")
+	Protected i
 	Protected k.s = LCase(Key)
 	Protected s.s = LCase(Section)
 	For i=1 To IniSize
@@ -222,7 +222,7 @@ EndProcedure
 ; 	IniWrite() ; завершение работы с ini-файлом
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; Folding = Dw
 ; EnableAsm
 ; DisableDebugger
