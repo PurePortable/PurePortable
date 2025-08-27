@@ -242,7 +242,7 @@ CompilerIf #DETOUR_SHGETFOLDERPATHEX
 	; https://learn.microsoft.com/en-us/windows/win32/shell/shgetfolderpathex
 	; cchPath в символах (+ нулевой?)
 	; Returns S_OK if successful, or an error value otherwise.
-	Prototype.l SHGetFolderPathEx(hwnd,csidl,hToken,dwFlags.l,*pszPath)
+	Prototype.l SHGetFolderPathEx(kfid,dwFlags,hToken,*pszPath,cchPath)
 	Global Original_SHGetFolderPathEx.SHGetFolderPathEx
 	Procedure.l Detour_SHGetFolderPathEx(kfid,dwFlags,hToken,*pszPath,cchPath)
 		Protected Result
@@ -682,7 +682,7 @@ EndProcedure
 AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; Folding = qBAA+
 ; EnableAsm
 ; DisableDebugger
