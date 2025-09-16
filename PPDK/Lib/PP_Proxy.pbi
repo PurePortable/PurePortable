@@ -175,7 +175,7 @@ Procedure.i LoadDll(DllName.s,fSystem=1)
 	If hDll
 		ProcedureReturn hDll
 	EndIf
-	PPLastErrorMessage("Failed load original dll:"+#LF$+DllName)
+	PPLastErrorMessage("Failed load dll:"+#LF$+DllName)
 	;RaiseError(#ERROR_DLL_INIT_FAILED)
 	TerminateProcess_(GetCurrentProcess_(),0)
 	ProcedureReturn #Null
@@ -202,7 +202,7 @@ Procedure.i LoadDll2(LocalDllName.s,SystemDllName.s="")
 		ProcedureReturn hDll
 	EndIf
 	
-	PPLastErrorMessage("Failed load original dll:"+#LF$+LocalDllName+"/"+SystemDllName)
+	PPLastErrorMessage("Failed load dll:"+#LF$+LocalDllName+"/"+SystemDllName)
 	;RaiseError(#ERROR_DLL_INIT_FAILED)
 	TerminateProcess_(GetCurrentProcess_(),0)
 	ProcedureReturn #Null
@@ -396,9 +396,9 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 198
+; CursorPosition = 204
 ; FirstLine = 90
-; Folding = -QYA-
+; Folding = -QYC-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
