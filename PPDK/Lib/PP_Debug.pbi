@@ -2,13 +2,15 @@
 ; Управление выводом отладочных (диагностических) сообщений
 ;;======================================================================================================================
 
+CompilerIf Not Defined(DBG_PREFIX,#PB_Constant) : #DBG_PREFIX = "PORT: " : CompilerEndIf
+
 CompilerIf Not Defined(dbg,#PB_Procedure)
 	CompilerIf Not Defined(DBG_PROCESS_ID,#PB_Constant) : #DBG_PROCESS_ID = 0 : CompilerEndIf
 	CompilerIf #DBG_PROCESS_ID
-		Global DbgProcessId.s = "PORT: ["+Str(ProcessId)+"] "
+		Global DbgProcessId.s = #DBG_PREFIX+"["+Str(ProcessId)+"] "
 		Procedure dbg(txt.s="") : OutputDebugString_(DbgProcessId+txt) : EndProcedure
 	CompilerElse
-		Procedure dbg(txt.s="") : OutputDebugString_("PORT: "+txt) : EndProcedure
+		Procedure dbg(txt.s="") : OutputDebugString_(#DBG_PREFIX+txt) : EndProcedure
 	CompilerEndIf
 CompilerEndIf
 CompilerIf Not Defined(dbgclear,#PB_Procedure)
@@ -67,8 +69,8 @@ Macro LoggingEnd(s) : EndMacro
 ; AddInitProcedure(_InitDebug)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 21
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 12
 ; Folding = --
 ; EnableThread
 ; DisableDebugger
