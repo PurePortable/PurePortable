@@ -58,6 +58,10 @@ Macro DeclareProxyDllExt(DllName,DllExt,fSystem=1)
 	Global hDll_#DllName = LoadDll(DoubleQuote#DllName.DllExt#DoubleQuote,fSystem)
 	;Global hDll = hDll_#DllName
 EndMacro
+Macro DeclareProxyDll2(DllName,LocalDllName,SystemDllName)
+	Global hDll_#DllName = LoadDll2(DoubleQuote#LocalDllName#DoubleQuote,DoubleQuote#SystemDllName#DoubleQuote)
+	;Global hDll = hDll_#DllName
+EndMacro
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Макросы для описания экспортируемых прокси-функции в dll, компилируемых не под своим именем (comdlg32, advapi32 и др.)
@@ -168,15 +172,40 @@ Procedure.i LoadDll(DllName.s,fSystem=1)
 	If fSystem : DllFull = SysDir+"\"+DllFull : EndIf
 	;Protected hDll = LoadLibraryEx_(@DllFull,#Null,0) ; #LOAD_LIBRARY_SEARCH_SYSTEM32
 	Protected hDll = LoadLibrary_(@DllFull)
-	If hDll = 0
-		PPLastErrorMessage("Failed load original dll:"+#LF$+DllName)
-		;RaiseError(#ERROR_DLL_INIT_FAILED)
-		TerminateProcess_(GetCurrentProcess_(),0)
+	If hDll
+		ProcedureReturn hDll
 	EndIf
-	;dbg(DllName+" :: "+Str(hDll))
-	;Protected hDll2 ; заменить на hDll?
-	;GetModuleHandleEx_(#GET_MODULE_HANDLE_EX_FLAG_PIN,@DllFull,@hDll2) ; запретить выгрузку из памяти
-	ProcedureReturn hDll
+	PPLastErrorMessage("Failed load original dll:"+#LF$+DllName)
+	;RaiseError(#ERROR_DLL_INIT_FAILED)
+	TerminateProcess_(GetCurrentProcess_(),0)
+	ProcedureReturn #Null
+EndProcedure
+
+Procedure.i LoadDll2(LocalDllName.s,SystemDllName.s="")
+	Protected hDll
+	Protected DllFull.s
+	If SystemDllName = "" : SystemDllName = LocalDllName : EndIf
+	
+	If GetExtensionPart(LocalDllName) = "" : LocalDllName + ".dll" : EndIf
+	DllFull = PrgDir+LocalDllName
+	;dbg("LoadDll: "+DllFull)
+	hDll = LoadLibrary_(@DllFull)
+	If hDll
+		ProcedureReturn hDll
+	EndIf
+	
+	If GetExtensionPart(SystemDllName) = "" : SystemDllName + ".dll" : EndIf
+	DllFull = SysDir+"\"+SystemDllName
+	;dbg("LoadDll: "+DllFull)
+	hDll = LoadLibrary_(@DllFull)
+	If hDll
+		ProcedureReturn hDll
+	EndIf
+	
+	PPLastErrorMessage("Failed load original dll:"+#LF$+LocalDllName+"/"+SystemDllName)
+	;RaiseError(#ERROR_DLL_INIT_FAILED)
+	TerminateProcess_(GetCurrentProcess_(),0)
+	ProcedureReturn #Null
 EndProcedure
 
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -211,9 +240,9 @@ EndMacro
 
 ; Макрос для описания функций, имена которых конфликтуют с процедурами PureBasic.
 ; Имена этих функций будут заменены в экспорте внешней утилитой.
-Macro DeclareProxyConflictFunc(DllName,FuncName,ConflictFuncName,Compat=0)
+Macro DeclareProxyConflictFunc(DllName,FuncName,NotConflictFuncName,Compat=0)
 	CompilerIf Compat=0 Or Compat<=#PROXY_DLL_COMPATIBILITY
-		ProcedureDLL ConflictFuncName()
+		ProcedureDLL NotConflictFuncName()
 			DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
 			CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 				!JMP [v_Trampoline_#FuncName]
@@ -367,9 +396,9 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 161
-; FirstLine = 66
-; Folding = -Agw
+; CursorPosition = 198
+; FirstLine = 90
+; Folding = -QYA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

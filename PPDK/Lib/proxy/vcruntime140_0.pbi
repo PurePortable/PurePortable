@@ -1,4 +1,4 @@
-﻿DeclareProxyDll(vcruntime140_0,0)
+﻿DeclareProxyDll2(vcruntime140_0,vcruntime140_0,vcruntime140)
 
 DeclareProxyFunc(vcruntime140_0,__AdjustPointer)
 DeclareProxyFunc(vcruntime140_0,__BuildCatchObject)
@@ -72,7 +72,7 @@ DeclareProxyFunc(vcruntime140_0,wcschr)
 DeclareProxyFunc(vcruntime140_0,wcsrchr)
 DeclareProxyFunc(vcruntime140_0,wcsstr)
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
