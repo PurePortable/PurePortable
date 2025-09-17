@@ -20,8 +20,6 @@ XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 ; CompilerIf #DBG_ANY And Not Defined(DBG_ALWAYS,#PB_Constant)
 ; 	#DBG_ALWAYS = 1
 ; CompilerEndIf
-;Global DbgAttach
-Global DbgDetach
 
 #IHELPFUL_INIT = 1
 #IMINHOOK_INIT = 1
@@ -43,8 +41,8 @@ Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование о
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 5
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 22
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

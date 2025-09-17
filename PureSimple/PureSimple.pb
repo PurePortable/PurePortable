@@ -107,7 +107,7 @@ Global DbgRegMode
 Global DbgSpecMode
 Global DbgEnvMode
 Global DbgAnyMode
-Global DbgDetach
+;Global DbgDetachMode
 Global DbgExtMode
 Global DbgExecMode
 Global DbgCbtMode
@@ -572,7 +572,7 @@ Procedure AttachProcedure()
 	DbgSpecMode = 0
 	DbgEnvMode = 0
 	DbgAnyMode = 0
-	DbgDetach = 1
+	DbgDetachMode = 1
 	DbgExecMode = 0
 	DbgClnMode = 0
 	If PreferenceGroup("Debug")
@@ -580,7 +580,7 @@ Procedure AttachProcedure()
 		DbgSpecMode = ReadPreferenceInteger("SpecialFolders",0)
 		DbgEnvMode = ReadPreferenceInteger("EnvironmentVariables",0)
 		;DbgAnyMode = ReadPreferenceInteger("Attach",0)
-		DbgDetach = ReadPreferenceInteger("Detach",1)
+		DbgDetachMode = ReadPreferenceInteger("Detach",1)
 		DbgExtMode = ReadPreferenceInteger("Extensions",0)
 		DbgExecMode = ReadPreferenceInteger("RunFrom",0)
 		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
@@ -676,6 +676,7 @@ Procedure AttachProcedure()
 				Case "temp"
 					TempRedir = p
 					CreatePath(p)
+				Case "alldirs"
 				Default
 					Protected id.s = k
 					Protected kfid.GUID
@@ -1120,9 +1121,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1008
-; FirstLine = 202
-; Folding = pCAGAICAgS+
+; CursorPosition = 582
+; FirstLine = 154
+; Folding = pCAGAISEgA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
