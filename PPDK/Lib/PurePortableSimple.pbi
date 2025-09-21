@@ -9,18 +9,6 @@ XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
-; Global ProcessId
-; Global DllInstance; будет иметь то же значение, что и одноимённый параметр в AttachProcess
-; Global DllPath.s
-; Global DllName.s
-; Global PrgDir.s
-; Global PrgDirN.s
-
-; CompilerIf Not Defined(DBG_ANY,#PB_Constant) : #DBG_ANY = 0 : CompilerEndIf
-; CompilerIf #DBG_ANY And Not Defined(DBG_ALWAYS,#PB_Constant)
-; 	#DBG_ALWAYS = 1
-; CompilerEndIf
-
 #IHELPFUL_INIT = 1
 #IMINHOOK_INIT = 1
 XIncludeFile "PP_Extension.pbi"
@@ -42,7 +30,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 22
+; CursorPosition = 10
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
