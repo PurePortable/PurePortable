@@ -13,8 +13,9 @@ Compile-ProxyDll-Start
   "winmm", "version", "version+"
   "avifil32", "dbghelp", "ddraw", "dinput", "dnsapi", "dwmapi", "dwrite", "glu32", "iphlpapi", "ktmw32"
   "mpr", "msacm32", "mscms", "msi", "msvbvm60", "msvfw32", "netapi32", "opengl32", "propsys", "secur32"
-  "shfolder", "urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wtsapi32", "vcruntime140", "vcruntime140_0"
+  "shfolder", "urlmon", "userenv", "uxtheme", "wer", "winhttp", "wininet", "wtsapi32"
   "comdlg32", "wintrust"
+  # "vcruntime140", "vcruntime140_0", "vcruntime140_1"
 ) | foreach { Compile-ProxyDll "PureSimpleLoader" $_ -Dir32 $Dir32 -Dir64 $Dir64 }
 
 # Загрузчики, требующие коррекцию экспорта
