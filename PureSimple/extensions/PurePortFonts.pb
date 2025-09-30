@@ -41,7 +41,7 @@ Procedure ExtensionProcedure()
 		If PreferenceGroup(#EXT_SECTION_MAIN+".Load")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
-				FontMask = NormalizePath(PreferenceKeyName())
+				FontMask = NormalizePPath(PreferenceKeyName())
 				DbgExt("  Enumeration fonts: "+FontMask)
 				FontDir = GetPathPart(FontMask)
 				FontMask = GetFilePart(FontMask)
@@ -65,7 +65,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 53
+; CursorPosition = 43
 ; FirstLine = 29
 ; Folding = -
 ; Optimizer

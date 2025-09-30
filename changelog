@@ -4,7 +4,8 @@
 (-) удалено
 (?) непонятно ))
 
-[4.11.0.11] 2025-07-30
+[4.11.0.11] 2025-09-30
+(!) Исправление Execute
 (!) Исправление в NormalizePath.
 (+) PureSimple: LocalLowAppData синоним для LocalAppDataLow.
 (+) IniFileEx: IniClear().
