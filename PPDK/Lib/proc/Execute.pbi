@@ -1,15 +1,4 @@
-﻿; https://vsokovikov.narod.ru/New_MSDN_API/Process_thread/fn_createprocess.htm
-; https://vsokovikov.narod.ru/New_MSDN_API/Process_thread/str_startupinfo.htm
-; https://learn.microsoft.com/ru-ru/windows/win32/procthread/creating-processes
-; https://learn.microsoft.com/ru-ru/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa
-; https://learn.microsoft.com/ru-ru/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject
-; https://learn.microsoft.com/ru-ru/windows/win32/api/synchapi/nf-synchapi-waitforsingleobjectex
-
-; https://www.transl-gunsmoker.ru/2011/08/undocumented-createprocess.html
-; https://www.gunsmoker.ru/2009/07/createprocess.html
-
-; https://www.gunsmoker.ru/2015/01/never-use-ShellExecute.html
-
+﻿
 #EXECUTE_WAIT = 1
 #EXECUTE_HIDE = 2
 #EXECUTE_MAX = 4
