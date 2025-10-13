@@ -16,16 +16,17 @@ Structure IRegistryData
 	hAppKey.l
 	*ConfigFile
 	*InitialFile
+	*Reserve ; для бывшего и возможно будущего дополнительного файла
 	*Keys.String ; указатель на массив строк
 	*Cfg.CFGDATA ; указатель на массив CFGDATA
-	*nkeys.INTEGER
+	*nKeys.INTEGER
 	*nCfg.INTEGER
 	*ConfigChanged.INTEGER
 EndStructure
 
 Structure IRegistry
 	Version.i ; 1 или 2
-	*D.IRegistryData
+	*RD.IRegistryData
 	CfgExist.CfgExist
 	SetCfgS.SetCfgS
 	SetCfgD.SetCfgD
@@ -42,7 +43,20 @@ CompilerIf Not Defined(IREGISTRY_INIT,#PB_Constant) : #IREGISTRY_INIT = 0 : Comp
 CompilerIf #IREGISTRY_INIT
 	
 	Global IRegistry.IRegistry
-	
+	Global IRegistryData.IRegistryData
+	CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
+		CompilerCase 1
+			IRegistryData\Cfg = @Cfg()
+			IRegistryData\Keys = @Keys()
+			IRegistryData\nCfg = @nCfg
+			IRegistryData\nKeys = @nKeys
+			IRegistryData\ConfigChanged = @ConfigChanged
+		CompilerCase 2
+			IRegistryData\hAppKey = hAppKey
+	CompilerEndSelect
+	IRegistryData\ConfigFile = @ConfigFile
+	IRegistryData\InitialFile = @InitialFile
+	IRegistry\RD = @IRegistryData
 	DataSection
 		IRegistry:
 		Data.i @CfgExist()
@@ -62,8 +76,8 @@ CompilerIf #IREGISTRY_INIT
 CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 14
-; FirstLine = 11
+; CursorPosition = 58
+; FirstLine = 41
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
