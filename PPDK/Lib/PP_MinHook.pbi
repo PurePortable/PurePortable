@@ -19,6 +19,17 @@ CompilerIf #DBG_MIN_HOOK And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 
+CompilerIf Not Defined(PPErrorMessage,#PB_Procedure)
+	Procedure PPErrorMessage(Msg.s,Error)
+		MessageBox_(0,Msg,"MinHook",#MB_ICONERROR)
+	EndProcedure
+CompilerEndIf
+CompilerIf Not Defined(PPLastErrorMessage,#PB_Procedure)
+	Procedure PPLastErrorMessage(Msg.s)
+		PPErrorMessage(Msg,GetLastError_())
+	EndProcedure
+CompilerEndIf
+
 ;CompilerIf Not Defined(MIN_HOOK_CHECKRESULT,#PB_Constant) : #MIN_HOOK_CHECKRESULT = 1 : CompilerEndIf
 CompilerIf Not Defined(MIN_HOOK_ERROR_MODE,#PB_Constant) : #MIN_HOOK_ERROR_MODE = 2 : CompilerEndIf
 ;#MIN_HOOK_ERROR_MODE = 2
@@ -186,7 +197,9 @@ EndProcedure
 MH_Initialize()
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = -z
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 26
+; FirstLine = 22
+; Folding = -P-
 ; DisableDebugger
 ; EnableExeConstant
