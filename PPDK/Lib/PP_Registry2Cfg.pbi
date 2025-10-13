@@ -238,19 +238,23 @@ EndProcedure
 ; https://docs.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regloadappkeya
 ; https://docs.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regloadkeya
 ; https://learn.microsoft.com/ru-ru/windows/win32/sysinfo/registry-key-security-and-access-rights
+CompilerIf Not Defined(PORTABLE_REG_IGNORE_ERR,#PB_Constant) : #PORTABLE_REG_IGNORE_ERR = 0 : CompilerEndIf
+
 CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 	CompilerCase 2
 		DeclareImport(advapi32,_RegLoadAppKeyW@20,RegLoadAppKeyW,RegLoadAppKey_(lpFile,phkResult,samDesired,dwOptions,Reserved))
 		Procedure ReadCfg()
 			Protected err.l = RegLoadAppKey_(@ConfigFile,@hAppKey,#KEY_ALL_ACCESS,0,0)
-			DbgReg("REGLOADAPPKEY: "+Str(err)+": "+ConfigFile)
+			dbg("REGLOADAPPKEY: CNT: "+Str(err)+": "+ConfigFile)
 			WriteLog("REGLOADAPPKEY: "+Str(err)+": "+ConfigFile)
 			If err<>#ERROR_SUCCESS
 				DbgReg("REGLOADAPPKEY: "+GetLastErrorStr(err))
 				WriteLog("REGLOADAPPKEY: "+GetLastErrorStr(err))
-				PPErrorMessage("RegLoadAppKey"+#CR$+"Error load hive ",err)
-				;RaiseError(#ERROR_DLL_INIT_FAILED)
-				TerminateProcess_(GetCurrentProcess_(),0)
+				CompilerIf Not #PORTABLE_REG_IGNORE_ERR
+					PPErrorMessage("RegLoadAppKey"+#CR$+"Error load hive ",err)
+					;RaiseError(#ERROR_DLL_INIT_FAILED)
+					TerminateProcess_(GetCurrentProcess_(),0)
+				CompilerEndIf
 			EndIf
 			If FileExist(InitialFile)
 				ImportCfg(InitialFile)
@@ -278,8 +282,9 @@ Procedure WriteCfg()
 EndProcedure
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 23
-; Folding = AC9
+; CursorPosition = 252
+; FirstLine = 72
+; Folding = Ai9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

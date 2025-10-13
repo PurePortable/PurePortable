@@ -2,6 +2,10 @@
 
 #PP_EXT_ALLOW_UNLOAD = 1 ; Разрешить выгрузку расширения
 
+#EXT_VERSION = 2 ; Версии структур
+; 1 - Исходная
+; 2 - Добавлен IRegistry
+
 ;;======================================================================================================================
 
 CompilerIf Not Defined(MAX_PATH_EXTEND,#PB_Constant) : #MAX_PATH_EXTEND = 32767 : CompilerEndIf
@@ -21,6 +25,7 @@ Structure EXTDATA
 	*Reserve ; Для расширения структуры в последующих версиях
 	*HF.IHelpful ; Интерфейс к различным функциям
 	*MH.IMinHook ; Интерфейс к MinHook
+	*VR.IRegistry ; Интерфейс к виртуальному реестру
 EndStructure
 
 Structure EXTPARAM
@@ -33,8 +38,8 @@ Prototype PurePortableExtension(*ExtData.EXTDATA,*ExtParam.EXTPARAM) ; прот�
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 31
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 6
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
