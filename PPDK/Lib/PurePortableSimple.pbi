@@ -11,6 +11,7 @@ XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 
 #IHELPFUL_INIT = 1
 #IMINHOOK_INIT = 1
+#IREGISTRY_INIT = 1
 XIncludeFile "PP_Extension.pbi"
 ;;======================================================================================================================
 
@@ -28,9 +29,18 @@ Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование о
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
+Procedure.s ReadPreferenceStringQ(Key.s,DefaultValue.s="")
+	ProcedureReturn Trim(ReadPreferenceString(Key,DefaultValue),Chr(34))
+EndProcedure
+;;======================================================================================================================
+Procedure.s PreferenceKeyValueQ()
+	ProcedureReturn Trim(PreferenceKeyValue(),Chr(34))
+EndProcedure
+;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 10
+; CursorPosition = 13
+; FirstLine = 4
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

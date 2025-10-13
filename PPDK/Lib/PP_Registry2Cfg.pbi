@@ -238,6 +238,7 @@ EndProcedure
 ; https://docs.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regloadappkeya
 ; https://docs.microsoft.com/ru-ru/windows/win32/api/winreg/nf-winreg-regloadkeya
 ; https://learn.microsoft.com/ru-ru/windows/win32/sysinfo/registry-key-security-and-access-rights
+
 CompilerIf Not Defined(PORTABLE_REG_IGNORE_ERR,#PB_Constant) : #PORTABLE_REG_IGNORE_ERR = 0 : CompilerEndIf
 
 CompilerSelect #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
@@ -282,7 +283,7 @@ Procedure WriteCfg()
 EndProcedure
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 252
+; CursorPosition = 238
 ; FirstLine = 72
 ; Folding = Ai9
 ; EnableThread

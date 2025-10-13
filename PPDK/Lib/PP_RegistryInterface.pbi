@@ -12,29 +12,6 @@ Prototype.s FindCfgS(ValueName.s) ; Только R1. Может не компи�
 Prototype.l FindCfgD(ValueName.s) ; Только R1. Может не компилироваться по условию
 ; Некоторые другие для R1 типа SetIC
 
-;{ Структуры R1 для работы с записываемыми/считываемыми в реестр данными
-Structure AnyBytes
-	b0.b
-	b1.b
-	b2.b
-	b3.b
-EndStructure
-Structure AnyWords
-	w0.w
-	w1.w
-EndStructure
-Structure AnyType
-	StructureUnion
-		l.l
-		w.w
-		b.b
-		x.b[3]
-		bx.AnyBytes
-		wx.AnyWords
-	EndStructureUnion
-EndStructure
-;}
-
 Structure IRegistryData
 	hAppKey.l
 	*ConfigFile
@@ -85,9 +62,8 @@ CompilerIf #IREGISTRY_INIT
 CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 67
-; FirstLine = 28
-; Folding = +
+; CursorPosition = 14
+; FirstLine = 11
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
