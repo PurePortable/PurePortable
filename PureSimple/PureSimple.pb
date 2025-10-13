@@ -930,7 +930,7 @@ Procedure AttachProcedure()
 		ExtData\HF = ?IHelpful
 		ExtData\MH = ?IMinHook
 		CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
-			ExtData\VR = ?IRegistry
+			ExtData\VR = @IRegistry
 		CompilerEndIf
 		; Перечисляем расширения
 		For iExtFile=1 To nExtFiles
@@ -1126,9 +1126,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 1026
-; FirstLine = 147
-; Folding = pCAAAgDAgA9
+; CursorPosition = 932
+; FirstLine = 135
+; Folding = pCAAAgDAwA9
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

@@ -25,7 +25,7 @@ Structure IRegistryData
 EndStructure
 
 Structure IRegistry
-	Version.i ; 1 или 2
+	StorageType.i ; 1 или 2
 	*RD.IRegistryData
 	CfgExist.CfgExist
 	SetCfgS.SetCfgS
@@ -57,29 +57,42 @@ CompilerIf #IREGISTRY_INIT
 	CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 		IRegistryData\ConfigFile = @ConfigFile
 		IRegistryData\InitialFile = @InitialFile
+		IRegistry\StorageType = #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 		IRegistry\RD = @IRegistryData
-		DataSection
-			IRegistry:
-			Data.i @CfgExist()
-			Data.i @SetCfgS()
-			Data.i @SetCfgD()
-			Data.i @SetCfgB()
-			Data.i @GetCfgS()
-			Data.i @GetCfgD()
-			Data.i @DelCfg()
-			Data.i @DelCfgTree()
-			CompilerIf Defined(CorrectCfgPath,#PB_Procedure)
-				Data.i @CorrectCfgPath()
-			CompilerElse
-				Data.i 0
-			CompilerEndIf
-		EndDataSection
+		IRegistry\CfgExist = @CfgExist()
+		IRegistry\SetCfgS = @SetCfgS()
+		IRegistry\SetCfgD = @SetCfgD()
+		IRegistry\SetCfgB = @SetCfgB()
+		IRegistry\GetCfgS = @GetCfgS()
+		IRegistry\GetCfgD = @GetCfgD()
+		IRegistry\DelCfg = @DelCfg()
+		IRegistry\DelCfgTree = @DelCfgTree()		
+		CompilerIf Defined(CorrectCfgPath,#PB_Procedure)
+			IRegistry\CorrectCfgPath = @CorrectCfgPath()
+		CompilerEndIf
+; 		DataSection
+; 			IRegistry:
+; 			Data.i
+; 			Data.i @CfgExist()
+; 			Data.i @SetCfgS()
+; 			Data.i @SetCfgD()
+; 			Data.i @SetCfgB()
+; 			Data.i @GetCfgS()
+; 			Data.i @GetCfgD()
+; 			Data.i @DelCfg()
+; 			Data.i @DelCfgTree()
+; 			CompilerIf Defined(CorrectCfgPath,#PB_Procedure)
+; 				Data.i @CorrectCfgPath()
+; 			CompilerElse
+; 				Data.i 0
+; 			CompilerEndIf
+; 		EndDataSection
 	CompilerEndIf
 CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 56
-; FirstLine = 43
+; CursorPosition = 64
+; FirstLine = 38
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
