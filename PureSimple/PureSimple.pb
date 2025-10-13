@@ -623,7 +623,7 @@ Procedure AttachProcedure()
 	If FirstProcess And PreferenceGroup("RunFromAttachProcess")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			RunFrom(PreferenceKeyName(),PreferenceKeyValueQ())
+			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 		Wend
 	EndIf		
 	;}
@@ -929,7 +929,9 @@ Procedure AttachProcedure()
 		ExtData\PrefsFile = @PureSimplePrefs
 		ExtData\HF = ?IHelpful
 		ExtData\MH = ?IMinHook
-		ExtData\VR = ?IRegistry
+		CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
+			ExtData\VR = ?IRegistry
+		CompilerEndIf
 		; Перечисляем расширения
 		For iExtFile=1 To nExtFiles
 			LoadableLibrary = ExtFiles(iExtFile)\File
@@ -1027,7 +1029,7 @@ Procedure DetachProcedure()
 		If PreferenceGroup("RunFromDetachProcess")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
-				RunFrom(PreferenceKeyName(),PreferenceKeyValueQ())
+				RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 			Wend
 		EndIf
 	EndIf
@@ -1124,9 +1126,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 931
-; FirstLine = 153
-; Folding = pCAAAgDAwA+
+; CursorPosition = 1026
+; FirstLine = 147
+; Folding = pCAAAgDAgA9
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

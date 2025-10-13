@@ -54,30 +54,32 @@ CompilerIf #IREGISTRY_INIT
 		CompilerCase 2
 			IRegistryData\hAppKey = hAppKey
 	CompilerEndSelect
-	IRegistryData\ConfigFile = @ConfigFile
-	IRegistryData\InitialFile = @InitialFile
-	IRegistry\RD = @IRegistryData
-	DataSection
-		IRegistry:
-		Data.i @CfgExist()
-		Data.i @SetCfgS()
-		Data.i @SetCfgD()
-		Data.i @SetCfgB()
-		Data.i @GetCfgS()
-		Data.i @GetCfgD()
-		Data.i @DelCfg()
-		Data.i @DelCfgTree()
-		CompilerIf Defined(CorrectCfgPath,#PB_Procedure)
-			Data.i @CorrectCfgPath()
-		CompilerElse
-			Data.i 0
-		CompilerEndIf
-	EndDataSection
+	CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
+		IRegistryData\ConfigFile = @ConfigFile
+		IRegistryData\InitialFile = @InitialFile
+		IRegistry\RD = @IRegistryData
+		DataSection
+			IRegistry:
+			Data.i @CfgExist()
+			Data.i @SetCfgS()
+			Data.i @SetCfgD()
+			Data.i @SetCfgB()
+			Data.i @GetCfgS()
+			Data.i @GetCfgD()
+			Data.i @DelCfg()
+			Data.i @DelCfgTree()
+			CompilerIf Defined(CorrectCfgPath,#PB_Procedure)
+				Data.i @CorrectCfgPath()
+			CompilerElse
+				Data.i 0
+			CompilerEndIf
+		EndDataSection
+	CompilerEndIf
 CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 58
-; FirstLine = 41
+; CursorPosition = 56
+; FirstLine = 43
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
