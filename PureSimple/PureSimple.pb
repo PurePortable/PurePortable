@@ -374,7 +374,7 @@ Procedure CheckProgram()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					v = PreferenceKeyValueQ()
+					v = PreferenceKeyValue()
 					Select LCase(k)
 						Case "reaction" ; пропускаем
 						Case "programname","programfilename"
@@ -417,7 +417,7 @@ Procedure CheckProgram()
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				k = PreferenceKeyName()
-				v = PreferenceKeyValueQ()
+				v = PreferenceKeyValue()
 				Select LCase(k)
 					Case "programname","programfilename"
 						If CompareWithList(PrgName,v,1)
@@ -481,7 +481,7 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			p = PreferenceKeyValueQ()
+			p = PreferenceKeyValue()
 			If p
 				SetEnvironmentVariable(k,ExpandEnvironmentStrings(p))
 			Else
@@ -493,7 +493,7 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			p = NormalizePPath(PreferenceKeyValueQ())
+			p = NormalizePPath(PreferenceKeyValue())
 			If p
 				;CreatePath(p)
 				SetEnvironmentVariable(k,p)
@@ -509,14 +509,14 @@ Procedure AttachProcedure()
 			If RegistryPermit
 				RegistryShlwapiPermit = ReadPreferenceInteger("RegistryShlwapi",1)
 			EndIf
-			ConfigFile = ReadPreferenceStringQ("DataFile","")
+			ConfigFile = ReadPreferenceString("DataFile","")
 			If ConfigFile
 				If GetExtensionPart(ConfigFile)=""
 					ConfigFile + #CONFIG_FILEEXT
 				EndIf
 				ConfigFile = NormalizePPath(ConfigFile)
 			EndIf
-			InitialFile = ReadPreferenceStringQ("InitFile","")
+			InitialFile = ReadPreferenceString("InitFile","")
 			If InitialFile
 				If GetExtensionPart(InitialFile)=""
 					InitialFile + #CONFIG_INITIALEXT
@@ -530,7 +530,7 @@ Procedure AttachProcedure()
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
 		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
-		EnvironmentVariablesCrt = ReadPreferenceStringQ("EnvironmentVariablesCrt","")
+		EnvironmentVariablesCrt = ReadPreferenceString("EnvironmentVariablesCrt","")
 		If EnvironmentVariablesCrt
 			EnvironmentVariablesCrtPermit = 1
 		EndIf
@@ -555,14 +555,14 @@ Procedure AttachProcedure()
 		CompilerIf Defined(BLOCK_RECENT_DOCS,#PB_Constant)
 			BlockRecentDocsPermit = ReadPreferenceInteger("BlockRecentDocs",0)
 		CompilerEndIf
-		p = ReadPreferenceStringQ("CurrentDirectory","")
+		p = ReadPreferenceString("CurrentDirectory","")
 		If p <> ""
 			SetCurrentDirectory(NormalizePPath(p))
 		EndIf
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
-		SpoofDateP = ReadPreferenceStringQ("SpoofDate","")
+		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
-		CBTTitles = "|" + ReadPreferenceStringQ("CBTTitles","")
+		CBTTitles = "|" + ReadPreferenceString("CBTTitles","")
 		CharLower_(@CBTTitles)
 		CBTHookPermit = Bool(Len(CBTTitles)>1)
 	EndIf
@@ -601,7 +601,7 @@ Procedure AttachProcedure()
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				k = LCase(PreferenceKeyName())
-				v = LCase(PreferenceKeyValueQ())
+				v = LCase(PreferenceKeyValue())
 				If v
 					AddKeyData(k,v)
 				ElseIf Left(k,9)="software\" ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
@@ -629,7 +629,7 @@ Procedure AttachProcedure()
 	;}
 	;{ Перенаправление специальных папок
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
-		v = Trim(ReadPreferenceStringQ("AllDirs",""),"\")
+		v = Trim(ReadPreferenceString("AllDirs",""),"\")
 		If v
 			p = NormalizePPath(v)
 			ProfileRedir = p
@@ -642,7 +642,7 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			v = RTrim(PreferenceKeyValueQ(),"\")
+			v = RTrim(PreferenceKeyValue(),"\")
 			If v
 				p = NormalizePPath(v)
 			Else
@@ -714,7 +714,7 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			k = PreferenceKeyName()
-			v = PreferenceKeyValueQ()
+			v = PreferenceKeyValue()
 			p = NormalizePPath(v)
 			Select LCase(k) ; если значение не задано, для некоторых устанавливаем то же, что и для SpecialFolders.
 				Case "userprofile"
@@ -751,7 +751,7 @@ Procedure AttachProcedure()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					p = PreferenceKeyValueQ()
+					p = PreferenceKeyValue()
 					i = FindString(k,"|")
 					If i
 						v = Mid(k,i+1)
@@ -786,7 +786,7 @@ Procedure AttachProcedure()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					p = NormalizePPath(PreferenceKeyValueQ())
+					p = NormalizePPath(PreferenceKeyValue())
 					i = FindString(k,"|")
 					If i
 						v = Mid(k,i+1)
@@ -803,7 +803,7 @@ Procedure AttachProcedure()
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					k = PreferenceKeyName()
-					p = NormalizePPath(PreferenceKeyValueQ()) ; ASK: Использовать как есть без нормализации?
+					p = NormalizePPath(PreferenceKeyValue()) ; ASK: Использовать как есть без нормализации?
 					i = FindString(k,"|")
 					If i
 						v = Mid(k,i+1)
@@ -899,7 +899,7 @@ Procedure AttachProcedure()
 	If PreferenceGroup("Extensions")
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
-			v = PreferenceKeyValueQ()
+			v = PreferenceKeyValue()
 			k = PreferenceKeyName()
 			DbgExt("ATTACHPROCESS: EXT: "+k)
 			If GetExtensionPart(k) = ""
@@ -978,7 +978,7 @@ Procedure DetachProcedure()
 	Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
 	If PreferenceGroup("Portable")
 		Cleanup = ReadPreferenceInteger("Cleanup",0)
-		CleanupDirectory = ReadPreferenceStringQ("CleanupDirectory",".")
+		CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
 	EndIf
 	;{ Чистка реестра для Registry1
 	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1
@@ -1126,9 +1126,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 932
-; FirstLine = 135
-; Folding = pCAAAgDAwA9
+; Folding = pCAAAoDAgA9
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
