@@ -70,25 +70,15 @@ CompilerIf Not Defined(DETOUR_SHGETVALUE,#PB_Constant)       : #DETOUR_SHGETVALU
 CompilerIf Not Defined(DETOUR_SHREGGETVALUE,#PB_Constant)    : #DETOUR_SHREGGETVALUE = 0    : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHCOPYKEY,#PB_Constant)        : #DETOUR_SHCOPYKEY = 0        : CompilerEndIf
 CompilerIf Not Defined(DETOUR_SHQUERYINFOKEY,#PB_Constant)   : #DETOUR_SHQUERYINFOKEY = 0   : CompilerEndIf
-
-; CompilerIf #DETOUR_SHDELETEKEY Or #DETOUR_SHDELETEEMPTYKEY Or #DETOUR_SHDELETEVALUE
-; 	#DETOUR_REG_SHLWAPI_ANY = 1
-; CompilerElseIf #DETOUR_SHGETVALUE Or #DETOUR_SHREGGETVALUE Or #DETOUR_SHCOPYKEY Or #DETOUR_SHQUERYINFOKEY
-; 	#DETOUR_REG_SHLWAPI_ANY = 1
-; CompilerElseIf #DETOUR_SHREGGETBOOLUSVALUE
-; 	#DETOUR_REG_SHLWAPI_ANY = 1
-; CompilerElse
-; 	#DETOUR_REG_SHLWAPI_ANY = 0
-; CompilerEndIf
 ;}
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; https://learn.microsoft.com/ru-ru/windows/win32/sysinfo/predefined-keys
 ; Для правильного сравнения в режиме x64
-Global HKCR.l = #HKEY_CLASSES_ROOT
-Global HKLM.l = #HKEY_LOCAL_MACHINE
-Global HKCU.l = #HKEY_CURRENT_USER
-Global HKU.l = #HKEY_USERS
+Global HKCR.l = #HKEY_CLASSES_ROOT ; depricated
+Global HKLM.l = #HKEY_LOCAL_MACHINE ; depricated
+Global HKCU.l = #HKEY_CURRENT_USER ; depricated
+Global HKU.l = #HKEY_USERS ; depricated
 
 CompilerIf Not Defined(CheckKey,#PB_Procedure) : Declare.s CheckKey(hKey.l,Key.s) : CompilerEndIf
 
@@ -375,9 +365,7 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 127
-; FirstLine = 109
-; Folding = njz-0
+; Folding = mjz-0
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
