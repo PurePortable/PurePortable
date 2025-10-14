@@ -29,17 +29,17 @@ Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование о
 	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
-Procedure.s ReadPreferenceStringQ(Key.s,DefaultValue.s="")
-	ProcedureReturn Trim(ReadPreferenceString(Key,DefaultValue),Chr(34))
-EndProcedure
+; Procedure.s ReadPreferenceStringQ(Key.s,DefaultValue.s="")
+; 	ProcedureReturn Trim(ReadPreferenceString(Key,DefaultValue),Chr(34))
+; EndProcedure
 ;;======================================================================================================================
-Procedure.s PreferenceKeyValueQ()
-	ProcedureReturn Trim(PreferenceKeyValue(),Chr(34))
-EndProcedure
+; Procedure.s PreferenceKeyValueQ()
+; 	ProcedureReturn Trim(PreferenceKeyValue(),Chr(34))
+; EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 13
+; CursorPosition = 32
 ; FirstLine = 4
 ; Folding = -
 ; EnableThread
