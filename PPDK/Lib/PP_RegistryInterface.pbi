@@ -1,4 +1,4 @@
-﻿
+﻿CompilerIf Not Defined(PORTABLE_REGISTRY,#PB_Constant) : #PORTABLE_REGISTRY = 0 : CompilerEndIf
 CompilerIf #PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK
 	Procedure.i XCfgExist(*Key,*Name)
 		ProcedureReturn CfgExist(PeekS(*Key),PeekS(*Name))
@@ -104,8 +104,6 @@ CompilerIf #IREGISTRY_INIT
 CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 102
-; FirstLine = 67
 ; Folding = --
 ; EnableThread
 ; DisableDebugger

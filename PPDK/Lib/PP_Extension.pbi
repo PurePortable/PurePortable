@@ -10,6 +10,7 @@
 
 CompilerIf Not Defined(MAX_PATH_EXTEND,#PB_Constant) : #MAX_PATH_EXTEND = 32767 : CompilerEndIf
 
+XIncludeFile "PurePortableCustom.pbi"
 XIncludeFile "PP_HelpfulInterface.pbi"
 XIncludeFile "PP_MinHookInterface.pbi"
 XIncludeFile "PP_RegistryInterface.pbi"
@@ -40,8 +41,7 @@ Prototype PurePortableExtension(*ExtData.EXTDATA,*ExtParam.EXTPARAM) ; прот�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 14
-; FirstLine = 4
+; CursorPosition = 12
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
