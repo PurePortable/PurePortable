@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.11
+;RES_VERSION 4.11.0.13
 ;RES_DESCRIPTION Work with ini-files
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePortIni
@@ -709,11 +709,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.11
+; VersionField0 = 4.11.0.13
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.11
+; VersionField5 = 4.11.0.13
 ; VersionField6 = Work with ini-files
 ; VersionField7 = PurePortIni
 ; VersionField9 = (c) Smitis, 2017-2025
