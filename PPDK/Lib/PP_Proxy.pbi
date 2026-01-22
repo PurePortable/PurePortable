@@ -245,17 +245,17 @@ Macro DeclareProxyConflictFunc(DllName,FuncName,NotConflictFuncName,Compat=0)
 		ProcedureDLL NotConflictFuncName()
 			DbgProxy(ProxyFuncCalledMsg FuncName#DoubleQuote)
 			CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
-				!JMP [v_Trampoline_#FuncName]
+				!JMP [v_Trampoline_#NotConflictFuncName]
 			CompilerElse
 				!ADD RSP,40
-				!JMP [v_Trampoline_#FuncName]
+				!JMP [v_Trampoline_#NotConflictFuncName]
 			CompilerEndIf
 		EndProcedure
 		DataSection
-			FuncAsciiName_#FuncName:
+			FuncAsciiName_#NotConflictFuncName:
 			!DB SingleQuote#FuncName#SingleQuote, 0
 		EndDataSection
-		Global Trampoline_#FuncName = _InitProxyFunc(hDll_#DllName,?FuncAsciiName_#FuncName)
+		Global Trampoline_#NotConflictFuncName = _InitProxyFunc(hDll_#DllName,?FuncAsciiName_#NotConflictFuncName)
 		;DbgProxy(ProxyFuncInitMsg FuncName#DoubleQuote)
 	CompilerEndIf
 EndMacro
@@ -396,9 +396,9 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 204
-; FirstLine = 90
-; Folding = -QYC-
+; CursorPosition = 247
+; FirstLine = 151
+; Folding = -QYG-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
