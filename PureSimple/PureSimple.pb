@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.12
+;RES_VERSION 4.11.0.13
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2025
 ;RES_INTERNALNAME PurePort.dll
@@ -36,6 +36,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #DETOUR_REG_SHLWAPI = 1 ; Перехват функций для работы с реестром из shlwapi
 #DETOUR_REG_TRANSACTED = 1
 ;}
+#PORTABLE_REG_ARRAY = 1
 #PORTABLE_SPECIAL_FOLDERS = 1 ; Перехват функций для работы со специальными папками
 ;{ Управление хуками PORTABLE_SPECIAL_FOLDERS
 #DETOUR_SHFOLDER = 1 ; Перехват функций из shfolder.dll
@@ -150,38 +151,8 @@ EndProcedure
 ;}
 ;{ REGISTRY
 CompilerIf #PORTABLE_REGISTRY
-	Structure KEYDATA
-		chk.s
-		clen.i
-		exact.i
-		virt.s
-	EndStructure
-	Global Dim KeyData.KEYDATA(0), nKeyData
 	Procedure.s CheckKey(hKey.l,Key.s)
-		Protected i, l, c, k.s
-		For i=1 To nKeyData
-			l = KeyData(i)\clen
-			k = KeyData(i)\chk
-			; было If Left(Key,KeyData(i)\clen)=KeyData(i)\chk
-			If KeyData(i)\exact
-				If StrCmp(@Key,@k)=0 Or (StrCmpN(@Key,@k,l)=0 And PeekW(@Key+l<<1)=92)
-					ProcedureReturn KeyData(i)\virt+Mid(Key,l+1)
-				EndIf
-			ElseIf StrCmpN(@Key,@k,l)=0
-				ProcedureReturn KeyData(i)\virt+Mid(Key,l+1)
-			EndIf
-		Next
-		ProcedureReturn ""
-	EndProcedure
-	Procedure AddKeyData(k.s,v.s)
-		If k
-			nKeyData+1
-			ReDim KeyData(nKeyData)
-			KeyData(nKeyData)\exact = Bool(Right(k,1)="\")
-			KeyData(nKeyData)\chk = RTrim(k,"\")
-			KeyData(nKeyData)\clen = Len(KeyData(nKeyData)\chk)
-			KeyData(nKeyData)\virt = RTrim(v,"\")
-		EndIf
+		ProcedureReturn CheckKeyArray(hKey,Key)
 	EndProcedure
 CompilerEndIf
 ;}
@@ -600,20 +571,20 @@ Procedure AttachProcedure()
 		If RegistryPermit And PreferenceGroup("Registry")
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
-				k = LCase(PreferenceKeyName())
-				v = LCase(PreferenceKeyValue())
+				k = PreferenceKeyName()
+				v = PreferenceKeyValue()
 				If v
-					AddKeyData(k,v)
-				ElseIf Left(k,9)="software\" ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
+					AddCheckedKey(k,v)
+				ElseIf LCase(Left(k,9))="software\" ; Специальная форма вида "Software\MyCompany" без значения или с пустым значением
 					v = Mid(k,10) ; все подстановки будут на этот путь
 					i = 0
 					Repeat
 						k = Mid(k,i+1)
-						AddKeyData(k,v)
+						AddCheckedKey(k,v)
 						i = FindString(k,"\")
 					Until i=0
 				Else ; используем as is
-					AddKeyData(k,k)
+					AddCheckedKey(k,k)
 				EndIf
 			Wend
 		EndIf
@@ -1133,11 +1104,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.12
+; VersionField0 = 4.11.0.13
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.12
+; VersionField5 = 4.11.0.13
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2025

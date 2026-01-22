@@ -267,6 +267,9 @@ CompilerSelect #REG_CRITICAL_SECTION
 CompilerEndSelect
 ;}
 
+CompilerIf #PORTABLE_REG_ARRAY
+	XIncludeFile "PP_RegistryCheckKey.pbi"
+CompilerEndIf
 XIncludeFile "PP_Registry2Detours.pbi"
 XIncludeFile "PP_Registry2Cfg.pbi"
 
@@ -365,6 +368,8 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 271
+; FirstLine = 96
 ; Folding = mjz-0
 ; EnableAsm
 ; DisableDebugger

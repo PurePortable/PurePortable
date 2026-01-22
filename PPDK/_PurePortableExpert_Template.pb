@@ -73,6 +73,8 @@ XIncludeFile "PurePortableCustom.pbi"
 
 #PORTABLE_CLEANUP = 0
 
+#PORTABLE_REG_ARRAY = 0
+
 ;;----------------------------------------------------------------------------------------------------------------------
 ;{ Мониторинг
 #DBG_REGISTRY = 0
@@ -145,28 +147,36 @@ CompilerEndIf
 ;}
 ;{ REGISTRY
 CompilerIf #PORTABLE_REGISTRY
-	Procedure.s CheckKey(hKey.l,Key.s)
-		; Key будет передан в нижнем регистре! Возвращаемое значение также должно быть в нижнем регистре!
-		; Если первым символом будет символ «?», такой ключ не будет сохранён.
-		;;---------------         1         2         3         4         5         6         7         8         9
-		;;---------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		If Left(Key,24)="software\company\program"
-			ProcedureReturn Mid(Key,10)
-		EndIf
-		;;---------------         1         2         3         4         5         6         7         8         9
-		;;---------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		If Left(Key,15)="company\program"
-			ProcedureReturn Key
-		EndIf
-		; Разные мусорные ключи можно перехватить, но не сохранять.
-		;If Left(Key,15)="software\python" : ProcedureReturn "?"+Key : EndIf
-		;If Left(Key,18)="software\qtproject" : ProcedureReturn "?"+Key : EndIf
-		;If Left(Key,18)="software\trolltech" : ProcedureReturn "?"+Key : EndIf
-		;If Left(Key,18)="software\asprotect" : ProcedureReturn "?"+Key : EndIf
-		;If Left(Key,18)="software\eurekalab" : ProcedureReturn "?"+Key : EndIf
-		;If Left(Key,20)="software\embarcadero" Or Left(Key,16)="software\borland" Or Left(Key,17)="software\codegear" : ProcedureReturn "?"+Key : EndIf
-		ProcedureReturn ""
-	EndProcedure
+	; Key будет передан в нижнем регистре! Возвращаемое значение также должно быть в нижнем регистре!
+	; Если первым символом будет символ «?», такой ключ не будет сохранён.
+	CompilerIf #PORTABLE_REG_ARRAY
+		; Для добавления ключей используется функция AddCheckedKey.
+		; Но при необходимости можно использовать прямое сравнение.
+		Procedure.s CheckKey(hKey.l,Key.s)
+			ProcedureReturn CheckKeyArray(hKey,Key)
+		EndProcedure
+	CompilerElse
+		Procedure.s CheckKey(hKey.l,Key.s)
+			;;---------------         1         2         3         4         5         6         7         8         9
+			;;---------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			If Left(Key,24)="software\company\program"
+				ProcedureReturn Mid(Key,10)
+			EndIf
+			;;---------------         1         2         3         4         5         6         7         8         9
+			;;---------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			If Left(Key,15)="company\program"
+				ProcedureReturn Key
+			EndIf
+			; Разные мусорные ключи можно перехватить, но не сохранять.
+			;If Left(Key,15)="software\python" : ProcedureReturn "?"+Key : EndIf
+			;If Left(Key,18)="software\qtproject" : ProcedureReturn "?"+Key : EndIf
+			;If Left(Key,18)="software\trolltech" : ProcedureReturn "?"+Key : EndIf
+			;If Left(Key,18)="software\asprotect" : ProcedureReturn "?"+Key : EndIf
+			;If Left(Key,18)="software\eurekalab" : ProcedureReturn "?"+Key : EndIf
+			;If Left(Key,20)="software\embarcadero" Or Left(Key,16)="software\borland" Or Left(Key,17)="software\codegear" : ProcedureReturn "?"+Key : EndIf
+			ProcedureReturn ""
+		EndProcedure
+	CompilerEndIf
 CompilerEndIf
 ;}
 ;{ PROFILE STRINGS
@@ -309,8 +319,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = 15FH6
-; Markers = 107
+; CursorPosition = 152
+; FirstLine = 93
+; Folding = 15LOy
+; Markers = 109
 ; Optimizer
 ; EnableThread
 ; Executable = 400.dll
