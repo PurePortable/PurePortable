@@ -932,6 +932,13 @@ Procedure AttachProcedure()
 		FreeMemory(*PurePortableExtensionNameA)
 	EndIf
 	;}
+	;{ Сохранение реестра
+	CompilerIf #PORTABLE_REGISTRY
+		If RegistryPermit
+			WriteCfg()
+		EndIf
+	CompilerEndIf
+	;}
 EndProcedure
 
 ;;======================================================================================================================
@@ -1099,7 +1106,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = pCAAAoDAgA9
+; CursorPosition = 610
+; FirstLine = 192
+; Folding = pCMAAMhAwA+
+; Markers = 776
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
