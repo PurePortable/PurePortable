@@ -19,6 +19,8 @@ Structure IHelpful
 	Hex2Bin.Hex2Bin
 	EncodeCtrl.EncodeCtrl
 	DecodeCtrl.DecodeCtrl
+	guid2s.guid2s
+	s2guid.s2guid
 EndStructure
 
 CompilerIf Not Defined(IHELPFUL_INIT,#PB_Constant) : #IHELPFUL_INIT = 0 : CompilerEndIf
@@ -45,9 +47,9 @@ CompilerIf #IHELPFUL_INIT
 	
 CompilerEndIf
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 41
-; FirstLine = 9
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 22
+; FirstLine = 3
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
