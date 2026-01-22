@@ -742,6 +742,8 @@ Procedure AttachProcedure()
 						Select t
 							Case "s"
 								SetCfgS(k,v,p)
+							Case "e"
+								SetCfgS(k,v,ExpandEnvironmentStrings(p))
 							Case "d"
 								SetCfgD(k,v,Val(p))
 							Case "b"
