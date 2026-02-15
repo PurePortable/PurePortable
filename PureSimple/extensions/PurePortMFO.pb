@@ -9,7 +9,7 @@
 ;PP_ENABLETHREAD 1
 ;RES_VERSION 4.11.0.13
 ;RES_DESCRIPTION Monitoring file operations
-;RES_COPYRIGHT (c) Smitis, 2017-2025
+;RES_COPYRIGHT (c) Smitis, 2017-2026
 ;RES_INTERNALNAME PurePortMFO
 ;RES_PRODUCTNAME PurePortable
 ;RES_PRODUCTVERSION 4.11.0.0
@@ -350,4 +350,4 @@ EndProcedure
 ; VersionField5 = 4.11.0.13
 ; VersionField6 = Monitoring file operations
 ; VersionField7 = PurePortMFO
-; VersionField9 = (c) Smitis, 2017-2025
+; VersionField9 = (c) Smitis, 2017-2026
