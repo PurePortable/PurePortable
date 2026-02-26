@@ -3,6 +3,7 @@
 #EXECUTE_HIDE = 2
 #EXECUTE_MAX = 4
 #EXECUTE_MIN = 8
+#EXECUTE_DBG = 16
 
 Procedure.i Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 	Protected StartupInfo.STARTUPINFO
@@ -49,9 +50,8 @@ Procedure.i Execute(Prg.s,Prm.s,ExecuteFlags=0,Dir.s="") ; TODO: Dir
 	ProcedureReturn ExitCode
 EndProcedure
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 43
-; FirstLine = 9
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 5
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

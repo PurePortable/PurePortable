@@ -332,10 +332,10 @@ Procedure CheckProgram()
 		PureSimplePrefs = PrgDir+"PurePort.ini"
 	EndIf
 	PureSimplePrefsExt = GetExtensionPart(PureSimplePrefs)
-	_OpenPreference(PureSimplePrefs) ; текущая группа будет Portable
+	_OpenPreference(PureSimplePrefs) ; текущая секция будет Portable
 	;}
 	;{ Мультиконфиг
-	; После _OpenPreference текущая группа Portable
+	; После _OpenPreference текущая секция Portable
 	If ReadPreferenceInteger("MultiConfig",0)
 		ExaminePreferenceGroups()
 		Protected Group.s
@@ -362,7 +362,7 @@ Procedure CheckProgram()
 				Wend
 			EndIf
 		Wend
-		If MultiConfigPrefs ; была обнаружена подходящая группа "Config:"
+		If MultiConfigPrefs ; была обнаружена подходящая секция "Config:"
 			If GetExtensionPart(MultiConfigPrefs) = ""
 				MultiConfigPrefs + "." + PureSimplePrefsExt
 			EndIf
@@ -378,50 +378,52 @@ Procedure CheckProgram()
 	;{ Проверка, та ли программа запущена
 	Protected InvalidProgram = 1
 	Protected InvalidReaction = 1
-	If PreferenceGroup("Portable")
-		If ReadPreferenceInteger("ValidateProgram",1)
-			If PreferenceGroup("ValidateProgram") = 0
-				MessageBox_(0,"Section [ValidateProgram] not found!","PurePortable",#MB_ICONERROR)
+	
+	;PreferenceGroup("Portable") ; Существование и открытие секции проверяется при открытии конфига
+	Protected ValidateProgram = ReadPreferenceInteger("ValidateProgram",1)
+	If ValidateProgram
+		If PreferenceGroup("ValidateProgram") = 0
+			MessageBox_(0,"Section [ValidateProgram] not found!","PurePortable",#MB_ICONERROR)
+			TerminateProcess_(GetCurrentProcess_(),0)
+			ProcedureReturn #INVALID_PROGRAM
+		EndIf
+		; Текущая секция ValidateProgram
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			v = PreferenceKeyValue()
+			Select LCase(k)
+				Case "programname","programfilename"
+					If CompareWithList(PrgName,v,1)
+						InvalidProgram = 0
+						Break
+					EndIf
+				Case "reaction"
+					InvalidReaction = Val(v)
+				Default ; остальные это ресурсы VersionInfo
+					If CompareWithList(GetFileVersionInfo(PrgPath,k),v,1)
+						InvalidProgram = 0
+						Break
+					EndIf
+			EndSelect
+		Wend
+		If InvalidProgram ; если не выполнилось ни одного условия
+			If InvalidReaction=3 ; Выдать предупреждение
+				MessageBox_(0,"Invalid program "+PrgName+"!","PurePortable",#MB_ICONERROR)
+			ElseIf InvalidReaction=1 Or InvalidReaction=2 ; Выдать запрос на продолжение
+				Protected MessageBoxType = #MB_ICONERROR+#MB_YESNO
+				If InvalidReaction=2
+					MessageBoxType+#MB_DEFBUTTON2
+				EndIf
+				RetCode = MessageBox_(0,"Invalid program "+PrgName+"!"+#CR$+"Continue the program execution?","PurePortable",MessageBoxType)
+				If RetCode<>#IDYES
+					InvalidReaction = 4 ; далее это завершит работу
+				EndIf
+			EndIf
+			If InvalidReaction=3 Or InvalidReaction=4 ; завершить работу
 				TerminateProcess_(GetCurrentProcess_(),0)
-				ProcedureReturn #INVALID_PROGRAM
 			EndIf
-			ExaminePreferenceKeys()
-			While NextPreferenceKey()
-				k = PreferenceKeyName()
-				v = PreferenceKeyValue()
-				Select LCase(k)
-					Case "programname","programfilename"
-						If CompareWithList(PrgName,v,1)
-							InvalidProgram = 0
-							Break
-						EndIf
-					Case "reaction"
-						InvalidReaction = Val(v)
-					Default ; остальные это ресурсы VersionInfo
-						If CompareWithList(GetFileVersionInfo(PrgPath,k),v,1)
-							InvalidProgram = 0
-							Break
-						EndIf
-				EndSelect
-			Wend
-			If InvalidProgram ; если не выполнилось ни одного условия
-				If InvalidReaction=3 ; Выдать предупреждение
-					MessageBox_(0,"Invalid program "+PrgName+"!","PurePortable",#MB_ICONERROR)
-				ElseIf InvalidReaction=1 Or InvalidReaction=2 ; Выдать запрос на продолжение
-					Protected MessageBoxType = #MB_ICONERROR+#MB_YESNO
-					If InvalidReaction=2
-						MessageBoxType+#MB_DEFBUTTON2
-					EndIf
-					RetCode = MessageBox_(0,"Invalid program "+PrgName+"!"+#CR$+"Continue the program execution?","PurePortable",MessageBoxType)
-					If RetCode<>#IDYES
-						InvalidReaction = 4 ; далее это завершит работу
-					EndIf
-				EndIf
-				If InvalidReaction=3 Or InvalidReaction=4 ; завершить работу
-					TerminateProcess_(GetCurrentProcess_(),0)
-				EndIf
-				ProcedureReturn #INVALID_PROGRAM
-			EndIf
+			ProcedureReturn #INVALID_PROGRAM
 		EndIf
 	EndIf
 	;}
@@ -1106,10 +1108,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 610
-; FirstLine = 192
-; Folding = pCMAAMhAwA+
-; Markers = 776
+; Folding = pCMAAAhCwA+
+; Markers = 778
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

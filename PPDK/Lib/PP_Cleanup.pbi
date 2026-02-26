@@ -11,7 +11,7 @@ CompilerIf #DBG_CLEANUP And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 
-Global DbgClnMode = 1
+Global DbgClnMode = #DBG_CLEANUP
 CompilerIf #DBG_CLEANUP
 	Procedure DbgCln(Txt.s)
 		If DbgClnMode
@@ -24,7 +24,7 @@ CompilerEndIf
 
 ;;----------------------------------------------------------------------------------------------------------------------
 
-Global CleanupList.s, hCleaupList
+Global CleanupList.s, hCleanupList
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Добавление цели в список очистки.
@@ -33,16 +33,15 @@ Global CleanupList.s, hCleaupList
 Procedure AddCleanItem(Item.s)
 	Protected RetCode
 	DbgCln("AddCleanItem: "+Item)
-	If hCleaupList = 0
+	If hCleanupList = 0
 		CleanupList = Space(#MAX_PATH)
 		RetCode = GetTempFileName_(TempDir,"~PP",0,@CleanupList)
 		;CleanupList = CleanupList ; убрать лишние символы
-		hCleaupList = OpenFile(#PB_Any,CleanupList,#PB_UTF8)
-		;hCleaupList = CreateFile(#PB_Any,CleanupList)
-		WriteStringFormat(hCleaupList,#PB_UTF8)
-		WriteStringN(hCleaupList,Str(DbgClnMode),#PB_UTF8) ; первая строка режим вывода сообщений для PureSimple
+		hCleanupList = OpenFile(#PB_Any,CleanupList,#PB_UTF8)
+		;hCleanupList = CreateFile(#PB_Any,CleanupList)
+		WriteStringFormat(hCleanupList,#PB_UTF8)
 	EndIf
-	WriteStringN(hCleaupList,NormalizePath(Item),#PB_UTF8)
+	WriteStringN(hCleanupList,NormalizePath(Item),#PB_UTF8)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 ; Ручное добавление цели в список очистки для использования в PureExpert из DetachProcedure.
@@ -55,10 +54,11 @@ EndProcedure
 ; Команды для добавления в DetachProcedure
 ; Если это последний процесс и список очистки создан (вызывались Clean или AddCleanItem), будет создан отдельный процесс для очистки.
 Macro DetachCleanup
-	If PrgIsValid And LastProcess And hCleaupList
-		CloseFile(hCleaupList)
-		;dbg("Execute rundll32 "+Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34))
-		Execute(SysDir+"\rundll32.exe",Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34))
+	If PrgIsValid And LastProcess And hCleanupList
+		CloseFile(hCleanupList)
+		Protected CleanupCmdLine.s = Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34)
+		DbgCln("PurePortableCleanup: "+SysDir+"\rundll32.exe "+CleanupCmdLine)
+		Execute(SysDir+"\rundll32.exe",CleanupCmdLine)
 	EndIf
 EndMacro
 
@@ -66,23 +66,23 @@ EndMacro
 #FOF_NO_CONNECTED_ELEMENTS = $2000 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperation-setoperationflags
 ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 	; *lpszCmdLine в кодировке ASCII !
-	; Командная строка: rundll32 путь_к_dll,PurePortableCleanup process_id "путь_к_списку"
+	; Командная строка: rundll32 путь_к_dll,PurePortableCleanup dbg_mode process_id "путь_к_списку"
 	
 	Protected CleanupItem.s
-	Protected LastProcessId = Val(ProgramParameter(2))
-	CleanupList.s = ProgramParameter(3)
+	DbgClnMode = Val(ProgramParameter(2))
+	Protected LastProcessId = Val(ProgramParameter(3))
+	CleanupList.s = ProgramParameter(4)
 	
 	;DbgCln("PurePortableCleanup: ProcessId: "+ProgramParameter(2))
 	;DbgCln("PurePortableCleanup: FileList: "+ProgramParameter(3))
 	
 	Protected SHFileOp.SHFILEOPSTRUCT
 	Protected RetCode
-	hCleaupList = ReadFile(#PB_Any,CleanupList,#PB_UTF8)
-	If hCleaupList
-		ReadStringFormat(hCleaupList) ; не важен, всегда должен быть UTF8
-		DbgClnMode = Val(ReadString(hCleaupList,#PB_UTF8)) ; первая строка режим вывода сообщений для PureSimple
-		While Not Eof(hCleaupList)
-			CleanupItem = ReadString(hCleaupList,#PB_UTF8)
+	hCleanupList = ReadFile(#PB_Any,CleanupList,#PB_UTF8)
+	If hCleanupList
+		ReadStringFormat(hCleanupList) ; не важен, всегда должен быть UTF8
+		While Not Eof(hCleanupList)
+			CleanupItem = ReadString(hCleanupList,#PB_UTF8)
 			DbgCln("PurePortableCleanup: "+CleanupItem)
 			CleanupItem+#XNUL$ ; Эта строка должна быть завершена двойным значением NULL
 			DecodeCtrl(@CleanupItem)
@@ -102,15 +102,15 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 			; Путь в источнике или пункте назначения или в обоих случаях недействителен.
 			DbgCln("PurePortableCleanup: RetCode: "+Str(RetCode))
 		Wend
-		CloseFile(hCleaupList)
+		CloseFile(hCleanupList)
 		DeleteFile(CleanupList)
 	EndIf
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 80
-; FirstLine = 60
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; CursorPosition = 104
+; FirstLine = 72
 ; Folding = --
 ; EnableThread
 ; DisableDebugger
