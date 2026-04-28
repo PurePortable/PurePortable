@@ -57,7 +57,6 @@ CompilerIf Not Defined(CFG_SAVE_ON_CLOSE,#PB_Constant) : #CFG_SAVE_ON_CLOSE = 0 
 CompilerIf Not Defined(PROC_CFG,#PB_Constant) : #PROC_CFG = 0 : CompilerEndIf
 Procedure.i CfgExist(sKey.s,sName.s)
 	CharLower_(@sKey)
-	CharLower_(@sName)
 	Protected i
 	Protected hKey = FindKey(sKey)
 	If hKey
@@ -475,9 +474,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 41
-; FirstLine = 16
-; Folding = BAAA-
+; Folding = AAAA-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
