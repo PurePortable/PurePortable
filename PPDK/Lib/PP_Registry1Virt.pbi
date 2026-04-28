@@ -43,7 +43,7 @@ Procedure.l AddKey(Key.s)
 		Key+"\"
 		p = FindString(Key,"\")
 		While p
-			SubKey.s = Left(Key,p-1)
+			SubKey = Left(Key,p-1)
 			; Ищем уже существующий ключ
 			For i=1 To nKeys
 				If Keys(i) = "" ; пустой элемент массива (удалённый ключ) можно использовать потом
@@ -341,61 +341,69 @@ EndProcedure
 Procedure.l GetDataW(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,rrfFlags=0)
 	Protected i, cbData.l, dwType.l, cbDataReq.l
 	If hKey
-		;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ*
+		;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ* из места вызова
 		For i=1 To nCfg
 			If Cfg(i)\h=hKey And Cfg(i)\n=sName
-				cbData = Cfg(i)\c
-				dwType = Cfg(i)\t
-				DbgRegVirt("GetDataW: "+sName+" type:"+type2str(dwType))
-				DbgRegVirt("GetDataW: *lpType:"+Hex(*lpType)+" *lpData:"+Hex(*lpData)+" *lpcbData:"+Hex(*lpcbData))
-				If *lpcbData : cbDataReq = *lpcbData\l : EndIf
-				If *lpType : *lpType\l = dwType : EndIf
-				If *lpData
-					If cbDataReq < cbData ; не хватает места!
-						DbgRegVirt("GetDataW (ERROR_MORE_DATA) len:"+Str(cbDataReq)+" need:"+Str(cbData))
-						If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
-							*lpcbData\l = cbData+2 ; +1 лишний символ (2 байта)
-						Else
-							*lpcbData\l = cbData
-						EndIf
-						ProcedureReturn #ERROR_MORE_DATA
-					EndIf
-					DbgRegVirt("GetDataW (data): "+sName+" cb:"+Str(cbData))
-					*lpcbData\l = cbData
-					If (dwType=#REG_DWORD Or dwType=#REG_BINARY) And cbData<=4
-						; Двоичные данные до 4-х байтов
-						Select cbData
-							Case 0
-								; Ничего не делаем
-							Case 1
-								*lpData\b = Cfg(i)\b
-							Case 2
-								*lpData\w = Cfg(i)\w
-							Case 3
-								*lpData\bx\b0 = Cfg(i)\bx\b0 ;*lpData\x[0] = Cfg(i)\x[0]
-								*lpData\bx\b1 = Cfg(i)\bx\b1 ;*lpData\x[1] = Cfg(i)\x[1]
-								*lpData\bx\b2 = Cfg(i)\bx\b2 ;*lpData\x[2] = Cfg(i)\x[2]
-							Default ; 4
-								*lpData\l = Cfg(i)\l
-						EndSelect
-					Else
-						; Все остальные данные записываем "как есть"
-						;DbgRegVirt("CopyMemory "+Str(@Cfg(i)\a)+" "+Str(*lpData))
-						CopyMemory(@Cfg(i)\a,*lpData,cbData)
-					EndIf
-				ElseIf *lpcbData
-					; Если *lpData имеет значение NULL, а *lpcbData — не NULL,
-					; функция возвращает ERROR_SUCCESS и сохраняет размер данных в байтах в переменной, на которую указывает *lpcbData.
-					DbgRegVirt("GetDataW (len): "+sName+" cb:"+Str(cbData))
-					If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
-						*lpcbData\l = cbData+2 ; +1 лишний символ (2 байта)
-					Else
-						*lpcbData\l = cbData
-					EndIf
-				EndIf
-				ProcedureReturn #NO_ERROR
+				Break
 			EndIf
 		Next
+		If i > nCfg ; Если значение не обнаружено и имя пустое, это значение по умолчанию и это пустая строка
+			If Cfg(i)\n = ""
+				i = 0 ; Нулевой элемент служит для имитации пустого дефолного значения
+			Else
+				ProcedureReturn #ERROR_FILE_NOT_FOUND
+			EndIf
+		EndIf
+		cbData = Cfg(i)\c
+		dwType = Cfg(i)\t
+		DbgRegVirt("GetDataW: "+sName+" type:"+type2str(dwType))
+		DbgRegVirt("GetDataW: *lpType:"+Hex(*lpType)+" *lpData:"+Hex(*lpData)+" *lpcbData:"+Hex(*lpcbData))
+		If *lpcbData : cbDataReq = *lpcbData\l : EndIf
+		If *lpType : *lpType\l = dwType : EndIf
+		If *lpData
+			If cbDataReq < cbData ; не хватает места!
+				DbgRegVirt("GetDataW (ERROR_MORE_DATA) len:"+Str(cbDataReq)+" need:"+Str(cbData))
+				If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
+					*lpcbData\l = cbData+2 ; +1 лишний символ (2 байта)
+				Else
+					*lpcbData\l = cbData
+				EndIf
+				ProcedureReturn #ERROR_MORE_DATA
+			EndIf
+			DbgRegVirt("GetDataW (data): "+sName+" cb:"+Str(cbData))
+			*lpcbData\l = cbData
+			If (dwType=#REG_DWORD Or dwType=#REG_BINARY) And cbData<=4
+				; Двоичные данные до 4-х байтов
+				Select cbData
+					Case 0
+						; Ничего не делаем
+					Case 1
+						*lpData\b = Cfg(i)\b
+					Case 2
+						*lpData\w = Cfg(i)\w
+					Case 3
+						*lpData\bx\b0 = Cfg(i)\bx\b0 ;*lpData\x[0] = Cfg(i)\x[0]
+						*lpData\bx\b1 = Cfg(i)\bx\b1 ;*lpData\x[1] = Cfg(i)\x[1]
+						*lpData\bx\b2 = Cfg(i)\bx\b2 ;*lpData\x[2] = Cfg(i)\x[2]
+					Default ; 4
+						*lpData\l = Cfg(i)\l
+				EndSelect
+			Else
+				; Все остальные данные записываем "как есть"
+				;DbgRegVirt("CopyMemory "+Str(@Cfg(i)\a)+" "+Str(*lpData))
+				CopyMemory(@Cfg(i)\a,*lpData,cbData)
+			EndIf
+		ElseIf *lpcbData
+			; Если *lpData имеет значение NULL, а *lpcbData — не NULL,
+			; функция возвращает ERROR_SUCCESS и сохраняет размер данных в байтах в переменной, на которую указывает *lpcbData.
+			DbgRegVirt("GetDataW (len): "+sName+" cb:"+Str(cbData))
+			If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
+				*lpcbData\l = cbData+2 ; +1 лишний символ (2 байта)
+			Else
+				*lpcbData\l = cbData
+			EndIf
+		EndIf
+		ProcedureReturn #NO_ERROR
 	EndIf
 	ProcedureReturn #ERROR_FILE_NOT_FOUND
 EndProcedure
@@ -404,93 +412,100 @@ Procedure.l GetDataA(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,
 	Protected sBuf.s
 	Protected *pb.Byte, *pw.Word, *End
 	If hKey
-		;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ*
+		;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ* из места вызова
 		For i=1 To nCfg
 			If Cfg(i)\h=hKey And Cfg(i)\n=sName
-				dwType = Cfg(i)\t
-				DbgRegVirt("GetDataA: "+sName+" type:"+type2str(dwType))
-				DbgRegVirt("GetDataA: *lpType:"+Hex(*lpType)+" *lpData:"+Hex(*lpData)+" *lpcbData:"+Hex(*lpcbData))
-				If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
-					; Так как юникод, строки реально занимают в два раза больше места, чем требуется. И наоборот.
-					cbData = (Cfg(i)\c+1)/2 ; С округлением в большую сторону
-				Else
-					cbData = Cfg(i)\c
-				EndIf
-				If *lpcbData : cbDataReq = *lpcbData\l : EndIf
-				If *lpType : *lpType\l = dwType : EndIf
-				If *lpData
-					If cbDataReq < cbData ; не хватает места!
-						DbgRegVirt("GetDataA (ERROR_MORE_DATA) len:"+Str(cbDataReq)+" need:"+Str(cbData))
-						If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
-							*lpcbData\l = cbData+1 ; +1 лишний символ
-						Else
-							*lpcbData\l = cbData
-						EndIf
-						ProcedureReturn #ERROR_MORE_DATA
-					EndIf
-					DbgRegVirt("GetDataA (data): "+sName+" cb:"+Str(cbData))
-					*lpcbData\l = cbData
-					If (dwType=#REG_DWORD Or dwType=#REG_BINARY) And cbData<=4
-						; Двоичные данные до 4-х байтов
-						Select cbData
-							Case 0
-								; Ничего не делаем?
-							Case 1
-								*lpData\b = Cfg(i)\b
-							Case 2
-								*lpData\w = Cfg(i)\w
-							Case 3
-								*lpData\bx\b0 = Cfg(i)\bx\b0 ;*lpData\x[0] = Cfg(i)\x[0]
-								*lpData\bx\b1 = Cfg(i)\bx\b1 ;*lpData\x[1] = Cfg(i)\x[1]
-								*lpData\bx\b2 = Cfg(i)\bx\b2 ;*lpData\x[2] = Cfg(i)\x[2]
-							Default ; 4
-								*lpData\l = Cfg(i)\l
-						EndSelect
-					ElseIf dwType=#REG_SZ Or dwType=#REG_EXPAND_SZ
-						DbgRegVirt("GetDataA (sz): "+Cfg(i)\a)
-						PokeS(*lpData,Cfg(i)\a,-1,#PB_Ascii)
-						DbgRegVirt("GetDataA (sz): "+PeekS(*lpData,-1,#PB_Ascii))
-					ElseIf dwType=#REG_MULTI_SZ
-						; Переносим в промежуточный буфер
-						; Не используем cbData!
-						sBuf = SpaceB(Cfg(i)\c)
-						CopyMemory(@Cfg(i)\a,@sBuf,Cfg(i)\c)
-						; Заменяем нулевой разделитель на Chr(1)
-						*pw = @sBuf
-						*end = *pw+Cfg(i)\c-2 ; кроме последнего нулевого символа
-						While *pw < *end
-							If *pw\w = 0
-								*pw\w = 1 ; *pw\w+1
-							EndIf
-							*pw + 2
-						Wend
-						; Записываем с конвертированием
-						; Дополнительный нулевой символ добавится автоматически
-						PokeS(*lpData,sBuf,-1,#PB_Ascii)
-						; Заменяем Chr(1) на ноль
-						*pb = *lpData
-						*end = *pb+cbData
-						While *pb < *end
-							If *pb\b = 1
-								*pb\b = 0 ;*pb\b-1
-							EndIf
-							*pb + 1
-						Wend
-					Else
-						; Все остальные данные записываем "как есть"
-						CopyMemory(@Cfg(i)\a,*lpData,cbData)
-					EndIf
-				ElseIf *lpcbData
-					DbgRegVirt("GetDataA (len): "+sName+" cb:"+Str(cbData))
-					If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
-						*lpcbData\l = cbData+1 ; +1 лишний символ
-					Else
-						*lpcbData\l = cbData
-					EndIf
-				EndIf
-				ProcedureReturn #NO_ERROR
 			EndIf
 		Next
+		If i > nCfg ; Если значение не обнаружено и имя пустое, это значение по умолчанию и это пустая строка
+			If Cfg(i)\n = ""
+				i = 0 ; Нулевой элемент служит для имитации пустого дефолтного значения
+			Else
+				ProcedureReturn #ERROR_FILE_NOT_FOUND
+			EndIf
+		EndIf
+		dwType = Cfg(i)\t
+		DbgRegVirt("GetDataA: "+sName+" type:"+type2str(dwType))
+		DbgRegVirt("GetDataA: *lpType:"+Hex(*lpType)+" *lpData:"+Hex(*lpData)+" *lpcbData:"+Hex(*lpcbData))
+		If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
+			; Так как юникод, строки реально занимают в два раза больше места, чем требуется. И наоборот.
+			cbData = (Cfg(i)\c+1)/2 ; С округлением в большую сторону
+		Else
+			cbData = Cfg(i)\c
+		EndIf
+		If *lpcbData : cbDataReq = *lpcbData\l : EndIf
+		If *lpType : *lpType\l = dwType : EndIf
+		If *lpData
+			If cbDataReq < cbData ; не хватает места!
+				DbgRegVirt("GetDataA (ERROR_MORE_DATA) len:"+Str(cbDataReq)+" need:"+Str(cbData))
+				If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
+					*lpcbData\l = cbData+1 ; +1 лишний символ
+				Else
+					*lpcbData\l = cbData
+				EndIf
+				ProcedureReturn #ERROR_MORE_DATA
+			EndIf
+			DbgRegVirt("GetDataA (data): "+sName+" cb:"+Str(cbData))
+			*lpcbData\l = cbData
+			If (dwType=#REG_DWORD Or dwType=#REG_BINARY) And cbData<=4
+				; Двоичные данные до 4-х байтов
+				Select cbData
+					Case 0
+						; Ничего не делаем?
+					Case 1
+						*lpData\b = Cfg(i)\b
+					Case 2
+						*lpData\w = Cfg(i)\w
+					Case 3
+						*lpData\bx\b0 = Cfg(i)\bx\b0 ;*lpData\x[0] = Cfg(i)\x[0]
+						*lpData\bx\b1 = Cfg(i)\bx\b1 ;*lpData\x[1] = Cfg(i)\x[1]
+						*lpData\bx\b2 = Cfg(i)\bx\b2 ;*lpData\x[2] = Cfg(i)\x[2]
+					Default ; 4
+						*lpData\l = Cfg(i)\l
+				EndSelect
+			ElseIf dwType=#REG_SZ Or dwType=#REG_EXPAND_SZ
+				DbgRegVirt("GetDataA (sz): "+Cfg(i)\a)
+				PokeS(*lpData,Cfg(i)\a,-1,#PB_Ascii)
+				DbgRegVirt("GetDataA (sz): "+PeekS(*lpData,-1,#PB_Ascii))
+			ElseIf dwType=#REG_MULTI_SZ
+				; Переносим в промежуточный буфер
+				; Не используем cbData!
+				sBuf = SpaceB(Cfg(i)\c)
+				CopyMemory(@Cfg(i)\a,@sBuf,Cfg(i)\c)
+				; Заменяем нулевой разделитель на Chr(1)
+				*pw = @sBuf
+				*end = *pw+Cfg(i)\c-2 ; кроме последнего нулевого символа
+				While *pw < *end
+					If *pw\w = 0
+						*pw\w = 1 ; *pw\w+1
+					EndIf
+					*pw + 2
+				Wend
+				; Записываем с конвертированием
+				; Дополнительный нулевой символ добавится автоматически
+				PokeS(*lpData,sBuf,-1,#PB_Ascii)
+				; Заменяем Chr(1) на ноль
+				*pb = *lpData
+				*end = *pb+cbData
+				While *pb < *end
+					If *pb\b = 1
+						*pb\b = 0 ;*pb\b-1
+					EndIf
+					*pb + 1
+				Wend
+			Else
+				; Все остальные данные записываем "как есть"
+				CopyMemory(@Cfg(i)\a,*lpData,cbData)
+			EndIf
+		ElseIf *lpcbData
+			DbgRegVirt("GetDataA (len): "+sName+" cb:"+Str(cbData))
+			If dwType=#REG_SZ Or dwType=#REG_MULTI_SZ Or dwType=#REG_EXPAND_SZ
+				*lpcbData\l = cbData+1 ; +1 лишний символ
+			Else
+				*lpcbData\l = cbData
+			EndIf
+		EndIf
+		ProcedureReturn #NO_ERROR
 	EndIf
 	ProcedureReturn #ERROR_FILE_NOT_FOUND
 EndProcedure
@@ -901,7 +916,7 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEY
 CompilerEndIf
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; Folding = CAA-
 ; EnableThread
 ; DisableDebugger

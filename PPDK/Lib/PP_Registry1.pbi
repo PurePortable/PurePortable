@@ -252,6 +252,7 @@ Structure CFGDATA Align #PB_Structure_AlignC
 	a.s ; any data
 EndStructure
 Global Dim Cfg.CFGDATA(0) ; Массив параметров
+Cfg(0)\c = 2 : Cfg(0)\t = #REG_SZ ; Имитация значения по умолчанию (пустая строка)
 Global nCfg = 0 ; размер Cfg() для использования вместо ArraySize(Cfg())
 Global ConfigChanged = #False ; были изменения
 ;}
@@ -452,8 +453,6 @@ AddInitProcedure(_InitRegistryHooks)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 331
-; FirstLine = 101
 ; Folding = mjj--4v-
 ; DisableDebugger
 ; EnableExeConstant
