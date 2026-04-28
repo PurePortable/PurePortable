@@ -15,6 +15,9 @@ Global PublicRedir.s
 Global CommonAppDataRedir.s
 Global CommonDocumentsRedir.s
 Global TempRedir.s
+Global WindowsDirectoryRedir.s
+Global SystemDirectoryRedir.s
+Global TemporaryDirectoryRedir.s
 
 ;;----------------------------------------------------------------------------------------------------------------------
 CompilerIf Not Defined(DETOUR_SHFOLDER,#PB_Constant) : #DETOUR_SHFOLDER = 0 : CompilerEndIf
@@ -633,6 +636,151 @@ CompilerIf #DETOUR_USERENV
 	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
+; https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getwindowsdirectoryw
+CompilerIf Not Defined(DETOUR_GETWINDOWSDIRECTORY,#PB_Constant) : #DETOUR_GETWINDOWSDIRECTORY = 0 : CompilerEndIf
+Prototype.l GetWindowsDirectory(*lpBuffer,uSize)
+CompilerIf #DETOUR_GETWINDOWSDIRECTORY
+	Global Original_GetWindowsDirectoryA.GetWindowsDirectory
+	Procedure.l Detour_GetWindowsDirectoryA(*lpBuffer,uSize)
+		Protected Result
+		CompilerIf Not #PORTABLE
+			Result = Original_GetWindowsDirectoryA(*lpBuffer,uSize)
+			DbgSpec("GetWindowsDirectoryA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+		CompilerElse
+			Result = Len(WindowsDirectoryRedir)
+			If Result = 0 ; Не задана
+				Result = Original_GetWindowsDirectoryA(*lpBuffer,uSize)
+				DbgSpec("GetWindowsDirectoryA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+			ElseIf Result+1 <= uSize ; Буфер не менее, чем на один символ больше, возвратим длину строки
+				PokeS(*lpBuffer,WindowsDirectoryRedir,-1,#PB_Ascii)
+				DbgSpec("GetWindowsDirectoryA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+			Else ; Возвратим на один символ больше
+				Result+1
+				DbgSpec("GetWindowsDirectoryA: "+Str(Result))
+			EndIf
+		CompilerEndIf
+		ProcedureReturn Result
+	EndProcedure
+	Global Original_GetWindowsDirectoryW.GetWindowsDirectory
+	Procedure.l Detour_GetWindowsDirectoryW(*lpBuffer,uSize)
+		Protected Result
+		CompilerIf Not #PORTABLE
+			Result = Original_GetWindowsDirectoryW(*lpBuffer,uSize)
+			DbgSpec("GetWindowsDirectoryW: "+PeekSZ(*lpBuffer))
+		CompilerElse
+			Result = Len(WindowsDirectoryRedir)
+			If Result = 0 ; Не задана
+				Result = Original_GetWindowsDirectoryW(*lpBuffer,uSize)
+				DbgSpec("GetWindowsDirectoryW: "+PeekSZ(*lpBuffer))
+			ElseIf Result+1 <= uSize ; Буфер не менее, чем на один символ больше, возвратим длину строки
+				PokeS(*lpBuffer,WindowsDirectoryRedir)
+				DbgSpec("GetWindowsDirectoryW: "+PeekSZ(*lpBuffer))
+			Else ; Возвратим на один символ больше
+				Result+1
+				DbgSpec("GetWindowsDirectoryW: "+Str(Result))
+			EndIf
+		CompilerEndIf
+		ProcedureReturn Result
+	EndProcedure
+CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemdirectoryw
+CompilerIf Not Defined(DETOUR_GETSYSTEMDIRECTORY,#PB_Constant) : #DETOUR_GETSYSTEMDIRECTORY = 0 : CompilerEndIf
+Prototype.l GetSystemDirectory(*lpBuffer,uSize)
+CompilerIf #DETOUR_GETSYSTEMDIRECTORY
+	Global Original_GetSystemDirectoryA.GetSystemDirectory
+	Procedure.l Detour_GetSystemDirectoryA(*lpBuffer,uSize)
+		Protected Result
+		CompilerIf Not #PORTABLE
+			Result = Original_GetSystemDirectoryA(*lpBuffer,uSize)
+			DbgSpec("GetSystemDirectoryA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+		CompilerElse
+			Result = Len(SystemDirectoryRedir)
+			If Result = 0 ; Не задана
+				Result = Original_GetSystemDirectoryA(*lpBuffer,uSize)
+				DbgSpec("GetSystemDirectoryA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+			ElseIf Result+1 <= uSize ; Буфер не менее, чем на один символ больше, возвратим длину строки
+				PokeS(*lpBuffer,SystemDirectoryRedir,-1,#PB_Ascii)
+				DbgSpec("GetSystemDirectoryA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+			Else ; Возвратим на один символ больше
+				Result+1
+				DbgSpec("GetSystemDirectoryA: "+Str(Result))
+			EndIf
+		CompilerEndIf
+		ProcedureReturn Result
+	EndProcedure
+	Global Original_GetSystemDirectoryW.GetSystemDirectory
+	Procedure.l Detour_GetSystemDirectoryW(*lpBuffer,uSize)
+		Protected Result
+		CompilerIf Not #PORTABLE
+			Result = Original_GetSystemDirectoryW(*lpBuffer,uSize)
+			DbgSpec("GetSystemDirectoryW: "+PeekSZ(*lpBuffer))
+		CompilerElse
+			Result = Len(SystemDirectoryRedir)
+			If Result = 0 ; Не задана
+				Result = Original_GetSystemDirectoryW(*lpBuffer,uSize)
+				DbgSpec("GetSystemDirectoryW: "+PeekSZ(*lpBuffer))
+			ElseIf Result+1 <= uSize ; Буфер не менее, чем на один символ больше, возвратим длину строки
+				PokeS(*lpBuffer,SystemDirectoryRedir)
+				DbgSpec("GetSystemDirectoryW: "+PeekSZ(*lpBuffer))
+			Else ; Возвратим на один символ больше
+				Result+1
+				DbgSpec("GetSystemDirectoryW: "+Str(Result))
+			EndIf
+		CompilerEndIf
+		ProcedureReturn Result
+	EndProcedure
+CompilerEndIf
+;;----------------------------------------------------------------------------------------------------------------------
+; https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppathw
+CompilerIf Not Defined(DETOUR_GETTEMPPATH,#PB_Constant) : #DETOUR_GETTEMPPATH = 0 : CompilerEndIf
+Prototype.l GetTempPath(nBufferLength.l,*lpBuffer)
+CompilerIf #DETOUR_GETTEMPPATH
+	Global Original_GetTempPathA.GetTempPath
+	Procedure.l Detour_GetTempPathA(nBufferLength.l,*lpBuffer)
+		Protected Result
+		CompilerIf Not #PORTABLE
+			Result = Original_GetTempPathA(nBufferLength.l,*lpBuffer)
+			DbgSpec("GetTempPathA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+		CompilerElse
+			Result = Len(SystemDirectoryRedir)
+			If Result = 0 ; Не задана
+				Result = Original_GetTempPathA(nBufferLength.l,*lpBuffer)
+				DbgSpec("GetTempPathA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+			ElseIf Result+1 <= nBufferLength ; Буфер не менее, чем на один символ больше, возвратим длину строки
+				PokeS(*lpBuffer,TemporaryDirectoryRedir,-1,#PB_Ascii)
+				DbgSpec("GetTempPathA: "+PeekSZ(*lpBuffer,-1,#PB_Ascii))
+			Else ; Возвратим на один символ больше
+				Result+1
+				DbgSpec("GetTempPathA: "+Str(Result))
+			EndIf
+		CompilerEndIf
+		ProcedureReturn Result
+	EndProcedure
+	Global Original_GetTempPathW.GetTempPath
+	Procedure.l Detour_GetTempPathW(nBufferLength.l,*lpBuffer)
+		Protected Result
+		CompilerIf Not #PORTABLE
+			Result = Original_GetTempPathW(nBufferLength.l,*lpBuffer)
+			DbgSpec("GetTempPathW: "+PeekSZ(*lpBuffer))
+		CompilerElse
+			Result = Len(SystemDirectoryRedir)
+			If Result = 0 ; Не задана
+				Result = Original_GetTempPathW(nBufferLength.l,*lpBuffer)
+				DbgSpec("GetTempPathW: "+PeekSZ(*lpBuffer))
+			ElseIf Result+1 <= nBufferLength ; Буфер не менее, чем на один символ больше, возвратим длину строки
+				PokeS(*lpBuffer,TemporaryDirectoryRedir)
+				DbgSpec("GetTempPathW: "+PeekSZ(*lpBuffer))
+			Else ; Возвратим на один символ больше
+				Result+1
+				DbgSpec("GetTempPathW: "+Str(Result))
+			EndIf
+		CompilerEndIf
+		ProcedureReturn Result
+	EndProcedure
+CompilerEndIf
+
+;;======================================================================================================================
 XIncludeFile "PP_MinHook.pbi"
 ;;======================================================================================================================
 ; Принудительная статическая линковка dll
@@ -677,13 +825,20 @@ Procedure _InitSpecialFoldersHooks()
 		CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR : MH_HookApi(shell32,SHGetFolderPathAndSubDirW) : CompilerEndIf
 		CompilerIf #DETOUR_SHGETFOLDERLOCATION : MH_HookApi(shell32,SHGetFolderLocation) : CompilerEndIf
 		CompilerIf #DETOUR_SHGETSPECIALFOLDERLOCATION : MH_HookApi(shell32,SHGetSpecialFolderLocation) : CompilerEndIf
+		
+		CompilerIf #DETOUR_GETWINDOWSDIRECTORY : MH_HookApi(kernel32,GetWindowsDirectoryA) : CompilerEndIf
+		CompilerIf #DETOUR_GETWINDOWSDIRECTORY : MH_HookApi(kernel32,GetWindowsDirectoryW) : CompilerEndIf
+		CompilerIf #DETOUR_GETSYSTEMDIRECTORY : MH_HookApi(kernel32,GetSystemDirectoryA) : CompilerEndIf
+		CompilerIf #DETOUR_GETSYSTEMDIRECTORY : MH_HookApi(kernel32,GetSystemDirectoryW) : CompilerEndIf
+		CompilerIf #DETOUR_GETTEMPPATH : MH_HookApi(kernel32,GetTempPathA) : CompilerEndIf
+		CompilerIf #DETOUR_GETTEMPPATH : MH_HookApi(kernel32,GetTempPathW) : CompilerEndIf
 	EndIf
 EndProcedure
 AddInitProcedure(_InitSpecialFoldersHooks)
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; Folding = qBAA+
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = qBAAA+
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
