@@ -6,7 +6,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.13
+;RES_VERSION 4.11.0.14
 ;RES_DESCRIPTION PurePortableSimple
 ;RES_COPYRIGHT (c) Smitis, 2017-2026
 ;RES_INTERNALNAME PurePort.dll
@@ -57,6 +57,10 @@ XIncludeFile "PurePortableCustom.pbi"
 #PORTABLE_USE_MUTEX = 0
 #PORTABLE_CLEANUP = 1
 #PORTABLE_CHECK_PROGRAM = 1
+
+#DETOUR_GETWINDOWSDIRECTORY = 0
+#DETOUR_GETSYSTEMDIRECTORY = 0
+#DETOUR_GETTEMPPATH = 0
 ;}
 ;{ Обработка ошибок
 ;#PROXY_ERROR_MODE = 1
@@ -719,7 +723,23 @@ Procedure AttachProcedure()
 	;{ Реестр
 	CompilerIf #PORTABLE_REGISTRY
 		If RegistryPermit
-			; Установка данных
+			;{ Удаление данных
+			If PreferenceGroup("Registry.Delete")
+				ExaminePreferenceKeys()
+				While NextPreferenceKey()
+					k = PreferenceKeyName()
+					;p = PreferenceKeyValue()
+					i = FindString(k,"|")
+					If i
+						DelCfg(Left(k,i-1),Mid(k,i+1))
+					Else
+						v = ""
+						DelCfgTree(k)
+					EndIf
+				Wend
+			EndIf
+			;}
+			;{ Установка данных
 			If PreferenceGroup("Registry.SetData")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
@@ -733,7 +753,7 @@ Procedure AttachProcedure()
 						v = ""
 					EndIf
 					t = "s" ; по умолчанию попробуем рассмотреть как строку
-					If p="" Or p="-"
+					If p="-"
 						DelCfg(k,v)
 					Else
 						i = FindString(p,":")
@@ -756,7 +776,8 @@ Procedure AttachProcedure()
 					EndIf
 				Wend
 			EndIf
-			; Установка путей
+			;}
+			;{ Установка путей
 			If PreferenceGroup("Registry.SetPaths")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
@@ -773,7 +794,8 @@ Procedure AttachProcedure()
 					SetCfgS(k,v,p)
 				Wend
 			EndIf
-			; Коррекция путей
+			;}
+			;{ Коррекция путей
 			If PreferenceGroup("Registry.CorrectPaths")
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
@@ -796,6 +818,7 @@ Procedure AttachProcedure()
 					EndIf
 				Wend
 			EndIf
+			;}
 		EndIf
 	CompilerEndIf
 	;}
@@ -1108,19 +1131,18 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = pCMAAAhCwA+
-; Markers = 778
+; Folding = AAAAAAAAAAA-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.13
+; VersionField0 = 4.11.0.14
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.13
+; VersionField5 = 4.11.0.14
 ; VersionField6 = PurePortableSimple
 ; VersionField7 = PurePort.dll
 ; VersionField9 = (c) Smitis, 2017-2026
