@@ -41,7 +41,7 @@ CompilerElse
 	#MINHOOKLIB = "minhook\libMinHook64.lib"
 CompilerEndIf
 Import #MINHOOKLIB
-	_MH_Initialize() As "MH_Initialize"
+	MH_Initialize()
 	MH_CreateHook(*pTarget,*pDetour,*ppOriginal)
 	MH_CreateHookApi(pszModule.p-unicode,pszProcName.p-ascii,*pDetour,*ppOriginal)
 	MH_CreateHookApiEx(pszModule.p-unicode,pszProcName.p-ascii,*pDetour,*ppOriginal,*ppTarget)
@@ -51,7 +51,7 @@ Import #MINHOOKLIB
 	MH_QueueEnableHook(*pTarget)
 	MH_QueueDisableHook(*pTarget)
 	MH_ApplyQueued()
-	_MH_Uninitialize() As "MH_Uninitialize"
+	MH_Uninitialize()
 	MH_StatusToString(Status)
 EndImport
 Enumeration MINHOOKRESULT -1
@@ -73,16 +73,6 @@ EndEnumeration
 
 #MH_ALL_HOOKS = 0
 
-;;======================================================================================================================
-Global MH_InitStatus
-Procedure MH_Initialize()
-	_MH_Initialize()
-	MH_InitStatus = #True
-EndProcedure
-Procedure MH_Uninitialize()
-	_MH_Uninitialize()
-	MH_InitStatus = #False
-EndProcedure
 ;;======================================================================================================================
 EnumerationBinary MH_HOOKAPI
 	#MH_HOOKAPI_NOCHECKRESULT
@@ -208,8 +198,6 @@ MH_Initialize()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 83
-; FirstLine = 84
-; Folding = --9
+; Folding = PA+
 ; DisableDebugger
 ; EnableExeConstant
