@@ -4,6 +4,14 @@
 (-) удалено
 (?) непонятно ))
 
+[4.11.0.14] 2026-04-30
+(+) SpecialFolders: GetWindowsDirectory, GetSystemDirectory
+(!) Registry1: Работа с дефолтным значением
+(*) PureSimple: Registry.SetData: Пустая строка больше не удаляет значение
+(*) PureSimple: Registry.Delete
+(!) Registry2: Фильтр для исключения повторного вызова функций из SetCfg* и пр.
+(!) CleanUp: Исправление удаления файлов (неправильная командная строка)
+
 [4.11.0.13] 2026-01-22
 (+) PORTABLE_REG_ARRAY
 (+) PureSimple: Registry.SetData: Добавлен тип данных «e» - аналогично типу «s», но перед установкой значения раскрываются переменные среды.

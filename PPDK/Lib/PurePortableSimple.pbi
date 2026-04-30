@@ -37,10 +37,17 @@ EndProcedure
 ; 	ProcedureReturn Trim(PreferenceKeyValue(),Chr(34))
 ; EndProcedure
 ;;======================================================================================================================
+Procedure.q ValX(Num.s)
+	If UCase(Left(Num,2)) = "0x"
+		Num = Val("$"+Mid(s,3))
+	EndIf
+	ProcedureReturn Val(Num)
+EndProcedure
+;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 32
-; FirstLine = 4
+; CursorPosition = 41
+; FirstLine = 8
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
