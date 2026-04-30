@@ -1,6 +1,13 @@
 ﻿;;======================================================================================================================
 Global hAppKey.l
 ;;======================================================================================================================
+Procedure.s CheckKey2(hKey.l, SubKey.s)
+	If hKey = hAppKey
+		ProcedureReturn ""
+	EndIf
+	ProcedureReturn CheckKey(hKey, SubKey)
+EndProcedure
+;;======================================================================================================================
 Prototype.l RegCreateKey(hKey.l,*lpSubKey,*phkResult.Long)
 CompilerIf #DETOUR_REGCREATEKEY
 	Global Original_RegCreateKeyA.RegCreateKey
@@ -10,7 +17,7 @@ CompilerIf #DETOUR_REGCREATEKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_RegCreateKeyA(hKey,*lpSubKey,*phkResult)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegCreateKeyA(hAppKey,*SubKeyA,*phkResult)
@@ -30,7 +37,7 @@ CompilerIf #DETOUR_REGCREATEKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_RegCreateKeyW(hKey,*lpSubKey,*phkResult)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegCreateKeyW(hAppKey,@SubKey,*phkResult)
 			Else
@@ -52,7 +59,7 @@ CompilerIf #DETOUR_REGCREATEKEYEX
 		CompilerIf Not #PORTABLE
 			Result = Original_RegCreateKeyExA(hKey,*lpSubKey,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegCreateKeyExA(hAppKey,*SubKeyA,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition)
@@ -72,7 +79,7 @@ CompilerIf #DETOUR_REGCREATEKEYEX
 		CompilerIf Not #PORTABLE
 			Result = Original_RegCreateKeyExW(hKey,*lpSubKey,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegCreateKeyExW(hAppKey,@SubKey,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition)
 			Else
@@ -94,7 +101,7 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTED
 		CompilerIf Not #PORTABLE
 			Result = Original_RegCreateKeyTransactedA(hKey,*lpSubKey,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition,hTransaction,*pExtendedParameter)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegCreateKeyTransactedA(hAppKey,*SubKeyA,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition,hTransaction,*pExtendedParameter)
@@ -114,7 +121,7 @@ CompilerIf #DETOUR_REGCREATEKEYTRANSACTED
 		CompilerIf Not #PORTABLE
 			Result = Original_RegCreateKeyTransactedW(hKey,*lpSubKey,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition,hTransaction,*pExtendedParameter)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegCreateKeyTransactedW(hAppKey,@SubKey,Reserved,*lpClass,dwOptions,samDesired,*lpSecurityAttributes,*phkResult,*lpdwDisposition,hTransaction,*pExtendedParameter)
 			Else
@@ -136,7 +143,7 @@ CompilerIf #DETOUR_REGOPENKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_RegOpenKeyA(hKey,*lpSubKey,*phkResult)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegOpenKeyA(hAppKey,*SubKeyA,*phkResult)
@@ -156,7 +163,7 @@ CompilerIf #DETOUR_REGOPENKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_RegOpenKeyW(hKey,*lpSubKey,*phkResult)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegOpenKeyW(hAppKey,@SubKey,*phkResult)
 			Else
@@ -178,7 +185,7 @@ CompilerIf #DETOUR_REGOPENKEYEX
 		CompilerIf Not #PORTABLE
 			Result = Original_RegOpenKeyExA(hKey,*lpSubKey,ulOptions,samDesired,*phkResult)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegOpenKeyExA(hAppKey,*SubKeyA,ulOptions,samDesired,*phkResult)
@@ -198,7 +205,7 @@ CompilerIf #DETOUR_REGOPENKEYEX
 		CompilerIf Not #PORTABLE
 			Result = Original_RegOpenKeyExW(hKey,*lpSubKey,ulOptions,samDesired,*phkResult)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegOpenKeyExW(hAppKey,@SubKey,ulOptions,samDesired,*phkResult)
 			Else
@@ -220,7 +227,7 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTED
 		CompilerIf Not #PORTABLE
 			Result = Original_RegOpenKeyTransactedA(hKey,*lpSubKey,ulOptions,samDesired,*phkResult,hTransaction,*pExtendedParameter)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegOpenKeyTransactedA(hAppKey,*SubKeyA,ulOptions,samDesired,*phkResult,hTransaction,*pExtendedParameter)
@@ -240,7 +247,7 @@ CompilerIf #DETOUR_REGOPENKEYTRANSACTED
 		CompilerIf Not #PORTABLE
 			Result = Original_RegOpenKeyTransactedW(hKey,*lpSubKey,ulOptions,samDesired,*phkResult,hTransaction,*pExtendedParameter)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegOpenKeyTransactedW(hAppKey,@SubKey,ulOptions,samDesired,*phkResult,hTransaction,*pExtendedParameter)
 			Else
@@ -262,7 +269,7 @@ CompilerIf #DETOUR_REGDELETEKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyA(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegDeleteKeyA(hAppKey,*SubKeyA)
@@ -282,7 +289,7 @@ CompilerIf #DETOUR_REGDELETEKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyW(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegDeleteKeyW(hAppKey,@SubKey)
 			Else
@@ -304,7 +311,7 @@ CompilerIf #DETOUR_REGDELETEKEYEX
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyExA(hKey,*lpSubKey,samDesired,Reserved)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegDeleteKeyExA(hAppKey,*SubKeyA,samDesired,Reserved)
@@ -324,7 +331,7 @@ CompilerIf #DETOUR_REGDELETEKEYEX
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyExW(hKey,*lpSubKey,samDesired,Reserved)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegDeleteKeyExW(hAppKey,@SubKey,samDesired,Reserved)
 			Else
@@ -346,7 +353,7 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTED
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyTransactedA(hKey,*lpSubKey,samDesired,Reserved,hTransaction,*pExtendedParameter)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegDeleteKeyTransactedA(hAppKey,*SubKeyA,samDesired,Reserved,hTransaction,*pExtendedParameter)
@@ -365,7 +372,7 @@ CompilerIf #DETOUR_REGDELETEKEYTRANSACTED
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyTransactedW(hKey,*lpSubKey,samDesired,Reserved,hTransaction,*pExtendedParameter)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegDeleteKeyTransactedW(hAppKey,@SubKey,samDesired,Reserved,hTransaction,*pExtendedParameter)
 			Else
@@ -386,7 +393,7 @@ CompilerIf #DETOUR_REGDELETETREE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteTreeA(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegDeleteTreeA(hAppKey,*lpSubKey)
@@ -405,7 +412,7 @@ CompilerIf #DETOUR_REGDELETETREE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteTreeW(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegDeleteTreeW(hAppKey,@SubKey)
 			Else
@@ -426,7 +433,7 @@ CompilerIf #DETOUR_SHDELETEKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHDeleteKeyA(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHDeleteKeyA(hAppKey,*SubKeyA)
@@ -446,7 +453,7 @@ CompilerIf #DETOUR_SHDELETEKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHDeleteKeyW(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHDeleteKeyW(hAppKey,@SubKey)
 			Else
@@ -468,7 +475,7 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHDeleteEmptyKeyA(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHDeleteEmptyKeyA(hAppKey,*SubKeyA)
@@ -488,7 +495,7 @@ CompilerIf #DETOUR_SHDELETEEMPTYKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHDeleteEmptyKeyW(hKey,*lpSubKey)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHDeleteEmptyKeyW(hAppKey,@SubKey)
 			Else
@@ -510,7 +517,7 @@ CompilerIf #DETOUR_REGDELETEKEYVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyValueA(hkey,*lpSubKey,*lpValueName)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegDeleteKeyValueA(hAppKey,*SubKeyA,*lpValueName)
@@ -530,7 +537,7 @@ CompilerIf #DETOUR_REGDELETEKEYVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegDeleteKeyValueW(hkey,*lpSubKey,*lpValueName)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegDeleteKeyValueW(hAppKey,@SubKey,*lpValueName)
 			Else
@@ -553,7 +560,7 @@ CompilerIf #DETOUR_SHDELETEVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHDeleteValueA(hKey,*lpSubKey,*lpValueName)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHDeleteValueA(hAppKey,*SubKeyA,*lpValueName)
@@ -573,7 +580,7 @@ CompilerIf #DETOUR_SHDELETEVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHDeleteValueW(hKey,*lpSubKey,*lpValueName)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHDeleteValueW(hAppKey,@SubKey,*lpValueName)
 			Else
@@ -595,7 +602,7 @@ CompilerIf #DETOUR_REGQUERYVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegQueryValueA(hKey,*lpSubKey,*lpData,*lpcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegQueryValueA(hAppKey,*SubKeyA,*lpData,*lpcbData)
@@ -615,7 +622,7 @@ CompilerIf #DETOUR_REGQUERYVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegQueryValueW(hKey,*lpSubKey,*lpData,*lpcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegQueryValueW(hAppKey,@SubKey,*lpData,*lpcbData)
 			Else
@@ -637,7 +644,7 @@ CompilerIf #DETOUR_REGGETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegGetValueA(hKey,*lpSubKey,*lpValueName,rrfFlags,*lpType,*lpData.Byte,*lpcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegGetValueA(hAppKey,*SubKeyA,*lpValueName,rrfFlags,*lpType,*lpData.Byte,*lpcbData)
@@ -657,7 +664,7 @@ CompilerIf #DETOUR_REGGETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegGetValueW(hKey,*lpSubKey,*lpValueName,rrfFlags,*lpType,*lpData.Byte,*lpcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegGetValueW(hAppKey,@SubKey,*lpValueName,rrfFlags,*lpType,*lpData.Byte,*lpcbData)
 			Else
@@ -679,7 +686,7 @@ CompilerIf #DETOUR_SHGETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHGetValueA(hKey,*lpSubKey,*lpValueName,*pdwType,*pvData,*pcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHGetValueA(hAppKey,*SubKeyA,*lpValueName,*pdwType,*pvData,*pcbData)
@@ -699,7 +706,7 @@ CompilerIf #DETOUR_SHGETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHGetValueW(hKey,*lpSubKey,*lpValueName,*pdwType,*pvData,*pcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHGetValueW(hAppKey,@SubKey,*lpValueName,*pdwType,*pvData,*pcbData)
 			Else
@@ -721,7 +728,7 @@ CompilerIf #DETOUR_SHREGGETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHRegGetValueA(hKey,*lpSubKey,*lpValueName,srrfFlags,*pdwType,*pvData,*pcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHRegGetValueA(hAppKey,*SubKeyA,*lpValueName,srrfFlags,*pdwType,*pvData,*pcbData)
@@ -741,7 +748,7 @@ CompilerIf #DETOUR_SHREGGETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHRegGetValueW(hKey,*lpSubKey,*lpValueName,srrfFlags,*pdwType,*pvData,*pcbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHRegGetValueW(hAppKey,@SubKey,*lpValueName,srrfFlags,*pdwType,*pvData,*pcbData)
 			Else
@@ -765,7 +772,7 @@ CompilerIf #DETOUR_SHREGGETBOOLUSVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHRegGetBoolUSValueA(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
 		CompilerElse
-			Protected SubKey.s = CheckKey(0,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(0,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected Size = SizeOf(Long)
 				If Original_SHRegGetValueA(hAppKey,*lpSubKey,*lpValueName,0,#REG_DWORD,@Result,@Size) <> #NO_ERROR
@@ -786,7 +793,7 @@ CompilerIf #DETOUR_SHREGGETBOOLUSVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_SHRegGetBoolUSValueW(*lpSubKey,*lpValueName,fIgnoreHKCU,fDefault)
 		CompilerElse
-			Protected SubKey.s = CheckKey(0,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(0,LPeekSZU(*lpSubKey))
 			If SubKey
 				Protected Size = SizeOf(Long)
 				If Original_SHRegGetValueW(hAppKey,*lpSubKey,*lpValueName,0,#REG_DWORD,@Result,@Size) <> #NO_ERROR
@@ -815,7 +822,7 @@ CompilerIf #DETOUR_REGSETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegSetValueA(hKey,*lpSubKey,dwType,*lpData,cbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegSetValueA(hAppKey,*SubKeyA,dwType,*lpData,cbData)
@@ -835,7 +842,7 @@ CompilerIf #DETOUR_REGSETVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegSetValueW(hKey,*lpSubKey,dwType,*lpData,cbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegSetValueW(hAppKey,@SubKey,dwType,*lpData,cbData)
 			Else
@@ -858,7 +865,7 @@ CompilerIf #DETOUR_REGSETKEYVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegSetKeyValueA(hKey,*lpSubKey,*lpValueName,dwType,*lpData,cbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_RegSetKeyValueA(hAppKey,*SubKeyA,*lpValueName,dwType,*lpData,cbData)
@@ -878,7 +885,7 @@ CompilerIf #DETOUR_REGSETKEYVALUE
 		CompilerIf Not #PORTABLE
 			Result = Original_RegSetKeyValueW(hKey,*lpSubKey,*lpValueName,dwType,*lpData,cbData)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_RegSetKeyValueW(hAppKey,@SubKey,*lpValueName,dwType,*lpData,cbData)
 			Else
@@ -901,7 +908,7 @@ CompilerIf #DETOUR_SHCOPYKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHCopyKeyA(hKeySrc,*lpSubKey,hKeyDest,fReserved)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKeySrc,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKeySrc,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHCopyKeyA(hAppKey,*SubKeyA,hKeyDest,fReserved)
@@ -921,7 +928,7 @@ CompilerIf #DETOUR_SHCOPYKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHCopyKeyW(hKeySrc,*lpSubKey,hKeyDest,fReserved)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKeySrc,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKeySrc,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHCopyKeyW(hAppKey,@SubKey,hKeyDest,fReserved)
 			Else
@@ -944,7 +951,7 @@ CompilerIf #DETOUR_SHQUERYINFOKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHQueryInfoKeyA(hKey,*lpSubKey,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZA(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZA(*lpSubKey))
 			If SubKey
 				Protected *SubKeyA = Ascii(SubKey)
 				Result = Original_SHQueryInfoKeyA(hAppKey,*SubKeyA,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
@@ -963,7 +970,7 @@ CompilerIf #DETOUR_SHQUERYINFOKEY
 		CompilerIf Not #PORTABLE
 			Result = Original_SHQueryInfoKeyW(hKey,*lpSubKey,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
 		CompilerElse
-			Protected SubKey.s = CheckKey(hKey,LPeekSZU(*lpSubKey))
+			Protected SubKey.s = CheckKey2(hKey,LPeekSZU(*lpSubKey))
 			If SubKey
 				Result = Original_SHQueryInfoKeyW(hAppKey,@SubKey,*lpcMaxSubKeyLen,*lpcValues,*lpcMaxValueNameLen)
 			Else
@@ -978,10 +985,8 @@ CompilerEndIf
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 784
-; FirstLine = 162
-; Folding = AAAAAgDw
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = AAAAAAAg
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
