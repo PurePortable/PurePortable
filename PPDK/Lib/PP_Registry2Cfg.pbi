@@ -46,17 +46,18 @@ DeclareImport(advapi32,_RegSetKeyValueW@24,RegSetKeyValueW,RegSetKeyValue_(hKey,
 DeclareImport(advapi32,_RegDeleteKeyValueW@12,RegDeleteKeyValueW,RegDeleteKeyValue_(hKey,*SubKey,*ValueName))
 DeclareImport(advapi32,_RegDeleteTreeW@8,RegDeleteTreeW,RegDeleteTree_(hKey,*SubKey))
 
+Global MH_InitStatus ; Переменная из MinHook - состояние - инициализирована или нет
 Procedure.s GetCfgS(sKey.s,sName.s)
 	Protected dwType, cbData, Result.s
 	Protected ret
-	If Original_RegGetValueW ; если хук установлен, через оригинальную функцию
+	If MH_InitStatus And Original_RegGetValueW ; если хук установлен, через оригинальную функцию
 		ret = Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,#Null,@cbData)
 	Else ; иначе напрямую
 		ret = RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,#Null,@cbData)
 	EndIf
 	If cbData And (dwType=#REG_SZ Or dwType=#REG_EXPAND_SZ)
 		Result = Space((cbData+1)/2)
-		If Original_RegGetValueW ; если хук установлен, через оригинальную функцию
+		If MH_InitStatus And Original_RegGetValueW ; если хук установлен, через оригинальную функцию
 			If Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_REG_SZ,@dwType,@Result,@cbData)=#NO_ERROR
 				ProcedureReturn Result
 			EndIf
@@ -71,7 +72,7 @@ EndProcedure
 Procedure.l GetCfgD(sKey.s,sName.s,DefVal.l=0)
 	Protected dwType, dwData.l, cbData=SizeOf(Long)
 	Protected ret
-	If Original_RegGetValueW ; если хук установлен, через оригинальную функцию
+	If MH_InitStatus And Original_RegGetValueW ; если хук установлен, через оригинальную функцию
 		If Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_DWORD,@dwType,@dwData,@cbData)=#NO_ERROR
 			ProcedureReturn dwData
 		EndIf
@@ -83,19 +84,19 @@ Procedure.l GetCfgD(sKey.s,sName.s,DefVal.l=0)
 	ProcedureReturn DefVal
 EndProcedure
 Procedure CfgExist(sKey.s,sName.s)
-	If Original_RegGetValueW
+	If MH_InitStatus And Original_RegGetValueW
 		ProcedureReturn Bool(Original_RegGetValueW(hAppKey,@sKey,@sName,#RRF_RT_ANY,#Null,#Null,#Null)=#NO_ERROR)
 	EndIf
 	ProcedureReturn Bool(RegGetValue_(hAppKey,@sKey,@sName,#RRF_RT_ANY,#Null,#Null,#Null)=#NO_ERROR)
 EndProcedure
 Procedure SetCfgS(sKey.s,sName.s,sData.s)
-	If Original_RegSetKeyValueW
+	If MH_InitStatus And Original_RegSetKeyValueW
 		ProcedureReturn Bool(Original_RegSetKeyValueW(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
 	EndIf
 	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_SZ,@sData,StringByteLength(sData)+2)=#NO_ERROR)
 EndProcedure
 Procedure SetCfgD(sKey.s,sName.s,dData.l)
-	If Original_RegSetKeyValueW
+	If MH_InitStatus And Original_RegSetKeyValueW
 		ProcedureReturn Bool(Original_RegSetKeyValueW(hAppKey,@sKey,@sName,#REG_DWORD,@dData,SizeOf(Long))=#NO_ERROR)
 	EndIf
 	ProcedureReturn Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_DWORD,@dData,SizeOf(Long))=#NO_ERROR)
@@ -104,7 +105,7 @@ Procedure SetCfgB(sKey.s,sName.s,sHex.s)
 	sHex = ReplaceString(ReplaceString(sHex,",","")," ","")+"0" ; плюс "0" для нейтрализации ошибки если было нечётное количество символов
 	Protected Result, cbData
 	Protected *Bin = Hex2Bin(sHex,#Null,@cbData)
-	If Original_RegSetKeyValueW
+	If MH_InitStatus And Original_RegSetKeyValueW
 		Result = Bool(Original_RegSetKeyValueW(hAppKey,@sKey,@sName,#REG_BINARY,*Bin,cbData)=#NO_ERROR)
 	Else
 		Result = Bool(RegSetKeyValue_(hAppKey,@sKey,@sName,#REG_BINARY,*Bin,cbData)=#NO_ERROR)
@@ -113,13 +114,13 @@ Procedure SetCfgB(sKey.s,sName.s,sHex.s)
 	ProcedureReturn Result
 EndProcedure
 Procedure DelCfg(sKey.s,sName.s)
-	If Original_RegDeleteKeyValueW
+	If MH_InitStatus And Original_RegDeleteKeyValueW
 		ProcedureReturn Bool(Original_RegDeleteKeyValueW(hAppKey,@sKey,@sName)=#NO_ERROR)
 	EndIf
 	ProcedureReturn Bool(RegDeleteKeyValue_(hAppKey,@sKey,@sName)=#NO_ERROR)
 EndProcedure
 Procedure DelCfgTree(sKey.s)
-	If Original_RegDeleteTreeW
+	If MH_InitStatus And Original_RegDeleteTreeW
 		ProcedureReturn Bool(Original_RegDeleteTreeW(hAppKey,@sKey)=#NO_ERROR)
 	EndIf
 	ProcedureReturn Bool(RegDeleteTree_(hAppKey,@sKey)=#NO_ERROR)
@@ -283,9 +284,7 @@ Procedure WriteCfg()
 EndProcedure
 ;;======================================================================================================================
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 238
-; FirstLine = 72
-; Folding = Ai9
+; Folding = Ag9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
