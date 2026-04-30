@@ -56,7 +56,7 @@ EndProcedure
 Macro DetachCleanup
 	If PrgIsValid And LastProcess And hCleanupList
 		CloseFile(hCleanupList)
-		Protected CleanupCmdLine.s = Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34)
+		Protected CleanupCmdLine.s = Chr(34)+DllPath+Chr(34)+",PurePortableCleanup "+StrU(DbgClnMode)+" "+StrU(ProcessId)+" "+Chr(34)+CleanupList+Chr(34)
 		DbgCln("PurePortableCleanup: "+SysDir+"\rundll32.exe "+CleanupCmdLine)
 		Execute(SysDir+"\rundll32.exe",CleanupCmdLine)
 	EndIf
@@ -65,7 +65,7 @@ EndMacro
 ;;----------------------------------------------------------------------------------------------------------------------
 #FOF_NO_CONNECTED_ELEMENTS = $2000 ; https://learn.microsoft.com/ru-ru/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileoperation-setoperationflags
 ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
-	; *lpszCmdLine в кодировке ASCII !
+	; *lpszCmdLine в кодировке ASCII ! Не используем!
 	; Командная строка: rundll32 путь_к_dll,PurePortableCleanup dbg_mode process_id "путь_к_списку"
 	
 	Protected CleanupItem.s
@@ -108,10 +108,8 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 EndProcedure
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 104
-; FirstLine = 72
-; Folding = --
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; Folding = C-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
