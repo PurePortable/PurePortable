@@ -29,6 +29,7 @@ Structure IMinHook
 	MH_StatusToString.MH_StatusToString
 	_MH_HookApi._MH_HookApi
 	_MH_Error._MH_Error
+	*MH_InitStatus.Integer
 EndStructure
 
 CompilerIf Not Defined(IMINHOOK_INIT,#PB_Constant) : #IMINHOOK_INIT = 0 : CompilerEndIf
@@ -50,6 +51,7 @@ CompilerIf #IMINHOOK_INIT
 	IMinHook\MH_StatusToString = @MH_StatusToString()
 	IMinHook\_MH_HookApi = @_MH_HookApi()
 	IMinHook\_MH_Error = @_MH_Error()
+	IMinHook\MH_InitStatus = @MH_InitStatus
 	
 	DataSection
 		IMinHook:
@@ -66,6 +68,7 @@ CompilerIf #IMINHOOK_INIT
 			!DD _MH_ApplyQueued@0
 			!DD _MH_Uninitialize@0
 			!DD _MH_StatusToString@4
+			!DD 0
 		CompilerElse
 			!DQ MH_Initialize
 			!DQ MH_CreateHook
@@ -79,6 +82,7 @@ CompilerIf #IMINHOOK_INIT
 			!DQ MH_ApplyQueued
 			!DQ MH_Uninitialize
 			!DQ MH_StatusToString
+			!DQ 0
 		CompilerEndIf
 		Data.i @_MH_HookApi()
 		Data.i @_MH_Error()
@@ -86,9 +90,9 @@ CompilerIf #IMINHOOK_INIT
 	
 CompilerEndIf
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 78
-; FirstLine = 51
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 31
+; FirstLine = 16
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
