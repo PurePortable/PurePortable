@@ -670,10 +670,7 @@ Procedure AttachProcedure()
 						KFIDs(nKFIDs)\path = p
 						CreatePath(p)
 					Else
-						If Left(k,2)="0x" ; HEX CSIDL
-							k = "$"+Mid(k,3)
-						EndIf
-						Protected csidl = Val(k)
+						Protected csidl = ValX(k)
 						If csidl
 							ncsidl+1
 							ReDim CSIDLs(ncsidl)
@@ -767,7 +764,7 @@ Procedure AttachProcedure()
 							Case "e"
 								SetCfgS(k,v,ExpandEnvironmentStrings(p))
 							Case "d"
-								SetCfgD(k,v,Val(p))
+								SetCfgD(k,v,ValX(p))
 							Case "b"
 								SetCfgB(k,v,p)
 							Default ; попробуем рассмотреть как строку
