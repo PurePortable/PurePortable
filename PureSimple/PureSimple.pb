@@ -290,7 +290,7 @@ Procedure CheckSpoofDate()
 			;dbg("Flag: "+SpoofDateFlag)
 		EndIf
 	EndIf
-	ProcedureReturn SpoofDateFlag	
+	ProcedureReturn SpoofDateFlag
 EndProcedure
 ;}
 ;;----------------------------------------------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ Procedure CheckProgram()
 	Protected RetCode
 	;{ Файл конфигурации
 	PureSimplePrefs = PrgDir+DllName
-	Protected MultiConfigPrefs.s 
+	Protected MultiConfigPrefs.s
 	If FileExist(PureSimplePrefs+".prefs")
 		PureSimplePrefs+".prefs"
 	ElseIf FileExist(PureSimplePrefs+".ini")
@@ -382,7 +382,7 @@ Procedure CheckProgram()
 	;{ Проверка, та ли программа запущена
 	Protected InvalidProgram = 1
 	Protected InvalidReaction = 1
-	
+
 	;PreferenceGroup("Portable") ; Существование и открытие секции проверяется при открытии конфига
 	Protected ValidateProgram = ReadPreferenceInteger("ValidateProgram",1)
 	If ValidateProgram
@@ -444,9 +444,9 @@ Procedure AttachProcedure()
 	Protected i, j
 	Protected k.s, v.s, p.s, n.s, o.s, t.s ; для обработки preferences
 	Protected RetCode
-	
+
 	OpenPreferences(PureSimplePrefs)
-	
+
 	;{ Установка переменных среды
 	SetEnvironmentVariable("PP_PrgPath",PrgPath)
 	SetEnvironmentVariable("PP_PrgDir",PrgDirN)
@@ -525,7 +525,7 @@ Procedure AttachProcedure()
 		CompilerEndIf
 		CompilerIf Defined(BLOCK_WINSOCKS,#PB_Constant)
 			BlockWinSocksPermit = ReadPreferenceInteger("BlockWinSocks",0)
-			;If BlockWinSocksPermit = 1 ; wsock32 иначе ws2_32, т.к. #BLOCK_WINSOCKS=2 
+			;If BlockWinSocksPermit = 1 ; wsock32 иначе ws2_32, т.к. #BLOCK_WINSOCKS=2
 			;	WinSocksDll = "wsock32"
 			;EndIf
 		CompilerEndIf
@@ -602,7 +602,7 @@ Procedure AttachProcedure()
 		While NextPreferenceKey()
 			RunFrom(PreferenceKeyName(),PreferenceKeyValue())
 		Wend
-	EndIf		
+	EndIf
 	;}
 	;{ Перенаправление специальных папок
 	If (SpecialFoldersPermit Or EnvironmentVariablesPermit) And PreferenceGroup("SpecialFolders")
@@ -864,16 +864,48 @@ Procedure AttachProcedure()
 				;dbg("SpoofDateShift:   "+RSet(Str(SpoofDateShift),24))
 				;SpoofDateLimit = SpoofDateLimit + SpoofDateShift
 				;dbg("SpoofDateLimit:   "+RSet(Str(SpoofDateLimit),24))
-				
+
 				;dbg("SPOOF DATE: "+Str(SpoofDateST\wYear)+" :: "+Str(SpoofDateST\wMonth)+" :: "+Str(SpoofDateST\wDay))
 				;SystemTimeToFileTime_(@SpoofDateST,@SpoofDateFT)
-				
+
 				MH_HookApi(kernel32,GetLocalTime)
 				MH_HookApi(kernel32,GetSystemTime)
 				MH_HookApi(kernel32,GetSystemTimeAsFileTime)
 				;MH_HookApi(kernel32,CompareFileTime)
 			EndIf
 		EndIf
+	EndIf
+	;}
+	;{ Патчинг файла в памяти
+	If PreferenceGroup("Patch")
+		Protected Addr, OldProt, *Bin, BinSize
+		ExaminePreferenceKeys()
+		While NextPreferenceKey()
+			k = PreferenceKeyName()
+			Addr = ValX(k)
+			v = PreferenceKeyValue()
+			i = FindString(v,":")
+			If i
+				*Bin = Hex2Bin(Left(v,i-1),#Null,@BinSize)
+				If CompareMemory(Addr,*Bin,BinSize) = 0
+					FreeMemory(*Bin)
+					Continue
+				EndIf
+				*Bin = Hex2Bin(Mid(v,i+1),#Null,@BinSize)
+			Else
+				*Bin = Hex2Bin(Mid(v,i+1),#Null,@BinSize)
+			EndIf
+			If BinSize
+				; https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect
+				VirtualProtect_(Addr,BinSize,#PAGE_EXECUTE_READWRITE,@OldProt)
+				;CopyMemory(*Bin,Addr,BinSize)
+				CopyMemory_(Addr,*Bin,BinSize)
+				VirtualProtect_(Addr,BinSize,OldProt,@OldProt)
+				; https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-flushinstructioncache
+				FlushInstructionCache_(GetCurrentProcess_(),Addr,BinSize)
+			EndIf
+			FreeMemory(*Bin)
+		Wend
 	EndIf
 	;}
 	;{ Загрузка сторонных библиотек
@@ -977,24 +1009,23 @@ Procedure DetachProcedure()
 		dbg("DetachProcedure: Error open prefs")
 		ProcedureReturn 1
 	EndIf
-	Protected CleanupDirectory.s, lCleanupDirectory, CleanupItem.s, Cleanup
-	If PreferenceGroup("Portable")
-		Cleanup = ReadPreferenceInteger("Cleanup",0)
-		CleanupDirectory = ReadPreferenceString("CleanupDirectory",".")
-	EndIf
+	Protected CleanupItem.s, EveryProcess
 	;{ Чистка реестра для Registry1
 	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 1
-		If RegistryPermit And Cleanup
-			If PreferenceGroup("Cleanup.Registry")
+		If PreferenceGroup("Cleanup.Registry")
+			If RegistryPermit
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
-					x = FindString(CleanupItem,"|")
-					If x
-						DelCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
-					Else
-						DelCfgTree(CleanupItem)
+					CleanupItem = PreferenceKeyName()
+					If Left(CleanupItem,1) <> "*"
+						DbgCln("Cleanup: Registry: "+CleanupItem)
+						x = FindString(CleanupItem,"|")
+						If x
+							DelCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
+						Else
+							DelCfgTree(CleanupItem)
+						EndIf
 					EndIf
-
 				Wend
 			EndIf
 		EndIf
@@ -1002,17 +1033,20 @@ Procedure DetachProcedure()
 	;}
 	;{ Чистка реестра для Registry2
 	CompilerIf #PORTABLE_REGISTRY And (#PORTABLE_REGISTRY & #PORTABLE_REG_STORAGE_MASK) = 2
-		If RegistryPermit And (Cleanup = 2 Or (LastProcess And Cleanup))
-			If PreferenceGroup("Cleanup.Registry")
+		If PreferenceGroup("Cleanup.Registry")
+			EveryProcess = ReadPreferenceInteger("*EveryProcess",0)
+			If RegistryPermit And (EveryProcess Or LastProcess)
 				ExaminePreferenceKeys()
 				While NextPreferenceKey()
 					CleanupItem = PreferenceKeyName()
-					DbgCln("Cleanup: Registry: "+CleanupItem)
-					x = FindString(CleanupItem,"|")
-					If x
-						DelCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
-					Else
-						DelCfgTree(CleanupItem)
+					If Left(CleanupItem,1) <> "*"
+						DbgCln("Cleanup: Registry: "+CleanupItem)
+						x = FindString(CleanupItem,"|")
+						If x
+							DelCfg(Left(CleanupItem,x-1),Mid(CleanupItem,x+1))
+						Else
+							DelCfgTree(CleanupItem)
+						EndIf
 					EndIf
 				Wend
 			EndIf
@@ -1036,71 +1070,78 @@ Procedure DetachProcedure()
 		EndIf
 	EndIf
 	;}
-	;{ Чистка
-	If Cleanup = 2 Or (LastProcess And Cleanup)
-		;{ Удаление разделов реального реестра
-		If PreferenceGroup("Cleanup.RealRegistry")
-			Protected hKey, sKey.s
+	;{ Удаление разделов реального реестра
+	If PreferenceGroup("Cleanup.RealRegistry")
+		Protected hKey, sKey.s
+		EveryProcess = ReadPreferenceInteger("*EveryProcess",0)
+		If EveryProcess Or LastProcess
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				CleanupItem = PreferenceKeyName()
-				DbgCln("Cleanup: RealRegistry: "+CleanupItem)
-				x = FindString(CleanupItem,"\")
-				If x
-					sKey = Mid(CleanupItem,x+1)
-					hKey = 0
-					Select UCase(Left(CleanupItem,x-1))
-						Case "HKLM","HKEY_LOCAL_MACHINE"
-							hKey = #HKEY_LOCAL_MACHINE
-						Case "HKCR","HKEY_CLASSES_ROOT"
-							hKey = #HKEY_CLASSES_ROOT
-						Case "HKCU","HKEY_CURRENT_USER"
-							hKey = #HKEY_CURRENT_USER
-					EndSelect
-					If hKey
-						x = FindString(sKey,"|")
-						If x
-							RegDeleteKeyValue_(hKey,Left(sKey,x-1),Mid(sKey,x+1))
-						Else
-							RegDeleteTree_(hKey,sKey)
+				If Left(CleanupItem,1) <> "*"
+					DbgCln("Cleanup: RealRegistry: "+CleanupItem)
+					x = FindString(CleanupItem,"\")
+					If x
+						sKey = Mid(CleanupItem,x+1)
+						hKey = 0
+						Select UCase(Left(CleanupItem,x-1))
+							Case "HKLM","HKEY_LOCAL_MACHINE"
+								hKey = #HKEY_LOCAL_MACHINE
+							Case "HKCR","HKEY_CLASSES_ROOT"
+								hKey = #HKEY_CLASSES_ROOT
+							Case "HKCU","HKEY_CURRENT_USER"
+								hKey = #HKEY_CURRENT_USER
+						EndSelect
+						If hKey
+							x = FindString(sKey,"|")
+							If x
+								RegDeleteKeyValue_(hKey,Left(sKey,x-1),Mid(sKey,x+1))
+							Else
+								RegDeleteTree_(hKey,sKey)
+							EndIf
 						EndIf
 					EndIf
 				EndIf
 			Wend
 		EndIf
-		;}
-		;{ Чистка папок
-		DbgCln("CleanupDirectory: "+CleanupDirectory)
-		Protected Dim ClnDirs.s(0), iClnDir
-		Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory,"|")
-		If nClnDir = 0
-			nClnDir = AddArrayS(ClnDirs(),PrgDirN)
-		EndIf
-		For iClnDir=1 To nClnDir
-			ClnDirs(iClnDir) = NormalizePPath(ClnDirs(iClnDir))
-		Next
-		ClnDirs(0) = TempDir ; всегда разрешено во временной папке
-		If PreferenceGroup("Cleanup")
+	EndIf
+	;}
+	;{ Чистка файлов и папок
+	Protected CleanupDirectory.s
+	If PreferenceGroup("Portable")
+		CleanupDirectory = ReadPreferenceString("CleanupDirectory","")
+	EndIf
+	If PreferenceGroup("Cleanup")
+		EveryProcess = ReadPreferenceInteger("*EveryProcess",0)
+		If EveryProcess Or LastProcess
+			CleanupDirectory = ReadPreferenceString("*Directories",CleanupDirectory)
+			DbgCln("Cleanup: Directories: "+CleanupDirectory)
+			Protected Dim ClnDirs.s(0), iClnDir
+			Protected nClnDir = SplitArray(ClnDirs(),CleanupDirectory,"|")
+			If nClnDir = 0
+				nClnDir = AddArrayS(ClnDirs(),PrgDirN)
+			EndIf
+			For iClnDir=1 To nClnDir
+				ClnDirs(iClnDir) = NormalizePPath(ClnDirs(iClnDir))
+			Next
+			ClnDirs(0) = TempDir ; всегда разрешено во временной папке
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				CleanupItem = NormalizePPath(PreferenceKeyName())
-				DbgCln("Cleanup: "+CleanupItem)
-				; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
-				Cleanup = 0
-				For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
-					DbgCln("Cleanup: Chk: "+ClnDirs(iClnDir))
-					If StartWithPath(CleanupItem,ClnDirs(iClnDir))
-						Cleanup = 1
-						DbgCln("Cleanup: Into: "+ClnDirs(iClnDir))
-						Break
-					EndIf
-				Next
-				If Cleanup
-					AddCleanItem(CleanupItem)
+				If Left(CleanupItem,1) <> "*"
+					DbgCln("Cleanup: "+CleanupItem)
+					; Для безопасности проверим путь - начало пути должно совпадать с одним из путей из ClnDirs
+					For iClnDir=0 To nClnDir ; проверяем, что очистка производится только в разрешённых папках
+						If StartWithPath(CleanupItem,ClnDirs(iClnDir))
+							AddCleanItem(CleanupItem)
+							DbgCln("  Into: "+ClnDirs(iClnDir))
+							Break
+						EndIf
+					Next
 				EndIf
 			Wend
 		EndIf
-		;}
+		; Сама очистка будет вызвана после завершения DetachProcedure
 	EndIf
 	;}
 	ClosePreferences()
