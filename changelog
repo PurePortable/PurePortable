@@ -5,7 +5,7 @@
 (?) непонятно ))
 
 [4.11.0.14] 2026-05-01
-(+) SpecialFolders: GetWindowsDirectory, GetSystemDirectory.
+(+) SpecialFolders: GetWindowsDirectory, GetSystemDirectory, GetTempPath.
 (!) Registry1: Работа с дефолтным значением.
 (!) Registry2: Фильтр для исключения повторного вызова функций из SetCfg* и пр.
 (*) PureSimple: Registry.SetData: Пустая строка больше не удаляет значение.
