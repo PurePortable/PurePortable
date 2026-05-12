@@ -84,7 +84,7 @@ ProcedureDLL.l PurePortableCleanup(hWnd,hInst,*lpszCmdLine,nCmdShow)
 		While Not Eof(hCleanupList)
 			CleanupItem = ReadString(hCleanupList,#PB_UTF8)
 			DbgCln("PurePortableCleanup: "+CleanupItem)
-			CleanupItem+#XNUL$ ; Эта строка должна быть завершена двойным значением NULL
+			CleanupItem = ReplaceString(CleanupItem,"|",#XNUL$)+#XNUL$ ; Эта строка должна быть завершена двойным значением NULL
 			DecodeCtrl(@CleanupItem)
 			;SetCurrentDirectory(CleanupDirectory)
 			; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationa
@@ -109,7 +109,9 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = C-
+; CursorPosition = 86
+; FirstLine = 42
+; Folding = i-
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
