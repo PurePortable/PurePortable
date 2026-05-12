@@ -348,7 +348,7 @@ Procedure.l GetDataW(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,
 			EndIf
 		Next
 		If i > nCfg ; Если значение не обнаружено и имя пустое, это значение по умолчанию и это пустая строка
-			If Cfg(i)\n = ""
+			If sName = ""
 				i = 0 ; Нулевой элемент служит для имитации пустого дефолного значения
 			Else
 				ProcedureReturn #ERROR_FILE_NOT_FOUND
@@ -418,7 +418,7 @@ Procedure.l GetDataA(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,
 			EndIf
 		Next
 		If i > nCfg ; Если значение не обнаружено и имя пустое, это значение по умолчанию и это пустая строка
-			If Cfg(i)\n = ""
+			If sName = ""
 				i = 0 ; Нулевой элемент служит для имитации пустого дефолтного значения
 			Else
 				ProcedureReturn #ERROR_FILE_NOT_FOUND
