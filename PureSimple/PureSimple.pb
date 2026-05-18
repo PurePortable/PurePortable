@@ -23,7 +23,7 @@ XIncludeFile "PurePortableCustom.pbi"
 #PROXY_DLL = "pureport"
 #PROXY_DLL_COMPATIBILITY = 0 ; Совместимость: 0 - по умолчанию, 5 - XP, 7 - Windows 7 (default), 10 - Windows 10
 
-#CONFIG_FILENAME = "browser"
+#CONFIG_FILENAME = "pupeport"
 #CONFIG_PERMANENT = #CONFIG_FILENAME+"-init"
 ;#CONFIG_INITIAL = #CONFIG_FILENAME+"-Init"
 ;#PREFERENCES_FILENAME = #CONFIG_FILENAME ; Имя файла конфигурации PurePortable
@@ -1169,7 +1169,7 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = AAAAAAAAAAA-
+; Folding = AAAAAABABAA-
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

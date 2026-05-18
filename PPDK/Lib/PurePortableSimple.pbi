@@ -38,7 +38,7 @@ EndProcedure
 ; EndProcedure
 ;;======================================================================================================================
 Procedure.q ValX(Num.s)
-	If UCase(Left(Num,2)) = "0x"
+	If UCase(Left(Num,2)) = "0X"
 		Num = "$"+Mid(Num,3)
 	EndIf
 	ProcedureReturn Val(Num)
@@ -46,7 +46,7 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 41
+; CursorPosition = 40
 ; FirstLine = 11
 ; Folding = -
 ; EnableThread
