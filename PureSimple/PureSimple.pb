@@ -116,11 +116,18 @@ Global DbgAnyMode
 Global DbgExtMode
 Global DbgExecMode
 Global DbgCbtMode
+Global DbgPatchMode
 Procedure DbgExt(txt.s)
 	If DbgExtMode
-		dbg(txt)
+		dbg("EXT: "+txt)
 	EndIf
 EndProcedure
+Procedure DbgPatch(txt.s)
+	If DbgPatchMode
+		dbg("PATCH: "+txt)
+	EndIf
+EndProcedure
+
 ;;======================================================================================================================
 ;{ SPECIAL FOLDERS
 Structure KFID_DATA
@@ -316,6 +323,7 @@ Procedure _OpenPreference(Prefs.s)
 EndProcedure
 ;;----------------------------------------------------------------------------------------------------------------------
 Declare RunFrom(k.s,p.s)
+Declare WriteMemory(*Addr,*Bin,BinSize)
 ;;----------------------------------------------------------------------------------------------------------------------
 ; До AttachProcedure
 ; Выбор файла конфигурации с учётом MultiConfig.
@@ -552,6 +560,8 @@ Procedure AttachProcedure()
 	DbgDetachMode = 1
 	DbgExecMode = 0
 	DbgClnMode = 0
+	;DbgExtMode = 0
+	;DbgPatchMode = 0
 	If PreferenceGroup("Debug")
 		DbgRegMode = ReadPreferenceInteger("Registry",0)
 		DbgSpecMode = ReadPreferenceInteger("SpecialFolders",0)
@@ -562,6 +572,7 @@ Procedure AttachProcedure()
 		DbgExecMode = ReadPreferenceInteger("RunFrom",0)
 		DbgClnMode = ReadPreferenceInteger("Cleanup",0)
 		DbgCbtMode = ReadPreferenceInteger("CBT",0)
+		DbgPatchMode = ReadPreferenceInteger("Patch",0)
 	EndIf
 	;}
 	;{ Создание папок
@@ -878,34 +889,87 @@ Procedure AttachProcedure()
 	;}
 	;{ Патчинг файла в памяти
 	If PreferenceGroup("Patch")
-		Protected Addr, OldProt, *Bin, BinSize
+		Protected *Addr.Byte, *Addr2.Byte, RelImageBase
+		Protected BinSearch, BinCheck, DataError
+		Protected *BinC.Byte, BinSizeC ; То, что проверяем / ищем
+		Protected *BinW.Byte, BinSizeW ; То, что пишем
+		Protected ImageBase2 = LoadLibrary_(@PrgPath)
+		DbgPatch("ImageBase: PEB: "+Str(ImageBase)+" LOAD: "+Str(ImageBase2))
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
+			DataError = #False
 			k = PreferenceKeyName()
-			Addr = ValX(k)
+			If Left(k,1) = "@" ; RVA относительно ImageBase
+				RelImageBase = #True
+				k = Mid(k,2)
+			Else
+				RelImageBase = #False
+			EndIf
+			i = FindString(k,":")
+			If i
+				BinSearch = #True
+				*Addr = ValX(Left(k,i-1))
+				*Addr2 = ValX(Mid(k,i+1))
+			Else
+				BinSearch = #False
+				*Addr = ValX(k)
+			EndIf
+			If RelImageBase
+				*Addr+ImageBase2
+				*Addr2+ImageBase2
+			EndIf
 			v = PreferenceKeyValue()
 			i = FindString(v,":")
 			If i
-				*Bin = Hex2Bin(Left(v,i-1),#Null,@BinSize)
-				If CompareMemory(Addr,*Bin,BinSize) = 0
-					FreeMemory(*Bin)
-					Continue
-				EndIf
-				*Bin = Hex2Bin(Mid(v,i+1),#Null,@BinSize)
+				BinCheck = #True
+				*BinC = Hex2Bin(Left(v,i-1),#Null,@BinSizeC)
+				*BinW = Hex2Bin(Mid(v,i+1),#Null,@BinSizeW)
 			Else
-				*Bin = Hex2Bin(Mid(v,i+1),#Null,@BinSize)
+				BinCheck = #False
+				*BinC = #Null
+				*BinW = Hex2Bin(v,#Null,@BinSizeW)
 			EndIf
-			If BinSize
-				; https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect
-				VirtualProtect_(Addr,BinSize,#PAGE_EXECUTE_READWRITE,@OldProt)
-				;CopyMemory(*Bin,Addr,BinSize)
-				CopyMemory_(Addr,*Bin,BinSize)
-				VirtualProtect_(Addr,BinSize,OldProt,@OldProt)
-				; https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-flushinstructioncache
-				FlushInstructionCache_(GetCurrentProcess_(),Addr,BinSize)
+			If BinSearch ; Поиск и замена
+				;DbgPatch("SEARCH: "+Str(*Addr))
+				If *Addr2>*Addr And BinSizeC And BinSizeW
+					While *Addr <= *Addr2 ; Учитывать длины BinSizeC и BinSizeW для безопасности?
+						;If *Addr\b = *BinC\b And CompareMemory(*Addr,*BinC,BinSizeC)
+						If CompareMemory(*Addr,*BinC,BinSizeC)
+							DbgPatch("FOUND: "+Str(*Addr)+" / 0x"+Hex(*Addr))
+							WriteMemory(*Addr,*BinW,BinSizeW)
+							Break
+						EndIf
+						*Addr+1
+					Wend
+				Else
+					DataError = #True
+				EndIf
+			ElseIf BinCheck ; Проверка и запись
+				;DbgPatch("CHECK: "+Str(*Addr\b)+" / 0x"+Right("0"+Hex(*Addr\b),2))
+				If *Addr And BinSizeC
+					DbgPatch("CHECK: "+Str(*Addr\b)+" / 0x"+Right("0"+Hex(*Addr\b),2))
+					If CompareMemory(*Addr,*BinC,BinSizeC)
+						DbgPatch("WRITE: "+Str(*Addr)+" / 0x"+Hex(*Addr))
+						WriteMemory(*Addr,*BinW,BinSizeW)
+					EndIf
+				Else
+					DataError = #True
+				EndIf
+			Else ; Запись
+				If *Addr And BinSizeC
+					DbgPatch("WRITE: "+Str(*Addr)+" / 0x"+Hex(*Addr))
+					WriteMemory(*Addr,*BinW,BinSizeW)
+				Else
+					DataError = #True
+				EndIf
 			EndIf
-			FreeMemory(*Bin)
+			If DataError
+				DbgPatch("ERROR: "+PreferenceKeyName()+"="+PreferenceKeyValue())
+			EndIf
+			FreeMemory(*BinC)
+			FreeMemory(*BinW)
 		Wend
+		FreeLibrary_(ImageBase2)
 	EndIf
 	;}
 	;{ Загрузка сторонных библиотек
@@ -914,10 +978,10 @@ Procedure AttachProcedure()
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			LoadableLibrary = NormalizePPath(PreferenceKeyName())
-			dbg("ATTACHPROCESS: DLL: "+LoadableLibrary)
+			DbgAlways("ATTACHPROCESS: DLL: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
-				dbg("ATTACHPROCESS: DLL: OK")
+				DbgAlways("ATTACHPROCESS: DLL: OK")
 			EndIf
 		Wend
 	EndIf
@@ -928,7 +992,6 @@ Procedure AttachProcedure()
 		While NextPreferenceKey()
 			v = PreferenceKeyValue()
 			k = PreferenceKeyName()
-			DbgExt("ATTACHPROCESS: EXT: "+k)
 			If GetExtensionPart(k) = ""
 				k + ".dll"
 			EndIf
@@ -962,14 +1025,14 @@ Procedure AttachProcedure()
 		; Перечисляем расширения
 		For iExtFile=1 To nExtFiles
 			LoadableLibrary = ExtFiles(iExtFile)\File
-			DbgExt("ATTACHPROCESS: EXT FILE: "+LoadableLibrary)
+			DbgExt("FILE: "+LoadableLibrary)
 			hLoadableLibrary = LoadLibrary_(@LoadableLibrary)
 			If hLoadableLibrary
-				DbgExt("ATTACHPROCESS: EXT ADDR: "+hLoadableLibrary)
+				DbgExt("ADDR: "+hLoadableLibrary)
 				PurePortableExtension = GetProcAddress_(hLoadableLibrary,*PurePortableExtensionNameA)
 				If PurePortableExtension
-					DbgExt("ATTACHPROCESS: EXT FUNC: "+PurePortableExtension)
-					; Персональные данные расширения
+					DbgExt("FUNC: "+PurePortableExtension)
+					; Индивидуальные данные расширения
 					*ExtParam = AllocateStructure(EXTPARAM)
 					*ExtParam\Version = #EXT_VERSION
 					*ExtParam\Parameters = @ExtFiles(iExtFile)\Params
@@ -984,6 +1047,7 @@ Procedure AttachProcedure()
 			EndIf
 		Next
 		FreeMemory(*PurePortableExtensionNameA)
+		;FreeArray(ExtFiles())
 	EndIf
 	;}
 	;{ Сохранение реестра
@@ -1166,10 +1230,23 @@ Procedure RunFrom(k.s,p.s)
 	ExecuteDll(ExpandEnvironmentStrings(p),ExecuteFlags)
 EndProcedure
 ;;======================================================================================================================
+Procedure WriteMemory(*Addr,*Bin,BinSize)
+	Protected OldProt
+	; https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualprotect
+	VirtualProtect_(*Addr,BinSize,#PAGE_EXECUTE_READWRITE,@OldProt)
+	;CopyMemory(*Bin,*Addr,BinSize)
+	CopyMemory_(*Addr,*Bin,BinSize)
+	VirtualProtect_(*Addr,BinSize,OldProt,@OldProt)
+	; https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-flushinstructioncache
+	FlushInstructionCache_(GetCurrentProcess_(),*Addr,BinSize)
+EndProcedure
+;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = AAAAAABABAA-
+; CursorPosition = 960
+; FirstLine = 183
+; Folding = AgAAAACACBA+
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll

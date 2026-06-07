@@ -59,6 +59,7 @@ EndDataSection
 Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess, FirstProcess, LastProcess, DllInstancesCnt
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
 Global PPTickCount.l, PPGUID.s
+Global ImageBase.i
 Global ProcessMutexName.s, hProcessMutex, ProcessPipeName.s, hProcessPipe
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
@@ -310,23 +311,27 @@ Procedure GlobalInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
 		!MOV [v_DllInstance], EAX
-		!MOV EAX, DWORD [FS:30h]
+		!MOV EAX, DWORD [FS:30h] ; PEB
 		!MOV EDX, DWORD [EAX+00A4h]
 		!MOV DWORD [v_OSMajorVersion], EDX
 		!MOV EDX, DWORD [EAX+00A8h]
 		!MOV DWORD [v_OSMinorVersion], EDX
 		;!MOV EDX, DWORD [EAX+00B0h]
 		;!MOV DWORD [v_OSPlatformId], EDX
+		!MOV EDX, DWORD [EAX+0008h]
+		!MOV DWORD [v_ImageBase], EDX
 	CompilerElse
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
-		!MOV RAX, QWORD [GS:60h]
+		!MOV RAX, QWORD [GS:60h] ; PEB
 		!MOV EDX, DWORD [RAX+0118h]
 		!MOV DWORD [v_OSMajorVersion], EDX
 		!MOV EDX, DWORD [RAX+011Ch]
 		!MOV DWORD [v_OSMinorVersion], EDX
 		;!MOV EDX, DWORD [RAX+0124h]
 		;!MOV DWORD [v_OSPlatformId], EDX
+		!MOV RDX, QWORD [RAX+0010h]
+		!MOV QWORD [v_ImageBase], RDX
 	CompilerEndIf
 	
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
@@ -584,9 +589,10 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 387
-; FirstLine = 304
-; Folding = OJw
+; CursorPosition = 333
+; FirstLine = 289
+; Folding = Orz
+; Markers = 309
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
