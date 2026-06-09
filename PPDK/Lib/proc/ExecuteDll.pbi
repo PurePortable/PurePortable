@@ -3,8 +3,8 @@
 ; https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw
 ; https://vsokovikov.narod.ru/New_MSDN_API/Process_thread/fn_commandlinetoargvw.htm
 
-XIncludeFile "proc\Execute.pbi"
-XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
+XIncludeFile "Execute.pbi"
+XIncludeFile "ExpandEnvironmentStrings.pbi"
 
 CompilerIf Not Defined(DBG_EXECUTEDLL,#PB_Constant) : #DBG_EXECUTEDLL = 0 : CompilerEndIf
 
@@ -47,9 +47,7 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
-; CursorPosition = 18
-; FirstLine = 5
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; Folding = -
 ; EnableThread
 ; DisableDebugger

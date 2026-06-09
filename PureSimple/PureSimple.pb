@@ -106,7 +106,8 @@ XIncludeFile "PurePortableCustom.pbi"
 #INCLUDE_MIN_HOOK = 1 ; Принудительное включение MinHook
 #INCLUDE_IAT_HOOK = 0 ; Принудительное включение IatHook
 XIncludeFile "PurePortableSimple.pbi"
-XIncludeFile "PP_ExecuteDll.pbi"
+#DBG_EXECUTEDLL = 1
+XIncludeFile "proc\ExecuteDll.pbi"
 ;;======================================================================================================================
 Global DbgRegMode
 Global DbgSpecMode

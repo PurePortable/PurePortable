@@ -86,7 +86,6 @@ XIncludeFile "PurePortableCustom.pbi"
 #DBG_IAT_HOOK = 0
 #DBG_PROXY_DLL = 0
 #DBG_CLEANUP = 0
-#DBG_EXECUTEDLL = 0
 #DBG_ANY = 0
 ;}
 ;{ Мониторинг некоторых вызовов WinApi
