@@ -30,7 +30,7 @@ Procedure ExecuteDll(CmdLine.s,ExecuteFlags=0)
 EndProcedure
 
 ProcedureDLL PurePortableExecute(hWnd,hInst,*lpszCmdLine,nCmdShow)
-	; Командная строка: rundll32 путь_к_dll,PurePortableExecute флаги Командная_строка_запускаемой программы
+	; Командная строка: rundll32 путь_к_dll,PurePortableExecute флаги Командная_строка_запускаемой_программы
 	Protected ExecuteFlags = Val(ProgramParameter(2))
 	Protected CmdLine.s = PeekS(GetCommandLine_())
 	DbgExecMode = ExecuteFlags & #EXECUTE_DBG
@@ -48,6 +48,8 @@ EndProcedure
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; CursorPosition = 32
+; FirstLine = 9
 ; Folding = -
 ; EnableThread
 ; DisableDebugger
