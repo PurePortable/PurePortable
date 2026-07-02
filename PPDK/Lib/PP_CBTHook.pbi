@@ -12,8 +12,8 @@ CompilerIf #DBG_CBT_HOOK And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 
+Global DbgCbtMode = #DBG_CBT_HOOK
 CompilerIf #DBG_CBT_HOOK
-	Global DbgCbtMode = #DBG_CBT_HOOK
 	Procedure DbgCbt(txt.s)
 		If DbgCbtMode
 			dbg(txt)
@@ -74,7 +74,8 @@ AddInitProcedure(_InitCBTHook)
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; Folding = y
+; CursorPosition = 13
+; Folding = -
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
