@@ -237,6 +237,16 @@ Macro DeclareProxyFunc(DllName,FuncName,Compat=0)
 		;DbgProxy(ProxyFuncInitMsg FuncName#DoubleQuote)
 	CompilerEndIf
 EndMacro
+Macro DeclareProxyFunc32(DllName,FuncName,Compat=0)
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
+		DeclareProxyFunc(DllName,FuncName,Compat)
+	CompilerEndIf
+EndMacro
+Macro DeclareProxyFunc64(DllName,FuncName,Compat=0)
+	CompilerIf #PB_Compiler_Processor = #PB_Processor_x64
+		DeclareProxyFunc(DllName,FuncName,Compat)
+	CompilerEndIf
+EndMacro
 
 ; Макрос для описания функций, имена которых конфликтуют с процедурами PureBasic.
 ; Имена этих функций будут заменены в экспорте внешней утилитой.
@@ -396,9 +406,9 @@ Global _InitProxyFunc = @_InitProxyFunc() ; Для вызова из ассем�
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 247
-; FirstLine = 151
-; Folding = -QYG-
+; CursorPosition = 246
+; FirstLine = 126
+; Folding = -QYe9
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
