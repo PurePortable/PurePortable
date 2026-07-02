@@ -890,34 +890,47 @@ Procedure AttachProcedure()
 	;}
 	;{ Патчинг файла в памяти
 	If PreferenceGroup("Patch")
-		Protected *Addr.Byte, *Addr2.Byte, RelImageBase
+		Protected *ImageBaseH, ImageSize.l
+		Protected *NtHeaders.IMAGE_NT_HEADERS
+		Protected *ImageBaseLL = LoadLibrary_(@PrgPath)
+		FreeLibrary_(*ImageBaseLL)
+		*NtHeaders = *ImageBase+*ImageBase\e_lfanew
+		ImageSize = *NtHeaders\OptionalHeader\SizeOfImage
+		*ImageBaseH = *NtHeaders\OptionalHeader\ImageBase
+		DbgPatch("ImageBase (PEB): "+Str(*ImageBase)+" / 0x"+Hex(*ImageBase))
+		DbgPatch("ImageBase (LL):  "+Str(*ImageBaseLL)+" / 0x"+Hex(*ImageBaseLL))
+		DbgPatch("ImageBase (HDR): "+Str(*ImageBaseH)+" / 0x"+Hex(*ImageBaseH))
+		DbgPatch("ImageSize: "+Str(ImageSize)+" / 0x"+Hex(ImageSize))
+		Protected *Addr.Byte, *End.Byte, RelImageBase
 		Protected BinSearch, BinCheck, DataError
-		Protected *BinC.Byte, BinSizeC ; То, что проверяем / ищем
-		Protected *BinW.Byte, BinSizeW ; То, что пишем
-		Protected ImageBase2 = LoadLibrary_(@PrgPath)
-		DbgPatch("ImageBase: PEB: "+Str(ImageBase)+" LOAD: "+Str(ImageBase2))
+		Protected *BinC.Byte, BinSizeC ; Что проверяем / ищем
+		Protected *BinW.Byte, BinSizeW ; Что пишем
+		Protected BinGap ; Смещение назад на максимальную из длин поска/замены
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			DataError = #False
 			k = PreferenceKeyName()
-			If Left(k,1) = "@" ; RVA относительно ImageBase
+			If Left(k,1) = "@" ; Абсолютный адрес
+				RelImageBase = #False
+			Else ; RVA относительно ImageBase
 				RelImageBase = #True
 				k = Mid(k,2)
-			Else
-				RelImageBase = #False
 			EndIf
 			i = FindString(k,":")
 			If i
 				BinSearch = #True
 				*Addr = ValX(Left(k,i-1))
-				*Addr2 = ValX(Mid(k,i+1))
+				*End = ValX(Mid(k,i+1))
+				If *End = 0
+					*End = *ImageBase+ImageSize
+				EndIf
 			Else
 				BinSearch = #False
 				*Addr = ValX(k)
 			EndIf
 			If RelImageBase
-				*Addr+ImageBase2
-				*Addr2+ImageBase2
+				*Addr+*ImageBase
+				*End+*ImageBase
 			EndIf
 			v = PreferenceKeyValue()
 			i = FindString(v,":")
@@ -925,15 +938,22 @@ Procedure AttachProcedure()
 				BinCheck = #True
 				*BinC = Hex2Bin(Left(v,i-1),#Null,@BinSizeC)
 				*BinW = Hex2Bin(Mid(v,i+1),#Null,@BinSizeW)
+				If BinSizeC >= BinSizeW
+					BinGap = BinSizeC
+				Else
+					BinGap = BinSizeW
+				EndIf
 			Else
 				BinCheck = #False
 				*BinC = #Null
 				*BinW = Hex2Bin(v,#Null,@BinSizeW)
+				BinGap = BinSizeW
 			EndIf
 			If BinSearch ; Поиск и замена
-				;DbgPatch("SEARCH: "+Str(*Addr))
-				If *Addr2>*Addr And BinSizeC And BinSizeW
-					While *Addr <= *Addr2 ; Учитывать длины BinSizeC и BinSizeW для безопасности?
+				*End-BinGap
+				DbgPatch("REPLACE: "+v)
+				If *End > *Addr And BinSizeC And BinSizeW
+					While *Addr <= *End ; Учитывать длины BinSizeC и BinSizeW для безопасности?
 						;If *Addr\b = *BinC\b And CompareMemory(*Addr,*BinC,BinSizeC)
 						If CompareMemory(*Addr,*BinC,BinSizeC)
 							DbgPatch("FOUND: "+Str(*Addr)+" / 0x"+Hex(*Addr))
@@ -965,12 +985,11 @@ Procedure AttachProcedure()
 				EndIf
 			EndIf
 			If DataError
-				DbgPatch("ERROR: "+PreferenceKeyName()+"="+PreferenceKeyValue())
+				DbgPatch("ERROR: "+k+"="+v)
 			EndIf
 			FreeMemory(*BinC)
 			FreeMemory(*BinW)
 		Wend
-		FreeLibrary_(ImageBase2)
 	EndIf
 	;}
 	;{ Загрузка сторонных библиотек
@@ -1245,8 +1264,6 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 960
-; FirstLine = 183
 ; Folding = AgAAAACACBA+
 ; Optimizer
 ; EnableThread

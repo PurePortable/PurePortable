@@ -59,7 +59,7 @@ EndDataSection
 Global ProcessId, ProcessCnt, ProcessCntPrev, SingleProcess, FirstProcess, LastProcess, DllInstancesCnt
 Global OSMajorVersion.l, OSMinorVersion.l ;, OSPlatformId.l
 Global PPTickCount.l, PPGUID.s
-Global ImageBase.i
+Global *ImageBase.IMAGE_DOS_HEADER
 Global ProcessMutexName.s, hProcessMutex, ProcessPipeName.s, hProcessPipe
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
@@ -319,7 +319,7 @@ Procedure GlobalInitialization()
 		;!MOV EDX, DWORD [EAX+00B0h]
 		;!MOV DWORD [v_OSPlatformId], EDX
 		!MOV EDX, DWORD [EAX+0008h]
-		!MOV DWORD [v_ImageBase], EDX
+		!MOV DWORD [p_ImageBase], EDX
 	CompilerElse
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
@@ -331,7 +331,7 @@ Procedure GlobalInitialization()
 		;!MOV EDX, DWORD [RAX+0124h]
 		;!MOV DWORD [v_OSPlatformId], EDX
 		!MOV RDX, QWORD [RAX+0010h]
-		!MOV QWORD [v_ImageBase], RDX
+		!MOV QWORD [p_ImageBase], RDX
 	CompilerEndIf
 	
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
@@ -589,10 +589,9 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 333
-; FirstLine = 289
+; CursorPosition = 357
+; FirstLine = 323
 ; Folding = Orz
-; Markers = 309
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
