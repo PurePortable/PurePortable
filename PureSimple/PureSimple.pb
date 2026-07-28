@@ -904,88 +904,84 @@ Procedure AttachProcedure()
 		*NtHeaders = *ImageBase+*ImageBase\e_lfanew
 		ImageSize = *NtHeaders\OptionalHeader\SizeOfImage
 		*ImageBaseH = *NtHeaders\OptionalHeader\ImageBase
-		DbgPatch("ImageBase (PEB): "+Str(*ImageBase)+" / 0x"+Hex(*ImageBase))
-		DbgPatch("ImageBase (LL):  "+Str(*ImageBaseLL)+" / 0x"+Hex(*ImageBaseLL))
-		DbgPatch("ImageBase (HDR): "+Str(*ImageBaseH)+" / 0x"+Hex(*ImageBaseH))
-		DbgPatch("ImageSize: "+Str(ImageSize)+" / 0x"+Hex(ImageSize))
+		DbgPatch("ImageBase (PEB): 0x"+Hex(*ImageBase))
+		DbgPatch("ImageBase (LL):  0x"+Hex(*ImageBaseLL))
+		DbgPatch("ImageBase (HDR): 0x"+Hex(*ImageBaseH))
+		DbgPatch("ImageSize: 0x"+Hex(ImageSize))
 		Protected *Addr.Byte, *End.Byte, RelImageBase
-		Protected BinSearch, BinCheck, DataError
+		Protected *AddrDbg ; для вывода информации
+		Protected BinSearch, BinCheck, BinSizeMax, DataError
 		Protected *BinC.Byte, BinSizeC ; Что проверяем / ищем
 		Protected *BinW.Byte, BinSizeW ; Что пишем
-		Protected BinGap ; Смещение назад на максимальную из длин поска/замены
 		ExaminePreferenceKeys()
 		While NextPreferenceKey()
 			DataError = #False
 			k = PreferenceKeyName()
-			If Left(k,1) = "@" ; Абсолютный адрес
-				RelImageBase = #False
-			Else ; RVA относительно ImageBase
-				RelImageBase = #True
+			RelImageBase = Bool(Left(k,1) <> "@")
+			If Not RelImageBase
 				k = Mid(k,2)
 			EndIf
-			i = FindString(k,":")
-			If i
-				BinSearch = #True
-				*Addr = ValX(Left(k,i-1))
-				*End = ValX(Mid(k,i+1))
+			BinSearch = FindString(k,":")
+			If BinSearch
+				*Addr = ValX(Left(k,BinSearch-1))
+				*End = ValX(Mid(k,BinSearch+1))
 				If *End = 0
-					*End = *ImageBase+ImageSize
+					*End = ImageSize
 				EndIf
 			Else
-				BinSearch = #False
 				*Addr = ValX(k)
 			EndIf
+			*AddrDbg = *Addr
 			If RelImageBase
 				*Addr+*ImageBase
 				*End+*ImageBase
 			EndIf
 			v = PreferenceKeyValue()
-			i = FindString(v,":")
-			If i
-				BinCheck = #True
-				*BinC = Hex2Bin(Left(v,i-1),#Null,@BinSizeC)
-				*BinW = Hex2Bin(Mid(v,i+1),#Null,@BinSizeW)
+			BinCheck = FindString(v,":")
+			If BinCheck
+				*BinC = Hex2Bin(Left(v,BinCheck-1),#Null,@BinSizeC)
+				*BinW = Hex2Bin(Mid(v,BinCheck+1),#Null,@BinSizeW)
 				If BinSizeC >= BinSizeW
-					BinGap = BinSizeC
+					BinSizeMax = BinSizeC
 				Else
-					BinGap = BinSizeW
+					BinSizeMax = BinSizeW
 				EndIf
 			Else
-				BinCheck = #False
 				*BinC = #Null
 				*BinW = Hex2Bin(v,#Null,@BinSizeW)
-				BinGap = BinSizeW
+				BinSizeMax = BinSizeW
 			EndIf
 			If BinSearch ; Поиск и замена
-				*End-BinGap
-				DbgPatch("REPLACE: "+v)
+				*End-BinSizeMax
+				DbgPatch("REPLACE: "+Bin2Hex(*BinC,BinSizeC)+" -> "+Bin2Hex(*BinW,BinSizeW))
 				If *End > *Addr And BinSizeC And BinSizeW
-					While *Addr <= *End ; Учитывать длины BinSizeC и BinSizeW для безопасности?
+					While *Addr <= *End
 						;If *Addr\b = *BinC\b And CompareMemory(*Addr,*BinC,BinSizeC)
 						If CompareMemory(*Addr,*BinC,BinSizeC)
-							DbgPatch("FOUND: "+Str(*Addr)+" / 0x"+Hex(*Addr))
+							DbgPatch("  FOUND: 0x"+Hex(*AddrDbg)+" BIN: "+Bin2Hex(*Addr,BinSizeMax))
 							WriteMemory(*Addr,*BinW,BinSizeW)
 							Break
 						EndIf
 						*Addr+1
+						*AddrDbg+1
 					Wend
 				Else
 					DataError = #True
 				EndIf
 			ElseIf BinCheck ; Проверка и запись
-				;DbgPatch("CHECK: "+Str(*Addr\b)+" / 0x"+Right("0"+Hex(*Addr\b),2))
-				If *Addr And BinSizeC
-					DbgPatch("CHECK: "+Str(*Addr\b)+" / 0x"+Right("0"+Hex(*Addr\b),2))
+				If *Addr And BinSizeC And BinSizeW
+					DbgPatch("CHECK: 0x"+Hex(*AddrDbg)+" BIN: "+Bin2Hex(*Addr,BinSizeMax))
 					If CompareMemory(*Addr,*BinC,BinSizeC)
-						DbgPatch("WRITE: "+Str(*Addr)+" / 0x"+Hex(*Addr))
+						DbgPatch("  WRITE: "+Bin2Hex(*BinW,BinSizeW))
 						WriteMemory(*Addr,*BinW,BinSizeW)
 					EndIf
 				Else
 					DataError = #True
 				EndIf
 			Else ; Запись
-				If *Addr And BinSizeC
-					DbgPatch("WRITE: "+Str(*Addr)+" / 0x"+Hex(*Addr))
+				If *Addr And BinSizeW
+					DbgPatch("ADDR: 0x"+Hex(*AddrDbg)+" BIN: "+Bin2Hex(*Addr,BinSizeMax))
+					DbgPatch("  WRITE: "+Bin2Hex(*BinW,BinSizeW))
 					WriteMemory(*Addr,*BinW,BinSizeW)
 				Else
 					DataError = #True
