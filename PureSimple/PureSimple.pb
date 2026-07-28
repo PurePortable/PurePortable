@@ -179,10 +179,15 @@ CompilerEndIf
 CompilerIf #PORTABLE_CBT_HOOK
 	Global CBTTitles.s
 	Procedure CheckTitle(nCode,Title.s) ; Заголовок передаётся в нижнем регистре не более 64 символов.
-		Title = "|"+Title
-		Protected lTitle = Len(Title)
-		If lTitle>1 And StrCmpN(@CbtTitles,@Title,lTitle)=0
-			ProcedureReturn #PORTABLE_CBTR_EXIT
+		If Len(Title)
+			Title = "|"+Title
+			;Protected lTitle = Len(Title)
+			;If lTitle>1 And StrCmpN(@CbtTitles,@Title,lTitle)=0
+			;	ProcedureReturn #PORTABLE_CBTR_EXIT
+			;EndIf
+			If FindString(CBTTitles,Title)
+				ProcedureReturn #PORTABLE_CBTR_EXIT
+			EndIf
 		EndIf
 		ProcedureReturn 0
 	EndProcedure
@@ -548,9 +553,11 @@ Procedure AttachProcedure()
 		VolumeSerialNumber = ReadPreferenceInteger("VolumeSerialNumber",0)
 		SpoofDateP = ReadPreferenceString("SpoofDate","")
 		SpoofDateTimeout = ReadPreferenceInteger("SpoofDateTimeout",0) * 10000 ; миллисекунды в 100-наносекундные интервалы
-		CBTTitles = "|" + ReadPreferenceString("CBTTitles","")
-		CharLower_(@CBTTitles)
-		CBTHookPermit = Bool(Len(CBTTitles)>1)
+		CompilerIf #PORTABLE_CBT_HOOK
+			CBTTitles = "|" + ReadPreferenceString("CBTTitles","")
+			CharLower_(@CBTTitles)
+			CBTHookPermit = Bool(Len(CBTTitles)>1)
+		CompilerEndIf
 	EndIf
 	;}
 	;{ Вывод отладочной информации
