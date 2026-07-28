@@ -107,8 +107,7 @@ CompilerIf Not Defined(DBG_CLEANUP,#PB_Constant) : #DBG_CLEANUP = 0 : CompilerEn
 CompilerIf #PORTABLE_CLEANUP
 	XIncludeFile "PP_Cleanup.pbi"
 CompilerElse
-	Macro DetachCleanup : EndMacro
-	Macro Clean(s) : EndMacro
+	Macro Clean(s,i=1) : EndMacro
 CompilerEndIf
 
 ;;======================================================================================================================
@@ -410,9 +409,10 @@ Procedure ExitProcedure()
 		CloseHandle_(hProcessMutex)
 	CompilerEndIf
 	If r = 0
-		DetachCleanup
+		CompilerIf Defined(DetachCleanup,#PB_Procedure) ; #PORTABLE_CLEANUP
+			DetachCleanup()
+		CompilerEndIf
 	EndIf
-	
 	ExitProcedureIsComleted = #True
 EndProcedure
 
@@ -589,9 +589,7 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 357
-; FirstLine = 323
-; Folding = Orz
+; Folding = mA5
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant

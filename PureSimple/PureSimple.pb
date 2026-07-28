@@ -1160,8 +1160,8 @@ Procedure DetachProcedure()
 	;{ Удаление разделов реального реестра
 	If PreferenceGroup("Cleanup.RealRegistry")
 		Protected hKey, sKey.s
-		EveryProcess = ReadPreferenceInteger("*EveryProcess",0)
-		If EveryProcess Or LastProcess
+		CleanupEveryProcess = ReadPreferenceInteger("*EveryProcess",0)
+		If CleanupEveryProcess Or LastProcess
 			ExaminePreferenceKeys()
 			While NextPreferenceKey()
 				CleanupItem = PreferenceKeyName()
@@ -1199,8 +1199,12 @@ Procedure DetachProcedure()
 		CleanupDirectory = ReadPreferenceString("CleanupDirectory","")
 	EndIf
 	If PreferenceGroup("Cleanup")
-		EveryProcess = ReadPreferenceInteger("*EveryProcess",0)
-		If EveryProcess Or LastProcess
+		AddCleanItem(">"+ReadPreferenceInteger("*TimeDelay",0),0)
+		CleanupEveryProcess = ReadPreferenceInteger("*EveryProcess",0)
+		If LastProcess
+			AddCleanItem("|"+ProcessPipeName,0) ; Независимо от CleanupEveryProcess!
+		EndIf
+		If CleanupEveryProcess Or LastProcess
 			CleanupDirectory = ReadPreferenceString("*Directories",CleanupDirectory)
 			DbgCln("Cleanup: Directories: "+CleanupDirectory)
 			Protected Dim ClnDirs.s(0), iClnDir
@@ -1267,7 +1271,8 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = AgAAAACACBA+
+; Folding = AAAAAAAAAAA9
+; Markers = 180,557
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
