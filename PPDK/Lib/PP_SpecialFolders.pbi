@@ -55,7 +55,6 @@ CompilerIf #DBG_SPECIAL_FOLDERS And Not Defined(DBG_ALWAYS,#PB_Constant)
 	#DBG_ALWAYS = 1
 CompilerEndIf
 CompilerIf #DBG_SPECIAL_FOLDERS
-	;UndefineMacro DbgAny : DbgAnyDef
 	Global DbgSpecMode = #DBG_SPECIAL_FOLDERS
 	Procedure DbgSpec(txt.s)
 		If DbgSpecMode
@@ -230,7 +229,7 @@ CompilerIf #DETOUR_SHGETKNOWNFOLDERPATH
 			If FolderPath
 				;DbgKfid("SHGetKnownFolderPath",kfid,FolderPath)
 				*ppszPath\i = CoTaskMemAlloc_(Len(FolderPath)*2+2)
-				;*ppszPath\i = CoTaskMemAlloc_(StringByteLength(FolderPath)+2,#PB_Unicode)
+				;*ppszPath\i = CoTaskMemAlloc_(StringByteLength(FolderPath)+2)
 				PokeS(*ppszPath\i,FolderPath)
 				Result = #S_OK
 			Else
@@ -265,7 +264,7 @@ CompilerIf #DETOUR_SHGETFOLDERPATHEX
 					Result = #S_OK
 				EndIf
 				If cchPath>0
-					PokeS(*pszPath,FolderPath,cchPath-1,#PB_Unicode)
+					PokeS(*pszPath,FolderPath,cchPath-1)
 				EndIf
 			Else
 				Result = Original_SHGetFolderPathEx(kfid,dwFlags,hToken,*pszPath,cchPath)
@@ -436,9 +435,9 @@ CompilerIf #DETOUR_SHGETFOLDERPATHANDSUBDIR
 			Protected FolderPath.s = csidl2path(csidl)
 			If FolderPath
 				If pszSubDir
-					FolderPath + "\" + PeekS(pszSubDir,-1,#PB_Unicode)
+					FolderPath + "\" + PeekS(pszSubDir)
 				EndIf
-				PokeS(*pszPath,FolderPath,-1,#PB_Unicode)
+				PokeS(*pszPath,FolderPath)
 				Result = #S_OK
 			Else
 				Result = Original_SHGetFolderPathAndSubDirW(hwnd,csidl,hToken,dwFlags,pszSubDir,*pszPath)
@@ -487,12 +486,12 @@ CompilerIf #DETOUR_SHGETSPECIALFOLDERPATH
 		Protected Result
 		CompilerIf Not #PORTABLE
 			Result = Original_SHGetSpecialFolderPathW(hwnd,*pszPath,csidl,fCreate)
-			DbgSpec("SHGetSpecialFolderPathW: csid:"+csidl2s(csidl)+" path:"+PeekS(*pszPath,-1,#PB_Unicode))
+			DbgSpec("SHGetSpecialFolderPathW: csid:"+csidl2s(csidl)+" path:"+PeekS(*pszPath))
 		CompilerElse
 			DbgSpec("SHGetSpecialFolderPathW: "+csidl2s(csidl))
 			Protected FolderPath.s = csidl2path(csidl)
 			If FolderPath
-				PokeS(*pszPath,FolderPath,-1,#PB_Unicode)
+				PokeS(*pszPath,FolderPath)
 				Result = #True
 			Else
 				Result = Original_SHGetSpecialFolderPathW(hwnd,*pszPath,csidl,fCreate)
@@ -592,12 +591,12 @@ CompilerIf #DETOUR_USERENV
 				If *lpProfileDir=#Null Or *lpcchSize=#Null Or *lpcchSize\l<ProfileDirSize
 					Result = #False
 					SetLastError_(122)
-					DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+")")
+					DbgSpec("GetUserProfileDirectoryA: ("+Str(ProfileDirSize)+")")
 				Else
 					Result = #True
 					PokeS(*lpProfileDir,ProfileRedir,-1,#PB_Ascii)
 					SetLastError_(0)
-					DbgSpec("GetUserProfileDirectoryA: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Ascii))
+					DbgSpec("GetUserProfileDirectoryA: ("+Str(ProfileDirSize)+") "+PeekSZ(*lpProfileDir,-1,#PB_Ascii))
 				EndIf
 			Else
 				Result = Original_GetUserProfileDirectoryA(hToken,*lpProfileDir,*lpcchSize)
@@ -611,7 +610,7 @@ CompilerIf #DETOUR_USERENV
 		Protected ProfileDirSize = Len(ProfileRedir)+1
 		CompilerIf Not #PORTABLE
 			Result = Original_GetUserProfileDirectoryW(hToken,*lpProfileDir,*lpcchSize)
-			DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Unicode))
+			DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir))
 			DbgSpec("GetUserProfileDirectoryW: RESULT: "+Str(Result)+" ERROR: "+Str(GetLastError_()))
 		CompilerElse
 			If GetUserProfileDirectoryMode
@@ -621,12 +620,12 @@ CompilerIf #DETOUR_USERENV
 				If *lpProfileDir=#Null Or *lpcchSize=#Null Or *lpcchSize\l<ProfileDirSize
 					Result = #False
 					SetLastError_(122)
-					DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+")")
+					DbgSpec("GetUserProfileDirectoryW: ("+Str(ProfileDirSize)+")")
 				Else
 					Result = #True
-					PokeS(*lpProfileDir,ProfileRedir,-1,#PB_Unicode)
+					PokeS(*lpProfileDir,ProfileRedir)
 					SetLastError_(0)
-					DbgSpec("GetUserProfileDirectoryW: ("+Str(*lpcchSize\l)+") "+PeekSZ(*lpProfileDir,-1,#PB_Unicode))
+					DbgSpec("GetUserProfileDirectoryW: ("+Str(ProfileDirSize)+") "+PeekSZ(*lpProfileDir))
 				EndIf
 			Else
 				Result = Original_GetUserProfileDirectoryW(hToken,*lpProfileDir,*lpcchSize)
@@ -839,6 +838,7 @@ AddInitProcedure(_InitSpecialFoldersHooks)
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; Folding = qBAAA+
+; Markers = 618
 ; EnableAsm
 ; DisableDebugger
 ; EnableExeConstant
