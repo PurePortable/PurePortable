@@ -415,6 +415,7 @@ Procedure.l GetDataA(hKey.l,sName.s,*lpType.Long,*lpData.AnyType,*lpcbData.Long,
 		;CharLower_(@sName) ; в нижний регистр преобразуется при чтении через LPeekSZ* из места вызова
 		For i=1 To nCfg
 			If Cfg(i)\h=hKey And Cfg(i)\n=sName
+				Break
 			EndIf
 		Next
 		If i > nCfg ; Если значение не обнаружено и имя пустое, это значение по умолчанию и это пустая строка
