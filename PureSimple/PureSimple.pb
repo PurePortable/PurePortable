@@ -518,6 +518,7 @@ Procedure AttachProcedure()
 				RegistryDll = "kernelbase"
 			EndIf
 		CompilerEndIf
+		IdName = ReadPreferenceString("IdName",PrgName)
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
 		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)

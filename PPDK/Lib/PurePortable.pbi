@@ -65,6 +65,7 @@ Global PrgPath.s ; полный путь к исполняемому файлу 
 Global PrgDir.s	 ; директория программы с "\" на конце
 Global PrgDirN.s ; директория программы без "\" на конце
 Global PrgName.s ; имя программы (без расширения)
+Global IdName.s ; по умолчанию, будет PrgName
 Global PrgIsValid ; программа прошла проверку
 Global DllPath.s, DllName.s
 ;Global DllDir.s, DllDirN.s ; это теперь PrgDir и PrgDirN !!!
@@ -338,6 +339,7 @@ Procedure GlobalInitialization()
 	GetModuleFileName_(0,@buf,#MAX_PATH_EXTEND)
 	PrgPath = buf ; полный путь к исполняемому файлу программы
 	PrgName = GetFilePart(PrgPath,#PB_FileSystem_NoExtension)
+	IdName = PrgName
 	;PrgDir = GetPathPart(PrgPath)
 	;PrgDirN = RTrim(PrgDir,"\")
 	
@@ -497,9 +499,9 @@ Procedure StartProcedure()
 	EndIf
 	PPGUID = PeekS(?sGUID)
 	PPTickCount = PeekL(?TickCount)
-	ProcessMutexName = "PP."+PrgName+"."+PPGUID
+	ProcessMutexName = "PP."+IdName+"."+PPGUID
 	ProcessPipeName = "\\.\pipe\"+ProcessMutexName
-	;ProcessPipeName = "\\.\pipe\PP."+PrgName+"."+PPGUID
+	;ProcessPipeName = "\\.\pipe\PP."+IdName+"."+PPGUID
 	
 	hProcessPipe = CreateNamedPipe_(@ProcessPipeName,#PIPE_ACCESS_DUPLEX,0,#PIPE_UNLIMITED_INSTANCES,16,16,0,#Null)
 	If hProcessPipe
@@ -589,7 +591,9 @@ CompilerEndIf
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = mA5
+; CursorPosition = 66
+; FirstLine = 57
+; Folding = mh5
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
