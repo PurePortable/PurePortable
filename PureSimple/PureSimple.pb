@@ -520,7 +520,7 @@ Procedure AttachProcedure()
 		CompilerEndIf
 		IdName = ReadPreferenceString("IdName",PrgName)
 		SpecialFoldersPermit = ReadPreferenceInteger("SpecialFolders",0)
-		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",1)
+		GetUserProfileDirectoryMode = ReadPreferenceInteger("GetUserProfileDirectory",0)
 		EnvironmentVariablesPermit = ReadPreferenceInteger("EnvironmentVariables",0)
 		EnvironmentVariablesCrt = ReadPreferenceString("EnvironmentVariablesCrt","")
 		If EnvironmentVariablesCrt
@@ -1272,8 +1272,10 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; Folding = AAAAAAAAAAA9
-; Markers = 180,557
+; CursorPosition = 522
+; FirstLine = 123
+; Folding = AAAAAAKAAAA9
+; Markers = 180,558
 ; Optimizer
 ; EnableThread
 ; Executable = PureSimple.dll
