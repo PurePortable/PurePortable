@@ -305,11 +305,14 @@ Procedure DetachProcedure()
 	CompilerEndIf
 	;}
 	;{ Удаление ненужных файлов и папок.
-	; Для работы необходимо установить #PORTABLE_CLEANUP=1
-	; Если процессов было запущено несколько, удаление файлов и папок будет выполнено только при завершении последнего процесса.
+	; Для использования необходимо установить #PORTABLE_CLEANUP=1
+	; Если CleanupEveryProcess=0, удаление файлов и папок будет выполнено только при завершении последнего процесса.
 	; Команда Clean добавляет файл или папку в список.
 	; Относительные пути рассматриваются относительно папки программы.
+	;CleanupTimeDelay = milliseconds ; Задержка перед очисткой в миллисекундах.
+	;CleanupEveryProcess = 1 ; Если не 0, очистка будет выполняться для каждого процесс. По умолчанию 0.
 	;Clean(AppDataRedir+".\NVIDIA")
+	;Clean(AppDataRedir+".\NVIDIA Corporation")
 	;Clean(AppDataRedir+".\Microsoft")
 	;}
 EndProcedure
@@ -318,9 +321,9 @@ EndProcedure
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 152
-; FirstLine = 93
-; Folding = 15LOy
+; CursorPosition = 311
+; FirstLine = 154
+; Folding = 15LO7
 ; Markers = 109
 ; Optimizer
 ; EnableThread
