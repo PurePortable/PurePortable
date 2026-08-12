@@ -122,7 +122,7 @@ function Compile-ProxyDll {
     $OutFile += ".dll"
   }
   $OutName = [System.IO.Path]::GetFileNameWithoutExtension($OutFile)
-  #Write-Host "Compile $OutName" -bac DarkBlue
+  #Write-Host "Compile $OutName" -Bac DarkBlue
 	
   # Список констант, заменяемых в исходном файле
   $Constants = @{}
@@ -206,7 +206,7 @@ function Compile-ProxyDll {
   # Компиляция x32
   if ($x32 -or ((-not $x32) -and (-not $x64))) {
     Write-Host "Compile " -Non
-    Write-Host "$OutName" -Bac DarkBlue -Non
+    Write-Host $OutName -Bac DarkBlue -Non
     Write-Host " (x32)"
     if ($Dir32) {
       $SubDir = $Dir32
@@ -237,7 +237,7 @@ function Compile-ProxyDll {
   # Компиляция x64
   if ($x64 -or ((-not $x32) -and (-not $x64))) {
     Write-Host "Compile " -Non
-    Write-Host "$OutName" -Bac DarkBlue -Non
+    Write-Host $OutName -Bac DarkBlue -Non
     Write-Host " (x64)"
     if ($Dir64) {
       $SubDir = $Dir64

@@ -97,7 +97,7 @@ if ([System.IO.Path]::GetExtension($OutFile) -eq "") {
   $OutFile += ".dll"
 }
 $OutName = [System.IO.Path]::GetFileNameWithoutExtension($OutFile)
-Write-Host "Compile $OutName" -bac DarkBlue
+Write-Host "Compile $OutName" -Bac DarkBlue
 
 # Список констант, заменяемых в исходном файле
 $Constants = @{}
