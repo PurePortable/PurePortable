@@ -1,6 +1,6 @@
 ﻿;;======================================================================================================================
 #PUREPORTABLEEXTENSION = 1
-#MIN_HOOK = 1 ; Так как испоьзуется MinHookInterface, избежать включения MinHook
+#MIN_HOOK = 1 ; Так как используется MinHookInterface, избежать включения MinHook
 ;;======================================================================================================================
 #MAX_PATH_EXTEND = 32767
 ;XIncludeFile "PP_Debug.pbi"
@@ -96,12 +96,18 @@ EndProcedure
 ExtensionInitialization()
 ;;======================================================================================================================
 Declare ExtensionProcedure()
-ProcedureDLL PurePortableExtension(*ExtData,*ExtParam)
-	*EXT = *ExtData
-	DbgExtMode = *EXT\AllowDbg
-	DbgExt("EXTENSION: "+DllPath)
-	PureSimplePrefs = PeekS(*EXT\PrefsFile)
-	ExtensionProcedure()
+Declare ExtensionExit()
+ProcedureDLL PurePortableExtension(*ExtData=#Null,*ExtParam=#Null)
+	If *ExtData And *ExtParam
+		*EXT = *ExtData
+		DbgExtMode = *EXT\AllowDbg
+		DbgExt("EXTENSION: "+DllPath)
+		PureSimplePrefs = PeekS(*EXT\PrefsFile)
+		ExtensionProcedure()
+	Else
+		DbgExt("EXTENSION EXIT: "+DllPath)
+		ExtensionExit()
+	EndIf
 	ProcedureReturn 0
 EndProcedure
 ;;======================================================================================================================
@@ -113,13 +119,15 @@ EndProcedure
 CompilerIf #PB_Compiler_IsMainFile
 	Procedure ExtensionProcedure()
 	EndProcedure
+	Procedure ExtensionExit()
+	EndProcedure
 CompilerEndIf
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 106
-; FirstLine = 81
-; Folding = -4
+; CursorPosition = 99
+; FirstLine = 85
+; Folding = -n
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
