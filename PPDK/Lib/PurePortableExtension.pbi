@@ -1,23 +1,23 @@
-﻿;;======================================================================================================================
-#PUREPORTABLEEXTENSION = 1
-#MIN_HOOK = 1 ; Так как используется MinHookInterface, избежать включения MinHook
+﻿
 ;;======================================================================================================================
 #MAX_PATH_EXTEND = 32767
-;XIncludeFile "PP_Debug.pbi"
+XIncludeFile "PP_Debug.pbi"
 XIncludeFile "PP_Extension.pbi"
-Global *EXT.EXTDATA
 ;;======================================================================================================================
-XIncludeFile "winapi\DeclareImportMacro.pbi"
-;DeclareImport(kernel32,_OutputDebugStringW@4,OutputDebugStringW,OutputDebugStringW(*txt))
-;Procedure dbg(txt.s="") : OutputDebugStringW("PORT: "+txt) : EndProcedure
-Procedure dbg(txt.s="") : *EXT\HF\dbg(txt) : EndProcedure
-;CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
-Global DbgExtMode
-Procedure DbgExt(txt.s)
-	If DbgExtMode
-		*EXT\HF\dbg(txt)
-	EndIf
-EndProcedure
+CompilerIf Not Defined(DBG_EXTENSION,#PB_Constant) : #DBG_EXTENSION = 0 : CompilerEndIf
+CompilerIf #DBG_EXTENSION And Not Defined(DBG_ALWAYS,#PB_Constant)
+	#DBG_ALWAYS = 1
+CompilerEndIf
+CompilerIf #DBG_EXTENSION
+	Global DbgExtMode = #DBG_EXTENSION
+	Procedure DbgExt(txt.s)
+		If DbgExtMode
+			dbg(txt)
+		EndIf
+	EndProcedure
+CompilerElse
+	Macro DbgExt(txt) : EndMacro
+CompilerEndIf
 ;;======================================================================================================================
 Global PrgPath.s ; полный путь к исполняемому файлу программы
 Global PrgDir.s	 ; директория программы с "\" на конце
@@ -25,8 +25,6 @@ Global PrgDirN.s ; директория программы без "\" на ко�
 Global PrgName.s ; имя программы (без расширения)
 Global DllPath.s, DllName.s
 Global ExtPrefs.s ; файл конфигурации расширения
-Global PureSimplePrefs.s
-
 ;;======================================================================================================================
 XIncludeFile "proc\CorrectPath.pbi"
 XIncludeFile "proc\CreatePath.pbi"
@@ -34,44 +32,34 @@ XIncludeFile "proc\ExpandEnvironmentStrings.pbi"
 XIncludeFile "proc\Exist.pbi"
 XIncludeFile "proc\NormalizePath.pbi"
 ;;======================================================================================================================
-EnumerationBinary MH_HOOKAPI
-	#MH_HOOKAPI_NOCHECKRESULT
-	#MH_HOOKAPI_INIT
-EndEnumeration
-UndefineMacro DoubleQuote
-Macro DoubleQuote
-	"
-EndMacro
-Macro MH_HookApi(DllName,FuncName,flags=0)
-	Global Target_#FuncName
-	*EXT\MH\_MH_HookApi(DoubleQuote#DllName#DoubleQuote,DoubleQuote#FuncName#DoubleQuote,@Detour_#FuncName(),@Original_#FuncName,@Target_#FuncName,flags)
-EndMacro
-;;======================================================================================================================
-Procedure.s NormalizePPath(Path.s="",Dir.s="") ; Преобразование относительных путей
-	If Path
-		If Dir="" : Dir = PrgDirN : EndIf
-		Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
-		If Path="."
-			Path = Dir
-		ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
-			Path = Dir+"\"+Path
-		EndIf
-		ProcedureReturn NormalizePath(Path)
+Procedure.s PreferencePath(Path.s="",Dir.s="") ; Преобразование относительных путей
+	Protected Result.s
+	If Path=""
+		Path = PreferenceKeyValue()
 	EndIf
-EndProcedure
-;;======================================================================================================================
-Procedure.s PeekSZ(*MemoryBuffer,Length=-1,Format=#PB_Unicode)
-	If *MemoryBuffer
-		ProcedureReturn PeekS(*MemoryBuffer,Length,Format)
+	If Dir=""
+		Dir = PrgDirN
 	EndIf
-	ProcedureReturn ""
+	;dbg("PreferencePath: <"+Path)
+	;Path = ExpandEnvironmentStrings(Trim(Trim(Path),Chr(34)))
+	Path = Trim(Trim(Path),Chr(34))
+	;dbg("PreferencePath: *"+Path)
+	If Path="."
+		Path = Dir
+	;ElseIf Path=".." Or Left(Path,2)=".\" Or Left(Path,3)="..\"
+	;	Path = Dir+"\"+Path
+	ElseIf Mid(Path,2,1)<>":" ; Не абсолютный путь
+		Path = Dir+"\"+Path
+	EndIf
+	;dbg("PreferencePath: >"+NormalizePath(Path))
+	ProcedureReturn NormalizePath(Path)
 EndProcedure
 ;;======================================================================================================================
 
 Global DllInstance ; будет иметь то же значение, что и одноимённый параметр в AttachProcess
 Global ProcessId
 
-Procedure ExtensionInitialization()
+Procedure _ExtInitialization()
 	CompilerIf #PB_Compiler_Processor = #PB_Processor_x86
 		!MOV EAX, [_PB_Instance]
 		!MOV [v_DllInstance], EAX
@@ -79,7 +67,7 @@ Procedure ExtensionInitialization()
 		!MOV RAX, [_PB_Instance]
 		!MOV [v_DllInstance], RAX
 	CompilerEndIf
-	;ProcessId = GetCurrentProcessId_()
+	ProcessId = GetCurrentProcessId_()
 	Protected buf.s = Space(#MAX_PATH_EXTEND)
 	GetModuleFileName_(DllInstance,@buf,#MAX_PATH_EXTEND)
 	DllPath = PeekS(@buf)
@@ -93,41 +81,13 @@ Procedure ExtensionInitialization()
 		ExtPrefs+".ini"
 	EndIf
 EndProcedure
-ExtensionInitialization()
-;;======================================================================================================================
-Declare ExtensionProcedure()
-Declare ExtensionExit()
-ProcedureDLL PurePortableExtension(*ExtData=#Null,*ExtParam=#Null)
-	If *ExtData And *ExtParam
-		*EXT = *ExtData
-		DbgExtMode = *EXT\AllowDbg
-		DbgExt("EXTENSION: "+DllPath)
-		PureSimplePrefs = PeekS(*EXT\PrefsFile)
-		ExtensionProcedure()
-	Else
-		DbgExt("EXTENSION EXIT: "+DllPath)
-		ExtensionExit()
-	EndIf
-	ProcedureReturn 0
-EndProcedure
-;;======================================================================================================================
-ProcedureDLL.l DetachProcess(Instance)
-	DbgExt("EXTENSION UNLOAD: "+DllPath)
-EndProcedure
-;;======================================================================================================================
-; Для тестирования
-CompilerIf #PB_Compiler_IsMainFile
-	Procedure ExtensionProcedure()
-	EndProcedure
-	Procedure ExtensionExit()
-	EndProcedure
-CompilerEndIf
+_ExtInitialization()
 ;;======================================================================================================================
 
 ; IDE Options = PureBasic 6.04 LTS (Windows - x64)
-; CursorPosition = 99
-; FirstLine = 85
-; Folding = -n
+; CursorPosition = 32
+; FirstLine = 13
+; Folding = -
 ; EnableThread
 ; DisableDebugger
 ; EnableExeConstant
