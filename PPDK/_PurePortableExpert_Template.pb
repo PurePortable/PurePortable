@@ -233,9 +233,9 @@ Procedure CheckProgram()
 	; #COMPARE_WITH_END (-1) - Должен совпасть конец.
 	; Макросы ValidateProgram* при первом параметре = #VALIDATE_PROGRAM_CONTINUE (2) вставят ProcedureReturn #INVALID_PROGRAM автоматически.
 	; Регистр символов при сравнении макросами игнорируется.
-	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"InternalName","program",#COMPARE_WITH_BEGIN) ; Проверка, та ли программа запущена
-	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"ProductName","program",#COMPARE_WITH_BEGIN) ; Проверка, та ли программа запущена
-	;ValidateProgramName(#VALIDATE_PROGRAM_TERMINATE,"ProgramName",#COMPARE_WITH_BEGIN) ; Проверка по имени, та ли программа запущена
+	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"InternalName","program",#COMPARE_WITH_BEGIN)
+	;ValidateProgram(#VALIDATE_PROGRAM_TERMINATE,"ProductName","program",#COMPARE_WITH_BEGIN)
+	;ValidateProgramName(#VALIDATE_PROGRAM_TERMINATE,"ProgramName",#COMPARE_WITH_BEGIN)
 EndProcedure
 ;;======================================================================================================================
 ; Действия выполняемые при запуске программы.
@@ -319,11 +319,11 @@ EndProcedure
 
 ;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x64)
+; IDE Options = PureBasic 6.04 LTS (Windows - x86)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 311
-; FirstLine = 154
-; Folding = 15LO7
+; CursorPosition = 301
+; FirstLine = 148
+; Folding = 15LO+
 ; Markers = 109
 ; Optimizer
 ; EnableThread
