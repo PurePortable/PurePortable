@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.13
+;RES_VERSION 4.11.0.14
 ;RES_DESCRIPTION Work with ini-files
 ;RES_COPYRIGHT (c) Smitis, 2017-2026
 ;RES_INTERNALNAME PurePortIni
@@ -695,6 +695,9 @@ Procedure.s CheckIni(IniFile.s)
 	IniFile = PrgDir+GetFilePart(IniFile)
 	DbgIni("      ->: «"+IniFile+"»")
 	ProcedureReturn IniFile
+EndProcedure
+;;======================================================================================================================
+Procedure ExtensionExit()
 EndProcedure
 ;;======================================================================================================================
 

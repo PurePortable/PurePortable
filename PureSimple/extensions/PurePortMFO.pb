@@ -7,7 +7,7 @@
 ;PP_PUREPORTABLE 1
 ;PP_FORMAT DLL
 ;PP_ENABLETHREAD 1
-;RES_VERSION 4.11.0.13
+;RES_VERSION 4.11.0.14
 ;RES_DESCRIPTION Monitoring file operations
 ;RES_COPYRIGHT (c) Smitis, 2017-2026
 ;RES_INTERNALNAME PurePortMFO
@@ -331,11 +331,14 @@ Procedure ExtensionProcedure()
 	EndIf
 EndProcedure
 ;;======================================================================================================================
+Procedure ExtensionExit()
+EndProcedure
+;;======================================================================================================================
 
-; IDE Options = PureBasic 6.04 LTS (Windows - x86)
+; IDE Options = PureBasic 6.04 LTS (Windows - x64)
 ; ExecutableFormat = Shared dll
-; CursorPosition = 244
-; FirstLine = 148
+; CursorPosition = 333
+; FirstLine = 220
 ; Folding = AAAA5-
 ; Optimizer
 ; EnableThread
@@ -343,11 +346,11 @@ EndProcedure
 ; DisableDebugger
 ; EnableExeConstant
 ; IncludeVersionInfo
-; VersionField0 = 4.11.0.13
+; VersionField0 = 4.11.0.14
 ; VersionField1 = 4.11.0.0
 ; VersionField3 = PurePortable
 ; VersionField4 = 4.11.0.0
-; VersionField5 = 4.11.0.13
+; VersionField5 = 4.11.0.14
 ; VersionField6 = Monitoring file operations
 ; VersionField7 = PurePortMFO
 ; VersionField9 = (c) Smitis, 2017-2026
